@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('direcciones', function (Blueprint $table) {
             $table->id();
+            $table->string('guid');
+            $table->string('calle');
+            $table->decimal('numero');
+            $table->integer('piso');
+            $table->string('letra');
+            $table->integer('codigoPostal');
             $table->timestamps();
         });
     }
