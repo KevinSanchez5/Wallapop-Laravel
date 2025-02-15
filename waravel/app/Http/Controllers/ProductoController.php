@@ -71,12 +71,12 @@ class ProductoController extends Controller
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'string|max:255',
-            'descripcion' => 'nullable|string',
-            'estadoFisico' => 'nullable|string|max:255',
+            'descripcion' => 'required|string',
+            'estadoFisico' => 'required|string|max:255',
             'precio' => 'numeric|min:0',
             'categoria' => 'string|max:255',
             'estado' => 'string|max:255',
-            'imagenes' => 'nullable|array',
+            'imagenes' => 'required|array',
             'imagenes.*' => 'url',
         ]);
 

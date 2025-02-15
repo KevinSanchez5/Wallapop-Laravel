@@ -40,8 +40,8 @@ class ClienteController extends Controller
             'guid' => 'required|unique:clientes,guid',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'avatar' => 'nullable|url',
-            'telefono' => 'nullable|string|max:20',
+            'avatar' => 'nullable|url', // No se si deberia ser required aqui
+            'telefono' => 'required|string|max:20',
             'direccion' => 'required|array',
             'activo' => 'required|boolean',
             'usuario_id' => 'required|exists:users,id',
