@@ -3,23 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Valoracion;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class ValoracionController extends Controller
 {
     // Mostrar todas las valoraciones
     public function index()
     {
-        $valoraciones = Valoracion::with('clienteValorado', 'creador')->get();
+        $valoraciones = Cache::remember('valoraciones_all', 60, function () {
+            return Valoracion::with('clienteValorado', 'creador')->get();
+        });
         return response()->json($valoraciones);
     }
 
     // Mostrar una valoración específica
     public function show($id)
     {
-        $valoracion = Valoracion::with('clienteValorado', 'creador')->find($id);
+        $valoracion = Cache::remember("valoracion_{$id}", 60, function () use ($id) {
+            return Valoracion::with('clienteValorado', 'creador')->find($id);
+        });
+
         if (!$valoracion) {
             return response()->json(['message' => 'Valoración no encontrada'], 404);
         }
+
         return response()->json($valoracion);
     }
 
@@ -39,6 +48,10 @@ class ValoracionController extends Controller
         }
 
         $valoracion = Valoracion::create($request->all());
+
+        // Limpiar caché de la lista de valoraciones
+        Cache::forget('valoraciones_all');
+
         return response()->json($valoracion, 201);
     }
 
@@ -60,6 +73,11 @@ class ValoracionController extends Controller
         }
 
         $valoracion->update($request->all());
+
+        // Limpiar caché de la valoración y de la lista
+        Cache::forget("valoracion_{$id}");
+        Cache::forget('valoraciones_all');
+
         return response()->json($valoracion);
     }
 
@@ -72,6 +90,11 @@ class ValoracionController extends Controller
         }
 
         $valoracion->delete();
+
+        // Limpiar caché de la valoración y de la lista
+        Cache::forget("valoracion_{$id}");
+        Cache::forget('valoraciones_all');
+
         return response()->json(['message' => 'Valoración eliminada correctamente']);
     }
 }
