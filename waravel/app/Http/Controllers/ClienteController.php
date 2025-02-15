@@ -3,23 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Cliente;
+use App\Models\Producto;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class ClienteController extends Controller
 {
     // Mostrar todos los clientes
     public function index()
     {
-        $clientes = Cliente::with('usuario', 'productos', 'favoritos', 'valoracionesRecibidas', 'valoracionesCreadas')->get();
+        $clientes = Cache::remember('clientes_all', 60, function () {
+            return Cliente::with('usuario', 'productos', 'favoritos', 'valoracionesRecibidas', 'valoracionesCreadas')->get();
+        });
         return response()->json($clientes);
     }
 
     // Mostrar un cliente específico
     public function show($id)
     {
-        $cliente = Cliente::with('usuario', 'productos', 'favoritos', 'valoracionesRecibidas', 'valoracionesCreadas')->find($id);
+        $cliente = Cache::remember("cliente_{$id}", 60, function () use ($id) {
+            return Cliente::with('usuario', 'productos', 'favoritos', 'valoracionesRecibidas', 'valoracionesCreadas')->find($id);
+        });
+
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
+
         return response()->json($cliente);
     }
 
@@ -42,6 +52,10 @@ class ClienteController extends Controller
         }
 
         $cliente = Cliente::create($request->all());
+
+        // Limpiar caché de la lista de clientes
+        Cache::forget('clientes_all');
+
         return response()->json($cliente, 201);
     }
 
@@ -68,6 +82,11 @@ class ClienteController extends Controller
         }
 
         $cliente->update($request->all());
+
+        // Limpiar caché del cliente y de la lista
+        Cache::forget("cliente_{$id}");
+        Cache::forget('clientes_all');
+
         return response()->json($cliente);
     }
 
@@ -80,6 +99,11 @@ class ClienteController extends Controller
         }
 
         $cliente->delete();
+
+        // Limpiar caché del cliente y de la lista
+        Cache::forget("cliente_{$id}");
+        Cache::forget('clientes_all');
+
         return response()->json(['message' => 'Cliente eliminado correctamente']);
     }
 
@@ -97,6 +121,10 @@ class ClienteController extends Controller
         }
 
         $cliente->favoritos()->attach($producto->id);
+
+        // Limpiar caché del cliente
+        Cache::forget("cliente_{$id}");
+
         return response()->json(['message' => 'Producto agregado a favoritos']);
     }
 
@@ -114,6 +142,10 @@ class ClienteController extends Controller
         }
 
         $cliente->favoritos()->detach($producto->id);
+
+        // Limpiar caché del cliente
+        Cache::forget("cliente_{$id}");
+
         return response()->json(['message' => 'Producto eliminado de favoritos']);
     }
 }
