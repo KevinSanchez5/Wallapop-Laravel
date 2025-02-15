@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
+            $table->string('guid');
+            $table->string('nombre');
+            $table->string('apellido');
+            $table->string('avatar');
+            $table->string('telefono');
+            $table->json('direccion'); // TODO - Cuidado, campo embebido
+            $table->boolean('activo')->default(true);
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

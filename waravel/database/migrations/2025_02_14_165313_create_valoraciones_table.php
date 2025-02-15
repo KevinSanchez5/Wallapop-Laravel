@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('guid');
             $table->string('comentario');
             $table->integer('puntuacion');
+            $table->foreignId('clienteValorado_id')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('autor_id')->constrained('clientes')->onDelete('cascade');
             $table->timestamps();
         });
     }
