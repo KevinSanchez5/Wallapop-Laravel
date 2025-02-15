@@ -3,23 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Producto;
+use App\Models\Cliente;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class ProductoController extends Controller
 {
     // Mostrar todos los productos
     public function index()
     {
-        $productos = Producto::with('vendedor', 'clientesFavoritos')->get();
+        $productos = Cache::remember('productos_all', 60, function () {
+            return Producto::with('vendedor', 'clientesFavoritos')->get();
+        });
         return response()->json($productos);
     }
 
     // Mostrar un producto específico
     public function show($id)
     {
-        $producto = Producto::with('vendedor', 'clientesFavoritos')->find($id);
+        $producto = Cache::remember("producto_{$id}", 60, function () use ($id) {
+            return Producto::with('vendedor', 'clientesFavoritos')->find($id);
+        });
+
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
+
         return response()->json($producto);
     }
 
@@ -30,12 +40,12 @@ class ProductoController extends Controller
             'guid' => 'required|unique:productos,guid',
             'vendedor_id' => 'required|exists:clientes,id',
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'estadoFisico' => 'nullable|string|max:255',
+            'descripcion' => 'required|string',
+            'estadoFisico' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
             'categoria' => 'required|string|max:255',
             'estado' => 'required|string|max:255',
-            'imagenes' => 'nullable|array',
+            'imagenes' => 'required|array',
             'imagenes.*' => 'url',
         ]);
 
@@ -44,6 +54,10 @@ class ProductoController extends Controller
         }
 
         $producto = Producto::create($request->all());
+
+        // Limpiar caché de la lista de productos
+        Cache::forget('productos_all');
+
         return response()->json($producto, 201);
     }
 
@@ -71,6 +85,11 @@ class ProductoController extends Controller
         }
 
         $producto->update($request->all());
+
+        // Limpiar caché del producto y de la lista
+        Cache::forget("producto_{$id}");
+        Cache::forget('productos_all');
+
         return response()->json($producto);
     }
 
@@ -83,6 +102,11 @@ class ProductoController extends Controller
         }
 
         $producto->delete();
+
+        // Limpiar caché del producto y de la lista
+        Cache::forget("producto_{$id}");
+        Cache::forget('productos_all');
+
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
 
@@ -100,6 +124,11 @@ class ProductoController extends Controller
         }
 
         $producto->clientesFavoritos()->attach($cliente->id);
+
+        // Limpiar caché del producto y de la lista
+        Cache::forget("producto_{$id}");
+        Cache::forget('productos_all');
+
         return response()->json(['message' => 'Producto agregado a favoritos']);
     }
 
@@ -117,6 +146,11 @@ class ProductoController extends Controller
         }
 
         $producto->clientesFavoritos()->detach($cliente->id);
+
+        // Limpiar caché del producto y de la lista
+        Cache::forget("producto_{$id}");
+        Cache::forget('productos_all');
+
         return response()->json(['message' => 'Producto eliminado de favoritos']);
     }
 }
