@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 
 class Direccion implements CastsAttributes
@@ -23,6 +22,7 @@ class Direccion implements CastsAttributes
         $this->codigoPostal = $codigoPostal;
     }
 
+    // Convertir JSON desde la BD a un objeto Dirección
     public function get($model, string $key, $value, array $attributes)
     {
         $data = json_decode($value, true);
@@ -36,6 +36,7 @@ class Direccion implements CastsAttributes
         );
     }
 
+    // Convertir objeto Dirección a JSON para guardar en BD
     public function set($model, string $key, $value, array $attributes)
     {
         if (!$value instanceof self) {
