@@ -13,6 +13,26 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
+            $table->string('guid');
+            $table->foreignId('vendedor_id')->constrained('clientes')->onDelete('cascade');
+            $table->string('nombre');
+            $table->string('descripcion');
+            $table->enum('estadoFisico', ['Nuevo', 'Usado', 'Deteriorado']);
+            $table->decimal('precio');
+            $table->enum('categoria', [
+                'Tecnologia',
+                'Ropa',
+                'Hogar',
+                'Coleccionismo',
+                'Vehiculos',
+                'Videojuegos',
+                'Musica',
+                'Deporte',
+                'Cine',
+                'Cocina'
+            ]);
+            $table->enum('estado', ['Disponible', 'Vendido', 'Desactivado']);
+            $table->json('imagenes'); // TODO - Cuidado a la hora de hacer la lógica
             $table->timestamps();
         });
     }
