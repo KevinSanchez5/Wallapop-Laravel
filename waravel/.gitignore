@@ -50,6 +50,12 @@ Homestead.json
 # Generated files
 .idea/**/contentModel.xml
 
+# Ignorar package-lock.json
+package-lock.json
+
+# Ignorar archivos de configuración de IDEs (PhpStorm, WebStorm, etc.)
+.idea/
+
 # Sensitive or high-churn files
 .idea/**/dataSources/
 .idea/**/dataSources.ids
