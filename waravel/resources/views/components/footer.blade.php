@@ -1,5 +1,5 @@
 <footer class="bg-[#BFF205] text-black py-6">
-    <div class="container mx-auto flex justify-between items-center">
+    <div class="container mx-auto flex justify-between items-center px-6">
         <div class="flex items-center">
             <img src="{{ asset('imgs/logo_negro.png') }}" alt="Waravel Logo" class="w-12 h-12 mr-4">
             <span class="text-3xl font-semibold">Waravel</span>
