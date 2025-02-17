@@ -107,6 +107,18 @@ class ClienteController extends Controller
         return response()->json(['message' => 'Cliente eliminado correctamente']);
     }
 
+    // Buscar favoritos
+    public function searchFavorites($id) {
+        $cliente = Cliente::find($id);
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+
+        $favoritos = $cliente->favoritos;
+
+        return response()->json($favoritos);
+    }
+
     // Agregar un producto a favoritos
     public function addToFavorites(Request $request, $id)
     {
