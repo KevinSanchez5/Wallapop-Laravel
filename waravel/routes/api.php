@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ValoracionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +17,21 @@ Route::middleware('api')->group(function () {
     Route::put('/productos/{id}', [ProductoController::class, 'update']);
     Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
 
-    Route::get('/Cliente', [ProductoController::class, 'categorias']);
+    Route::get('/clientes', [ClienteController::class, 'index']);
+    Route::get('/clientes/{id}', [ClienteController::class, 'show']);
+    Route::post('/clientes', [ClienteController::class, 'store']);
+    Route::put('/clientes/{id}', [ClienteController::class, 'update']);
+    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
 
+    //Route::get('/users', [UserController::class, 'index']);
+    //Route::get('/users/{id}', [UserController::class, 'show']);
+    //Route::post('/users', [UserController::class, 'store']);
+    //Route::put('/users/{id}', [UserController::class, 'update']);
+    //Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+    Route::get('/valoraciones', [ValoracionController::class, 'index']);
+    Route::get('/valoraciones/{id}', [ValoracionController::class, 'show']);
+    Route::post('/valoraciones', [ValoracionController::class, 'store']);
+    Route::put('/valoraciones/{id}', [ValoracionController::class, 'update']);
+    Route::delete('/valoraciones/{id}', [ValoracionController::class, 'destroy']);
 });
