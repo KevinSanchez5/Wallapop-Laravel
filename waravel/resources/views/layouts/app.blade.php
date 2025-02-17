@@ -6,18 +6,10 @@
     <title>@yield('title', 'Mi Sitio')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100 min-h-screen">
-
-<!-- Este es el header que hay que cambiar si se ha iniciado sesión o no -->
-<x-header />
-
-<!-- Este es el contenido general que varía en cada página -->
-<main class="container mx-auto py-6">
-    @yield('content')
-</main>
-
-<!-- Este es el pie de página que NO varía -->
-<x-footer />
-
+<body class="bg-gray-100 min-h-screen m-0 p-0">
+    <!-- Este es el contenido general que varía en cada página -->
+    <main class="min-h-screen m-0 p-0">
+        @yield('content')
+    </main>
 </body>
 </html>
