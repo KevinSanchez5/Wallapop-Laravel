@@ -163,7 +163,9 @@ class ClienteController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $filePath = $request->file('avatar')->store('clients/avatars', 'public');
+        $file = $request->file('avatar');
+        $filename = $cliente->guid . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('clients/avatars', $filename, 'public');
 
         $cliente->avatar = $filePath;
         $cliente->save();
