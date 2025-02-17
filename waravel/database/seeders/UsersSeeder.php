@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class UsersSeeder extends Seeder
 {
@@ -16,7 +15,7 @@ class UsersSeeder extends Seeder
             'password' => 'adminPassword123',
             'role' => 'admin',
             'email_verified_at' => now(),
-            'remember_token' => Str::random(10),
+            'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -26,7 +25,7 @@ class UsersSeeder extends Seeder
             'password' => 'Password123',
             'role' => 'cliente',
             'email_verified_at' => now(),
-            'remember_token' => Str::random(10),
+            'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -36,7 +35,7 @@ class UsersSeeder extends Seeder
             'password' => 'Password123',
             'role' => 'cliente',
             'email_verified_at' => now(),
-            'remember_token' => Str::random(10),
+            'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -46,7 +45,7 @@ class UsersSeeder extends Seeder
             'password' => 'Password123',
             'role' => 'cliente',
             'email_verified_at' => now(),
-            'remember_token' => Str::random(10),
+            'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -56,7 +55,7 @@ class UsersSeeder extends Seeder
             'password' => 'Password123',
             'role' => 'user',
             'email_verified_at' => now(),
-            'remember_token' => Str::random(10),
+            'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
