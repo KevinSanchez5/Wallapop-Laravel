@@ -1,12 +1,14 @@
 <header class="bg-[#BFF205] py-4 shadow-md">
     <div class="container mx-auto flex justify-between items-center px-6">
 
-        <h1 class="text-3xl font-bold text-gray-800">Waravel</h1>
+        <a routerLink="/inicio" class="text-3xl font-bold text-gray-800">
+            Waravel
+        </a>
 
         <div class="flex items-center space-x-6">
 
             <!-- Esta parte varia segun si la sesion esta iniciada o no -->
-            <a href="/"
+            <a href="{{ route('login') }}"
                class="bg-gray-800 text-white px-5 py-2 rounded-lg shadow-md hover:bg-gray-900 transition-all duration-300">
                 Iniciar Sesión
             </a>
