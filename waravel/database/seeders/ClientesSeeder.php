@@ -15,13 +15,13 @@ class ClientesSeeder extends Seeder
             'apellido' => 'Pérez',
             'avatar' => 'juan.jpg',
             'telefono' => '612345678',
-            'direccion' => json_encode([
+            'direccion' => [
                 'calle' => 'Avenida Siempre Viva',
                 'numero' => 742,
                 'piso' => 1,
                 'letra' => 'A',
                 'codigoPostal' => 28001
-            ]),
+            ],
             'activo' => true,
             'usuario_id' => 2,
             'created_at' => now(),
@@ -33,13 +33,13 @@ class ClientesSeeder extends Seeder
             'apellido' => 'García',
             'avatar' =>'maria.jpg',
             'telefono' => '987654321',
-            'direccion' => json_encode([
+            'direccion' => [
                 'calle' => 'Calle de las Nubes',
                 'numero' => 123,
                 'piso' => 2,
                 'letra' => 'C',
                 'codigo_postal' => 28002
-            ]),
+            ],
             'activo' => true,
             'usuario_id' => 3,
             'created_at' => now(),
@@ -51,13 +51,13 @@ class ClientesSeeder extends Seeder
             'apellido' => 'Martínez',
             'avatar' => 'pedro.jpg',
             'telefono' => '321456789',
-            'direccion' => json_encode([
+            'direccion' => [
                 'calle' => 'Avenida España',
                 'numero' => 456,
                 'piso' => 3,
                 'letra' => 'B',
                 'codigo_postal' => 28003
-            ]),
+            ],
             'activo' => false,
             'usuario_id' => 4,
             'created_at' => now(),
