@@ -13,9 +13,7 @@ class ProductoController extends Controller
     // Mostrar todos los productos
     public function index()
     {
-        $productos = Cache::remember('productos_all', 60, function () {
-            return Producto::with('vendedor', 'clientesFavoritos')->get();
-        });
+        $productos = Producto::with('vendedor', 'clientesFavoritos')->get();
         return response()->json($productos);
     }
 
