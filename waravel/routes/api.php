@@ -24,6 +24,8 @@ Route::middleware('api')->group(function () {
     Route::put('/clientes/{id}', [ClienteController::class, 'update']);
     Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
     Route::post('/clientes/{id}/upload', [ClienteController::class, 'updateProfilePhoto']);
+    Route::get('/clientes/favoritos/{id}', [ClienteController::class, 'searchFavorites']);
+    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
 
     //Route::get('/users', [UserController::class, 'index']);
     //Route::get('/users/{id}', [UserController::class, 'show']);

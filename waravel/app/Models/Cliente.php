@@ -9,11 +9,7 @@ class Cliente extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['guid', 'nombre', 'apellido', 'avatar', 'telefono', 'direccion', 'activo', 'usuario_id', 'favoritos'];
-
-    protected $casts = [
-        'direccion' => Direccion::class
-    ];
+    protected $fillable = ['guid', 'nombre', 'apellido', 'avatar', 'telefono', 'direccion', 'activo', 'usuario_id'];
 
     // Relación 1-1 inversa con User
     public function usuario()
@@ -43,5 +39,15 @@ class Cliente extends Model
     public function valoracionesCreadas()
     {
         return $this->hasMany(Valoracion::class, 'creador_id');
+    }
+
+    public function setDireccionAttribute($value)
+    {
+        $this->attributes['direccion'] = json_encode($value);
+    }
+
+    public function getDireccionAttribute($value)
+    {
+        return json_decode($value);
     }
 }
