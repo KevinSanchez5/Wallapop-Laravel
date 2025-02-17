@@ -13,9 +13,7 @@ class ClienteController extends Controller
     // Mostrar todos los clientes
     public function index()
     {
-        $clientes = Cache::remember('clientes_all', 60, function () {
-            return Cliente::with('usuario', 'productos', 'favoritos', 'valoracionesRecibidas', 'valoracionesCreadas')->get();
-        });
+        $clientes = Cliente::with('usuario', 'productos', 'valoracionesRecibidas', 'valoracionesCreadas')->get();
         return response()->json($clientes);
     }
 
@@ -23,7 +21,7 @@ class ClienteController extends Controller
     public function show($id)
     {
         $cliente = Cache::remember("cliente_{$id}", 60, function () use ($id) {
-            return Cliente::with('usuario', 'productos', 'favoritos', 'valoracionesRecibidas', 'valoracionesCreadas')->find($id);
+            return Cliente::with('usuario', 'productos', 'valoracionesRecibidas', 'valoracionesCreadas')->find($id);
         });
 
         if (!$cliente) {
@@ -40,7 +38,7 @@ class ClienteController extends Controller
             'guid' => 'required|unique:clientes,guid',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'avatar' => 'nullable|url', // No se si deberia ser required aqui
+            'avatar' => 'default|url',
             'telefono' => 'required|string|max:20',
             'direccion' => 'required|array',
             'activo' => 'required|boolean',
@@ -107,6 +105,18 @@ class ClienteController extends Controller
         return response()->json(['message' => 'Cliente eliminado correctamente']);
     }
 
+    // Buscar favoritos
+    public function searchFavorites($id) {
+        $cliente = Cliente::find($id);
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+
+        $favoritos = $cliente->favoritos;
+
+        return response()->json($favoritos);
+    }
+
     // Agregar un producto a favoritos
     public function addToFavorites(Request $request, $id)
     {
@@ -147,5 +157,32 @@ class ClienteController extends Controller
         Cache::forget("cliente_{$id}");
 
         return response()->json(['message' => 'Producto eliminado de favoritos']);
+    }
+
+    public function updateProfilePhoto(Request $request, $id) {
+        $cliente = Cliente::find($id);
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'required|image|mimes:jpg,jpeg,png',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $file = $request->file('avatar');
+        $filename = $cliente->guid . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('clients/avatars', $filename, 'public');
+
+        $cliente->avatar = $filePath;
+        $cliente->save();
+
+        // Limpiar caché del cliente
+        Cache::forget("cliente_{$id}");
+
+        return response()->json(['message' => 'Avatar actualizado', 'cliente' => $cliente]);
     }
 }
