@@ -6,27 +6,32 @@ use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Models\Producto;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class ClienteController extends Controller
 {
     // Mostrar todos los clientes
     public function index()
     {
-        $clientes = Cliente::with('usuario', 'productos', 'valoracionesRecibidas', 'valoracionesCreadas')->get();
+        $clientes = Cliente::all();
         return response()->json($clientes);
     }
 
     // Mostrar un cliente específico
     public function show($id)
     {
-        $cliente = Cache::remember("cliente_{$id}", 60, function () use ($id) {
-            return Cliente::with('usuario', 'productos', 'valoracionesRecibidas', 'valoracionesCreadas')->find($id);
-        });
+        $clienteRedis = Redis::get('cliente_' . $id);
+        if ($clienteRedis) {
+            return response()->json(json_decode($clienteRedis));
+        }
+
+        $cliente = Cliente::find($id);
 
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
+
+        Redis::set('cliente_' . $id, json_encode($cliente), 'EX', 1800);
 
         return response()->json($cliente);
     }
@@ -51,16 +56,18 @@ class ClienteController extends Controller
 
         $cliente = Cliente::create($request->all());
 
-        // Limpiar caché de la lista de clientes
-        Cache::forget('clientes_all');
-
         return response()->json($cliente, 201);
     }
 
     // Actualizar un cliente existente
     public function update(Request $request, $id)
     {
-        $cliente = Cliente::find($id);
+        $cliente = Redis::get('cliente_' . $id);
+
+        if (!$cliente) {
+            $cliente = Cliente::find($id);
+        }
+
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
@@ -81,9 +88,9 @@ class ClienteController extends Controller
 
         $cliente->update($request->all());
 
-        // Limpiar caché del cliente y de la lista
-        Cache::forget("cliente_{$id}");
-        Cache::forget('clientes_all');
+        // Limpiar caché del cliente
+        Redis::del('cliente_' . $id);
+        Redis::set('cliente_' . $id, json_encode($cliente), 'EX', 1800);
 
         return response()->json($cliente);
     }
@@ -91,23 +98,29 @@ class ClienteController extends Controller
     // Eliminar un cliente
     public function destroy($id)
     {
-        $cliente = Cliente::find($id);
+        $cliente = Redis::get('cliente_' . $id);
+
+        if (!$cliente) {
+            $cliente = Cliente::find($id);
+        }
+
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
         $cliente->delete();
 
-        // Limpiar caché del cliente y de la lista
-        Cache::forget("cliente_{$id}");
-        Cache::forget('clientes_all');
+        // Limpiar caché del cliente
+        Redis::del('cliente_' . $id);
 
         return response()->json(['message' => 'Cliente eliminado correctamente']);
     }
 
     // Buscar favoritos
-    public function searchFavorites($id) {
+    public function searchFavorites($id)
+    {
         $cliente = Cliente::find($id);
+
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
@@ -121,6 +134,7 @@ class ClienteController extends Controller
     public function addToFavorites(Request $request, $id)
     {
         $cliente = Cliente::find($id);
+
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
@@ -131,9 +145,6 @@ class ClienteController extends Controller
         }
 
         $cliente->favoritos()->attach($producto->id);
-
-        // Limpiar caché del cliente
-        Cache::forget("cliente_{$id}");
 
         return response()->json(['message' => 'Producto agregado a favoritos']);
     }
@@ -153,36 +164,6 @@ class ClienteController extends Controller
 
         $cliente->favoritos()->detach($producto->id);
 
-        // Limpiar caché del cliente
-        Cache::forget("cliente_{$id}");
-
         return response()->json(['message' => 'Producto eliminado de favoritos']);
-    }
-
-    public function updateProfilePhoto(Request $request, $id) {
-        $cliente = Cliente::find($id);
-        if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'avatar' => 'required|image|mimes:jpg,jpeg,png',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $file = $request->file('avatar');
-        $filename = $cliente->guid . '.' . $file->getClientOriginalExtension();
-        $filePath = $file->storeAs('clients/avatars', $filename, 'public');
-
-        $cliente->avatar = $filePath;
-        $cliente->save();
-
-        // Limpiar caché del cliente
-        Cache::forget("cliente_{$id}");
-
-        return response()->json(['message' => 'Avatar actualizado', 'cliente' => $cliente]);
     }
 }

@@ -14,7 +14,7 @@ class ProductoController extends Controller
     // Mostrar todos los productos
     public function index()
     {
-        $productos = Producto::with('vendedor', 'clientesFavoritos')->get();
+        $productos = Producto::all();
         return response()->json($productos);
     }
 
@@ -22,7 +22,7 @@ class ProductoController extends Controller
     public function show($id)
     {
         $producto = Cache::remember("producto_{$id}", 60, function () use ($id) {
-            return Producto::with('vendedor', 'clientesFavoritos')->find($id);
+            return Producto::find($id);
         });
 
         if (!$producto) {
