@@ -7,6 +7,7 @@ use App\Models\Producto;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class ProductoController extends Controller
 {
@@ -150,5 +151,38 @@ class ProductoController extends Controller
         Cache::forget('productos_all');
 
         return response()->json(['message' => 'Producto eliminado de favoritos']);
+    }
+
+    public function addListingPhoto(Request $request, $id) {
+        $product = Producto::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpg,jpeg,png',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Verificar que no tiene más de 5 fotos
+        $images = $product->imagenes ?? [];
+        if (count($images) >= 5) {
+            return response()->json(['message' => 'Solo se pueden subir un máximo de 5 fotos'], 422);
+        }
+
+        $file = $request->file('image');
+        $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs("products/{$product->guid}", $filename, 'public');
+
+        $product->imagenes = array_merge($images, [$filePath]);
+        $product->save();
+
+        // Limpiar caché del producto
+        Cache::forget("producto_{$id}");
+
+        return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
 }

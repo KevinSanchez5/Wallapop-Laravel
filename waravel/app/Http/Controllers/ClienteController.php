@@ -158,4 +158,31 @@ class ClienteController extends Controller
 
         return response()->json(['message' => 'Producto eliminado de favoritos']);
     }
+
+    public function updateProfilePhoto(Request $request, $id) {
+        $cliente = Cliente::find($id);
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'required|image|mimes:jpg,jpeg,png',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $file = $request->file('avatar');
+        $filename = $cliente->guid . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('clients/avatars', $filename, 'public');
+
+        $cliente->avatar = $filePath;
+        $cliente->save();
+
+        // Limpiar caché del cliente
+        Cache::forget("cliente_{$id}");
+
+        return response()->json(['message' => 'Avatar actualizado', 'cliente' => $cliente]);
+    }
 }

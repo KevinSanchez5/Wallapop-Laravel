@@ -16,11 +16,14 @@ Route::middleware('api')->group(function () {
     Route::post('/productos', [ProductoController::class, 'store']);
     Route::put('/productos/{id}', [ProductoController::class, 'update']);
     Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
+    Route::post('/productos/{id}/upload', [ProductoController::class, 'addListingPhoto']);
 
     Route::get('/clientes', [ClienteController::class, 'index']);
     Route::get('/clientes/{id}', [ClienteController::class, 'show']);
     Route::post('/clientes', [ClienteController::class, 'store']);
     Route::put('/clientes/{id}', [ClienteController::class, 'update']);
+    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
+    Route::post('/clientes/{id}/upload', [ClienteController::class, 'updateProfilePhoto']);
     Route::get('/clientes/favoritos/{id}', [ClienteController::class, 'searchFavorites']);
     Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
 
