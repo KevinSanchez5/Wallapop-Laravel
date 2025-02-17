@@ -12,9 +12,7 @@ class ValoracionController extends Controller
     // Mostrar todas las valoraciones
     public function index()
     {
-        $valoraciones = Cache::remember('valoraciones_all', 60, function () {
-            return Valoracion::with('clienteValorado', 'creador')->get();
-        });
+        $valoraciones = Valoracion::with('clienteValorado', 'creador')->get();
         return response()->json($valoraciones);
     }
 
