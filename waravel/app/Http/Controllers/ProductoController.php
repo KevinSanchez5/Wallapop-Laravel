@@ -185,4 +185,28 @@ class ProductoController extends Controller
 
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
+
+
+    public function indexVista()
+    {
+        // Obtenemos los productos desde la base de datos
+        $productos = Producto::with('vendedor', 'clientesFavoritos')->get();
+
+        // Devolvemos la vista de inicio con los productos
+        return view('pages.home', compact('productos'));
+    }
+
+    // Mostrar un producto específico en la vista
+    public function showVista($id)
+    {
+        $producto = Cache::remember("producto_{$id}", 60, function () use ($id) {
+            return Producto::with('vendedor', 'clientesFavoritos')->find($id);
+        });
+
+        if (!$producto) {
+            return redirect()->route('inicio')->with('error', 'Producto no encontrado');
+        }
+
+        return view('productos.show', compact('producto'));
+    }
 }
