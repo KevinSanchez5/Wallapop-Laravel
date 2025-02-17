@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\LineaVenta;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,5 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call(ProductosSeeder::class);
         $this->call(ValoracionesSeeder::class);
         $this->call(ClientesFavoritosSeeder::class);
+        $this->call(LineaVentaSeeder::class);
+        $this->call(VentaSeeder::class);
+        $this->call(LineaCarritoSeeder::class);
+        $this->call(CarritoSeeder::class);
     }
 }
