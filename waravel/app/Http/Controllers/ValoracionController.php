@@ -91,7 +91,12 @@ class ValoracionController extends Controller
     // Eliminar una valoración
     public function destroy($id)
     {
-        $valoracion = Valoracion::find($id);
+        $valoracion = Redis::get('valoracion_'. $id);
+
+        if ($valoracion) {
+            $valoracion = Valoracion::find($id);
+        }
+
         if (!$valoracion) {
             return response()->json(['message' => 'Valoración no encontrada'], 404);
         }
@@ -99,8 +104,8 @@ class ValoracionController extends Controller
         $valoracion->delete();
 
         // Limpiar caché de la valoración y de la lista
-        Cache::forget("valoracion_{$id}");
-        Cache::forget('valoraciones_all');
+        Redis::del('valoracion_'. $id);
+
 
         return response()->json(['message' => 'Valoración eliminada correctamente']);
     }
