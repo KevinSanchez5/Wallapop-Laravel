@@ -11,7 +11,7 @@ class ProductosSeeder extends Seeder
     {
         $productos = [
             [
-                'guid' => "1f0368b0-5ce9-4099-bd13-0c1cede8d349",
+                'guid' => '1f0368b0-5ce9-4099-bd13-0c1cede8d349',
                 'vendedor_id' => 1,
                 'nombre' => 'Portatil Gamer',
                 'descripcion' => 'Portatil potente para gaming y trabajo pesado.',
@@ -24,7 +24,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'guid' => "b4cb952d-1568-4763-901a-dfb9e05a4992",
+                'guid' => 'b4cb952d-1568-4763-901a-dfb9e05a4992',
                 'vendedor_id' => 2,
                 'nombre' => 'Chaqueta de cuero',
                 'descripcion' => 'Chaqueta elegante y resistente, ideal para el frío.',
@@ -37,7 +37,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'guid' => "8b09d444-554b-4b95-9962-d6d64d46719c",
+                'guid' => '8b09d444-554b-4b95-9962-d6d64d46719c',
                 'vendedor_id' => 3,
                 'nombre' => 'Guitarra eléctrica',
                 'descripcion' => 'Modelo clásico con excelente sonido.',
@@ -50,7 +50,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'guid' => "f047b42f-5151-4497-a300-7e78794c850f",
+                'guid' => 'f047b42f-5151-4497-a300-7e78794c850f',
                 'vendedor_id' => 1,
                 'nombre' => 'Pantalones de lana',
                 'descripcion' => 'Pantalones de lana de manga corta y cómodos.',
@@ -63,7 +63,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'guid' => "b060d2c6-9386-46a7-88c8-607850d75585",
+                'guid' => 'b060d2c6-9386-46a7-88c8-607850d75585',
                 'vendedor_id' => 2,
                 'nombre' => 'Mario Party 8',
                 'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
@@ -76,7 +76,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'guid' => "00f26236-958a-4043-8756-60430d98040d",
+                'guid' => '00f26236-958a-4043-8756-60430d98040d',
                 'vendedor_id' => 3,
                 'nombre' => 'Consola Xbox Series X',
                 'descripcion' => 'Consola de juegos de acción y adrenalina',
