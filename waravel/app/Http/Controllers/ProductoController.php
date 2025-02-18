@@ -196,9 +196,12 @@ class ProductoController extends Controller
         return view('pages.home', compact('productos'));
     }
 
-    // Mostrar un producto específico en la vista
     public function showVista($id)
     {
+        if (!is_numeric($id)) {
+            return redirect()->route('inicio')->with('error', 'ID no válido');
+        }
+
         $producto = Cache::remember("producto_{$id}", 60, function () use ($id) {
             return Producto::with('vendedor', 'clientesFavoritos')->find($id);
         });
@@ -209,4 +212,5 @@ class ProductoController extends Controller
 
         return view('productos.show', compact('producto'));
     }
+
 }
