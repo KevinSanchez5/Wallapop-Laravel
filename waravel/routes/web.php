@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\Views\ProductoControllerView;
 use Illuminate\Support\Facades\Route;
 
 // Ruta para la página principal
-Route::get('/', [ProductoController::class, 'indexVista'])->name('inicio');
+Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('inicio');
 
-Route::get('/productos', [ProductoController::class, 'indexVista'])->name('productos.index');
-Route::get('/producto/{guid}', [ProductoController::class, 'showVista'])->name('producto.show');
+Route::get('/productos', [ProductoControllerView::class, 'indexVista'])->name('productos.index');
+Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');
 
 Route::get('/login', function () {
     return view('auth.login');
