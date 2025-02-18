@@ -52,7 +52,6 @@ class ProductoController extends Controller
             'categoria' => 'required|string|max:255',
             'estado' => 'required|string|max:255',
             'imagenes' => 'required|array',
-            'imagenes.*' => 'url',
         ]);
 
         if ($validator->fails()) {
@@ -61,8 +60,6 @@ class ProductoController extends Controller
 
         $producto = Producto::create($request->all());
 
-        // Limpiar caché de la lista de productos
-        Cache::forget('productos_all');
 
         return response()->json($producto, 201);
     }
@@ -70,7 +67,11 @@ class ProductoController extends Controller
     // Actualizar un producto existente
     public function update(Request $request, $id)
     {
-        $producto = Producto::find($id);
+        $producto = Redis::get('producto_'.$id);
+        if (!$producto) {
+            $producto = Producto::find($id);
+        }
+
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
@@ -83,7 +84,7 @@ class ProductoController extends Controller
             'categoria' => 'string|max:255',
             'estado' => 'string|max:255',
             'imagenes' => 'required|array',
-            'imagenes.*' => 'url',
+
         ]);
 
         if ($validator->fails()) {
@@ -93,8 +94,8 @@ class ProductoController extends Controller
         $producto->update($request->all());
 
         // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
+        Redis::del('producto_' . $id);
+        Redis::set('producto_' . $id, json_encode($producto), 'EX', 1800);
 
         return response()->json($producto);
     }
