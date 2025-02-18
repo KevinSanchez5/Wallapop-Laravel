@@ -106,28 +106,39 @@ class ProductoController extends Controller
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'string|max:255',
-            'descripcion' => 'required|string',
-            'estadoFisico' => 'required|string|max:255',
-            'precio' => 'numeric|min:0',
-            'categoria' => 'string|max:255',
-            'estado' => 'string|max:255',
-            'imagenes' => 'required|array',
+        if (is_string($producto)) {
+            $productoArray = json_decode($producto, true);
+            $productoModel = Producto::hydrate([$productoArray])->first();
+        } elseif ($producto instanceof Producto) {
+            $productoModel = $producto;
+        } else {
+            $productoModel = Producto::hydrate([$producto])->first();
+        }
 
+        $validator = Validator::make($request->all(), [
+            'nombre'       => 'string|max:255',
+            'descripcion'  => 'required|string',
+            'estadoFisico' => 'required|string|max:255',
+            'precio'       => 'numeric|min:0',
+            'categoria'    => 'string|max:255',
+            'estado'       => 'string|max:255',
+            //'imagenes'   => 'required|array',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'Error de validación',
+                'errors'  => $validator->errors()
+            ], 422);
         }
 
-        $producto->update($request->all());
+        $productoModel->update($request->all());
 
         // Limpiar caché del producto y de la lista
         Redis::del('producto_' . $id);
-        Redis::set('producto_' . $id, json_encode($producto), 'EX', 1800);
+        Redis::set('producto_' . $id, json_encode($productoModel), 'EX', 1800);
 
-        return response()->json($producto);
+        return response()->json($productoModel);
     }
 
     // Eliminar un producto
