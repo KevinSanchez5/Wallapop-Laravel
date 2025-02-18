@@ -15,8 +15,38 @@ class ProductoController extends Controller
     // Mostrar todos los productos
     public function index()
     {
-        $productos = Producto::all();
-        return response()->json($productos);
+        $query = Producto::orderBy('id', 'asc');
+
+        $productos = $query->paginate(15);
+
+        $data = $productos->getCollection()->transform(function ($cliente) {
+           return [
+               'id' => $cliente->id,
+               'guid' => $cliente->guid,
+               'vendedor_id' => $cliente->vendedor_id,
+               'nombre' => $cliente->nombre,
+               'descripcion' => $cliente->descripcion,
+               'estadoFisico' => $cliente->estadoFisico,
+               'precio' => $cliente->precio,
+               'categoria' => $cliente->categoria,
+               'estado' => $cliente->estado,
+               'imagenes' => $cliente->imagenes,
+               'created_at' => $cliente->created_at->toDateTimeString(),
+               'updated_at' => $cliente->updated_at->toDateTimeString(),
+           ];
+        });
+
+        $customResponse = [
+            'productos' => $data,
+            'paginacion' => [
+                'pagina_actual' => $productos->currentPage(),
+                'elementos_por_pagina' => $productos->perPage(),
+                'ultima_pagina' => $productos->lastPage(),
+                'elementos_totales' => $productos->total(),
+            ],
+        ];
+
+        return response()->json($customResponse);
     }
 
     // Mostrar un producto específico
