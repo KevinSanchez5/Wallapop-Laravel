@@ -52,7 +52,7 @@ class ValoracionController extends Controller
         }
 
         $valoracion = Valoracion::create($request->all());
-        
+
 
         return response()->json($valoracion, 201);
     }
@@ -60,7 +60,12 @@ class ValoracionController extends Controller
     // Actualizar una valoración existente
     public function update(Request $request, $id)
     {
-        $valoracion = Valoracion::find($id);
+        $valoracion = Redis::find($id);
+
+        if ($valoracion) {
+            $valoracion = Valoracion::find($id);
+        }
+
         if (!$valoracion) {
             return response()->json(['message' => 'Valoración no encontrada'], 404);
         }
@@ -77,8 +82,8 @@ class ValoracionController extends Controller
         $valoracion->update($request->all());
 
         // Limpiar caché de la valoración y de la lista
-        Cache::forget("valoracion_{$id}");
-        Cache::forget('valoraciones_all');
+        Redis::del('valoracion_'. $id);
+        Redis::set('valoracion_' . $id, json_encode($valoracion), 'EX', 1800);
 
         return response()->json($valoracion);
     }
