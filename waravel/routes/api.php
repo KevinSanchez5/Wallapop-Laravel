@@ -26,7 +26,9 @@ Route::middleware('api')->group(function () {
     Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
     Route::post('/clientes/{id}/upload', [ClienteController::class, 'updateProfilePhoto']);
     Route::get('/clientes/favoritos/{id}', [ClienteController::class, 'searchFavorites']);
-    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
+    Route::post('/clientes/favoritos/{id}', [ClienteController::class, 'addToFavorites']);
+    Route::delete('/clientes/favoritos/{id}', [ClienteController::class, 'removeFromFavorites']);
+
 
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
