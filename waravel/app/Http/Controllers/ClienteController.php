@@ -21,6 +21,7 @@ class ClienteController extends Controller
     public function show($id)
     {
         $clienteRedis = Redis::get('cliente_' . $id);
+
         if ($clienteRedis) {
             return response()->json(json_decode($clienteRedis));
         }
@@ -64,7 +65,7 @@ class ClienteController extends Controller
     {
         $cliente = Redis::get('cliente_' . $id);
 
-        if (!$cliente) {
+        if ($cliente) {
             $cliente = Cliente::find($id);
         }
 
@@ -100,7 +101,7 @@ class ClienteController extends Controller
     {
         $cliente = Redis::get('cliente_' . $id);
 
-        if (!$cliente) {
+        if ($cliente) {
             $cliente = Cliente::find($id);
         }
 
