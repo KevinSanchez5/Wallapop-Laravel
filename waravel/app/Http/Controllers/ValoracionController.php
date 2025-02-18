@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Valoracion;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class ValoracionController extends Controller
 {
     // Mostrar todas las valoraciones
     public function index()
     {
-        $valoraciones = Valoracion::with('clienteValorado', 'creador')->get();
+        $valoraciones = Valoracion::all();
         return response()->json($valoraciones);
     }
 
