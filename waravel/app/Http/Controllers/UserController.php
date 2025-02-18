@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -16,13 +16,17 @@ class UserController extends Controller
 
     public function show($id)
     {
-        $user = Cache::remember("user_{$id}", 60, function () use ($id) {
-            $user = User::find($id);
-            return $user ?: null;
-        });
-        if(!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+        $userRedis = Redis::get('user_'.$id);
+        if($userRedis) {
+            return response()->json(json_decode($userRedis));
+
         }
+
+        $user = User::find($id);
+
+          if(!$userRedis) {
+              return response()->json(['message' => 'User not found'], 404);
+          }
 
         return response()->json($user);
     }
