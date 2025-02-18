@@ -26,7 +26,9 @@ Route::middleware('api')->group(function () {
     Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
     Route::post('/clientes/{id}/upload', [ClienteController::class, 'updateProfilePhoto']);
     Route::get('/clientes/favoritos/{id}', [ClienteController::class, 'searchFavorites']);
-    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
+    Route::post('/clientes/favoritos/{id}', [ClienteController::class, 'addToFavorites']);
+    Route::delete('/clientes/favoritos/{id}', [ClienteController::class, 'removeFromFavorites']);
+
 
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
@@ -39,4 +41,10 @@ Route::middleware('api')->group(function () {
     Route::post('/valoraciones', [ValoracionController::class, 'store']);
     Route::put('/valoraciones/{id}', [ValoracionController::class, 'update']);
     Route::delete('/valoraciones/{id}', [ValoracionController::class, 'destroy']);
+
+    Route::get('/ventas', [VentaController::class, 'index']);
+    Route::get('/ventas/{id}', [VentaController::class, 'show']);
+    Route::post('/ventas', [VentaController::class, 'store']);
+    Route::put('/ventas/{id}', [VentaController::class, 'update']);
+    Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
 });

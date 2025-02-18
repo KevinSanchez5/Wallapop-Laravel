@@ -13,14 +13,44 @@ class ClienteController extends Controller
     // Mostrar todos los clientes
     public function index()
     {
-        $clientes = Cliente::all();
-        return response()->json($clientes);
+        $query = Cliente::orderBy('id', 'asc');
+
+        $clientes = $query->paginate(5);
+
+        $data = $clientes->getCollection()->transform(function ($cliente) {
+            return [
+                'id' => $cliente->id,
+                'guid' => $cliente->guid,
+                'nombre' => $cliente->nombre,
+                'apellido' => $cliente->apellido,
+                'avatar' => $cliente->avatar,
+                'telefono' => $cliente->telefono,
+                'direccion' => $cliente->direccion,
+                'activo' => $cliente->activo,
+                'usuario_id' => $cliente->usuario_id,
+                'created_at' => $cliente->created_at->toDateTimeString(),
+                'updated_at' => $cliente->updated_at->toDateTimeString(),
+            ];
+        });
+
+        $customResponse = [
+            'clientes' => $data,
+            'paginacion' => [
+                'pagina_actual' => $clientes->currentPage(),
+                'elementos_por_pagina' => $clientes->perPage(),
+                'ultima_pagina' => $clientes->lastPage(),
+                'elementos_totales' => $clientes->total(),
+            ],
+        ];
+
+        return response()->json($customResponse);
     }
 
     // Mostrar un cliente específico
     public function show($id)
     {
         $clienteRedis = Redis::get('cliente_' . $id);
+
         if ($clienteRedis) {
             return response()->json(json_decode($clienteRedis));
         }
