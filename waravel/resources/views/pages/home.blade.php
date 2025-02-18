@@ -59,7 +59,7 @@
                                     <button type="submit" name="categoria" value="{{ $category }}"
                                             class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 font-semibold transition-all duration-300
                                    hover:bg-[#BFF205] hover:text-black dark:hover:bg-[#BFF205] dark:hover:text-black
-                                   {{ $selectedCategory == $category ? 'bg-[#BFF205] text-black' : '' }}">
+                                   {{ $selectedCategory == $category ? 'bg-[#BFF205] text-black dark:text-gray-700' : '' }}">
                                         {{ ucfirst($category) }}
                                     </button>
                                 </form>
