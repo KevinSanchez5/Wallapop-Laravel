@@ -41,23 +41,34 @@
         <!-- Lista de productos -->
         <div id="productos-container" class="container mx-auto mt-8 px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             @forelse ($productos as $producto)
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow duration-300">
-                    <img src="{{ $producto->imagenes[0] ?? 'https://via.placeholder.com/150' }}" alt="Imagen del producto" class="w-full h-40 object-cover rounded-t-lg">
-                    <div class="p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col">
+                    <img src="{{ asset('storage/productos/' . ($producto->imagenes[0] ?? 'default.jpg')) }}"
+                         alt="Imagen del producto"
+                         class="w-full h-40 object-cover rounded-t-lg">
+
+                    <div class="p-4 flex-grow">
                         <h3 class="font-semibold text-lg text-gray-900 dark:text-white">{{ $producto->nombre }}</h3>
                         <p class="text-gray-500 dark:text-gray-300 text-sm">{{ $producto->categoria }}</p>
                         <p class="text-gray-900 dark:text-gray-200 font-semibold mt-2">{{ $producto->precio }} €</p>
                     </div>
-                    <div class="p-4 flex justify-center items-center">
-                        <a href="{{ route('producto.show', $producto->guid) }}" class="relative inline-block bg-[#BFF205] text-black font-semibold py-2 px-6 rounded-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#BFF205] focus:ring-opacity-50">
+
+                    <div class="p-4">
+                        <a href="{{ route('producto.show', $producto->guid) }}"
+                           class="block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#BFF205] focus:ring-opacity-50">
                             Ver detalles
                         </a>
                     </div>
                 </div>
             @empty
-                <p class="text-gray-600 dark:text-gray-400 col-span-5">No hay productos disponibles.</p>
+                <p class="text-gray-600 dark:text-gray-400 col-span-5 text-center">No hay productos disponibles.</p>
             @endforelse
         </div>
+
+        <!-- Paginación -->
+        <div class="mt-4 text-center">
+            {{ $productos->links('pagination::tailwind') }}
+        </div>
+
     </div>
 
     <!-- Pie de página -->
