@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
+
 use Illuminate\Support\Str;
 
 class ProductoController extends Controller
@@ -21,13 +22,19 @@ class ProductoController extends Controller
     // Mostrar un producto específico
     public function show($id)
     {
-        $producto = Cache::remember("producto_{$id}", 60, function () use ($id) {
-            return Producto::find($id);
-        });
+        $productoRedis = Redis::get('producto_'.$id);
+
+        if ($productoRedis) {
+            return response()->json(json_decode($productoRedis));
+        }
+
+        $producto = Producto::find($id);
 
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
+
+        Redis::set('producto_'. $id, json_encode($producto), 'EX',1800);
 
         return response()->json($producto);
     }
