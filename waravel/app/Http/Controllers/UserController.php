@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailSender;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -81,4 +84,20 @@ class UserController extends Controller
         Cache::forget("user_{$id}");
         return response()->json(null, 204);
     }
+
+    public function enviarCorreoRecuperarContrasenya($id)
+    {
+        $user = User::findOrFail($id);
+        if(!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        $codigo = strtoupper(Str::random(10));
+
+        Mail::to($user->email)->send(new EmailSender($user, $codigo, null, "recuperarContrasenya"));
+
+        return response()->json([
+            'message' => 'Correo enviado',
+        ], 200);
+    }
+
 }

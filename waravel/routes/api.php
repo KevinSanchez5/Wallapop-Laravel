@@ -33,6 +33,7 @@ Route::middleware('api')->group(function () {
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::get('/users/{id}/correo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
 
     Route::get('/valoraciones', [ValoracionController::class, 'index']);
     Route::get('/valoraciones/{id}', [ValoracionController::class, 'show']);
