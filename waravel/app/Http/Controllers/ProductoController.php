@@ -103,7 +103,11 @@ class ProductoController extends Controller
     // Eliminar un producto
     public function destroy($id)
     {
-        $producto = Producto::find($id);
+        $producto = Redis::get('producto_'. $id);
+
+        if ($producto) {
+            $producto = Producto::find($id);
+        }
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
@@ -111,55 +115,12 @@ class ProductoController extends Controller
         $producto->delete();
 
         // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
+        Redis::del('producto_'. $id);
+
 
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
-
-    // Agregar un producto a favoritos de un cliente
-    public function addToFavorites(Request $request, $id)
-    {
-        $producto = Producto::find($id);
-        if (!$producto) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-
-        $cliente = Cliente::find($request->cliente_id);
-        if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
-        }
-
-        $producto->clientesFavoritos()->attach($cliente->id);
-
-        // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
-
-        return response()->json(['message' => 'Producto agregado a favoritos']);
-    }
-
-    // Quitar un producto de favoritos de un cliente
-    public function removeFromFavorites(Request $request, $id)
-    {
-        $producto = Producto::find($id);
-        if (!$producto) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-
-        $cliente = Cliente::find($request->cliente_id);
-        if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
-        }
-
-        $producto->clientesFavoritos()->detach($cliente->id);
-
-        // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
-
-        return response()->json(['message' => 'Producto eliminado de favoritos']);
-    }
+    
 
     public function addListingPhoto(Request $request, $id) {
         $product = Producto::find($id);
@@ -188,8 +149,6 @@ class ProductoController extends Controller
         $product->imagenes = array_merge($images, [$filePath]);
         $product->save();
 
-        // Limpiar caché del producto
-        Cache::forget("producto_{$id}");
 
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
