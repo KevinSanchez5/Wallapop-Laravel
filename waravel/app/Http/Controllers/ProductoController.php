@@ -144,20 +144,28 @@ class ProductoController extends Controller
     // Eliminar un producto
     public function destroy($id)
     {
-        $producto = Redis::get('producto_'. $id);
+        $producto = Redis::get('producto_' . $id);
 
-        if (!$producto) {
+        if ($producto) {
+            $producto = json_decode($producto, true);
+        } else {
             $producto = Producto::find($id);
         }
+
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        $producto->delete();
+        if (is_array($producto)) {
+            $productoModel = Producto::hydrate([$producto])->first();
+        } else {
+            $productoModel = $producto;
+        }
 
-        // Limpiar caché del producto y de la lista
-        Redis::del('producto_'. $id);
+        $productoModel->delete();
 
+        // Limpiar caché del producto
+        Redis::del('producto_' . $id);
 
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
