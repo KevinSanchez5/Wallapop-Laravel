@@ -41,4 +41,10 @@ Route::middleware('api')->group(function () {
     Route::post('/valoraciones', [ValoracionController::class, 'store']);
     Route::put('/valoraciones/{id}', [ValoracionController::class, 'update']);
     Route::delete('/valoraciones/{id}', [ValoracionController::class, 'destroy']);
+
+    Route::get('/ventas', [VentaController::class, 'index']);
+    Route::get('/ventas/{id}', [VentaController::class, 'show']);
+    Route::post('/ventas', [VentaController::class, 'store']);
+    Route::put('/ventas/{id}', [VentaController::class, 'update']);
+    Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
 });
