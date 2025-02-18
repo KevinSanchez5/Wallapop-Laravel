@@ -50,7 +50,7 @@ class UserController extends Controller
     {
         $user = Redis::get('user_'. $id);
 
-        if($user) {
+        if(!$user) {
             $user = User::find($id);
         }
 
@@ -77,7 +77,7 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = Redis::get('user_' . $id);
-        if($user) {
+        if(!$user) {
             $user = User::find($id);
         }
 
@@ -86,7 +86,7 @@ class UserController extends Controller
         }
         $user->delete();
         Redis::del('user_'. $id);
-       
+
         return response()->json(['message' => 'User eliminado correctamente']);
     }
 }
