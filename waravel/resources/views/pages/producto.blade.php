@@ -3,36 +3,77 @@
 @section('title', 'Detalles del Producto')
 
 @section('content')
-    <x-header />
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <div style="margin-top: -25px">
+    <x-header/>
 
-    <div class="container mx-auto py-6">
-        <!-- Detalles del producto -->
-        <div class="bg-white shadow-lg rounded-xl p-6">
-            <div class="flex flex-col md:flex-row">
-                <div class="md:w-1/3">
-                    @if (!empty($producto->imagenes[0]))
-                        <img src="{{ asset('storage/' . $producto->imagenes[0]) }}" alt="Imagen del producto" class="w-full h-60 object-cover rounded-lg">
-                    @else
-                        <div class="w-full h-60 bg-gray-300 flex items-center justify-center rounded-lg">
-                            <span class="text-white">Sin Imagen</span>
-                        </div>
-                    @endif
-                </div>
+        <div class="container mx-auto px-4 py-10">
+            <!-- Contenedor principal con fondo claro/oscuro -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-5xl mx-auto">
 
-                <div class="md:w-2/3 md:ml-8 mt-4 md:mt-0">
-                    <h3 class="font-semibold text-2xl">{{ $producto->nombre }}</h3>
-                    <p class="text-gray-500 text-sm">{{ $producto->categoria }}</p>
-                    <p class="text-gray-700 text-base mt-2">{{ $producto->descripcion }}</p>
-                    <p class="text-gray-500 text-sm mt-2">Estado: {{ $producto->estadoFisico }}</p>
-                    <p class="text-gray-900 font-semibold text-xl mt-4">{{ $producto->precio }} €</p>
+                <!-- Carrusel (Swiper) arriba -->
+                <div class="swiper w-full h-96 mb-6">
+                    <div class="swiper-wrapper">
+                        @foreach ($producto->imagenes as $imagen)
+                            <div class="swiper-slide">
+                                <img src="{{ asset('storage/productos/' . $imagen) }}" alt="Imagen del producto"
+                                     class="w-full h-full object-cover rounded-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
+                            </div>
+                        @endforeach
 
-                    <div class="mt-6">
-                        <a href="#" class="btn btn-success">Comprar</a>
+                        @if (empty($producto->imagenes) || count($producto->imagenes) === 0)
+                            <div class="swiper-slide">
+                                <div class="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center rounded-lg shadow-lg">
+                                    <span class="text-white text-lg font-semibold">Sin Imagen</span>
+                                </div>
+                            </div>
+                        @endif
                     </div>
+                    <!-- Controles del carrusel -->
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
                 </div>
+
+                <!-- Contenido del producto debajo del carrusel -->
+                <h3 class="font-semibold text-2xl text-gray-800 dark:text-white text-center md:text-left">
+                    {{ $producto->nombre }}
+                </h3>
+                <p class="text-gray-500 dark:text-gray-300 text-sm text-center md:text-left">
+                    {{ $producto->categoria }}
+                </p>
+                <p class="text-gray-700 dark:text-gray-200 text-base mt-4 text-center md:text-left">
+                    {{ $producto->descripcion }}
+                </p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mt-2 text-center md:text-left">
+                    Estado: {{ $producto->estadoFisico }}
+                </p>
+                <p class="text-gray-900 dark:text-gray-100 font-semibold text-xl mt-4 text-center md:text-left">
+                    {{ $producto->precio }} €
+                </p>
+
+                <!-- Botones -->
+                <div class="mt-6 flex flex-col sm:flex-row items-center sm:justify-center md:justify-start gap-4">
+                    <!-- Botón Agregar a Cesta con el color personalizado -->
+                    <a href="#" class="bg-[#BFF205] text-white font-semibold py-2 px-6 rounded-md
+       hover:bg-[#A8D403] transition duration-300 transform hover:scale-105">
+                        Agregar a Cesta
+                    </a>
+
+                    <!-- Botón Añadir a Favoritos con icono de corazón -->
+                    <a href="#" class="bg-white text-gray-800 font-semibold py-2 px-6 rounded-md
+       hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800 transition duration-300 transform hover:scale-105 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Añadir a Favoritos
+                    </a>
+                </div>
+
+
             </div>
         </div>
-    </div>
-
     <x-footer />
+    </div>
 @endsection
