@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('guid');
             $table->foreignId('vendedor_id')->constrained('clientes')->onDelete('cascade');
             $table->string('nombre');
-            $table->string('descripcion');
+            $table->text('descripcion');
             $table->enum('estadoFisico', ['Nuevo', 'Usado', 'Deteriorado']);
             $table->decimal('precio');
             $table->enum('categoria', [
