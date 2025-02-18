@@ -76,12 +76,17 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::find($id);
+        $user = Redis::get('user_' . $id);
+        if($user) {
+            $user = User::find($id);
+        }
+
         if(!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['message' => 'User no encontrado'], 404);
         }
         $user->delete();
-        Cache::forget("user_{$id}");
-        return response()->json(null, 204);
+        Redis::del('user_'. $id);
+       
+        return response()->json(['message' => 'User eliminado correctamente']);
     }
 }
