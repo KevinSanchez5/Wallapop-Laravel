@@ -12,28 +12,79 @@
 
         <div class="container mx-auto mt-8 px-4">
             <div class="bg-white dark:bg-gray-800 shadow-lg dark:shadow-md rounded-xl p-6 flex flex-col md:flex-row md:justify-between md:items-center transition-all duration-300">
+                @php
+                    $categories = ['todos','Tecnologia','Ropa','Hogar','Coleccionismo','Vehiculos','Videojuegos','Musica','Deporte','Cine','Cocina'];
+                    $selectedCategory = request('categoria', 'todos');
+                @endphp
 
-                <div class="flex flex-wrap gap-3">
-                    <!-- Categorías -->
-                    @php
-                        $categories = ['Electrónica', 'Ropa', 'Hogar', 'Juguetes', 'Automóviles'];
-                    @endphp
-                    @foreach ($categories as $category)
-                        <button class="relative overflow-hidden bg-gray-100 dark:bg-gray-700 px-5 py-2 rounded-lg text-gray-700 dark:text-gray-200 font-semibold
-                        transition-all duration-300 hover:text-white dark:hover:text-black group">
-                            <span class="absolute inset-0 bg-[#BFF205] scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100"></span>
-                            <span class="relative z-10">{{ $category }}</span>
+                    <!-- Contenedor principal con flexbox para alinear a izquierda y derecha -->
+                <div class="flex items-center justify-between w-full flex-wrap md:flex-nowrap gap-3">
+                    <!-- IZQUIERDA: Menú hamburguesa + 3 categorías principales -->
+                    <div class="flex items-center gap-3">
+                        <!-- Botón hamburguesa para las demás categorías -->
+                        <div class="relative inline-block text-left">
+                            <!-- Botón hamburguesa -->
+                            <button type="button"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-300 bg-gray-100 dark:bg-gray-700 p-1 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+                                    id="category-menu-button">
+                                <i class="fas fa-bars text-gray-700 dark:text-gray-200"></i>
+                            </button>
+
+                            <!-- Menú desplegable con las categorías restantes -->
+                            <div class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
+                                 id="category-menu"
+                                 role="menu"
+                                 aria-orientation="vertical"
+                                 aria-labelledby="category-menu-button">
+                                <div class="py-1" role="none">
+                                    @foreach ($categories as $category)
+                                        @if (!in_array($category, ['todos', 'Tecnologia', 'Musica', 'Ropa']))
+                                            <form method="GET" action="{{ route('productos.search') }}" class="inline-block w-full">
+                                                <button type="submit" name="categoria" value="{{ $category }}"
+                                                        class="w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-[#BFF205] hover:text-black dark:hover:bg-[#BFF205] dark:hover:text-black
+                                               {{ $selectedCategory == $category ? 'bg-[#BFF205] text-black' : '' }}">
+                                                    {{ ucfirst($category) }}
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3 categorías principales: Todos, Electrónica, Ropa -->
+                        <div class="flex gap-3">
+                            @foreach (['todos', 'Tecnologia', 'Musica', 'Ropa'] as $category)
+                                <form method="GET" action="{{ route('productos.search') }}">
+                                    <button type="submit" name="categoria" value="{{ $category }}"
+                                            class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 font-semibold transition-all duration-300
+                                   hover:bg-[#BFF205] hover:text-black dark:hover:bg-[#BFF205] dark:hover:text-black
+                                   {{ $selectedCategory == $category ? 'bg-[#BFF205] text-black' : '' }}">
+                                        {{ ucfirst($category) }}
+                                    </button>
+                                </form>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- DERECHA: Barra de búsqueda -->
+                    <form action="{{ route('productos.search') }}" method="GET" class="relative flex items-center w-full md:w-96 mt-3 md:mt-0">
+                        <input type="text"
+                               name="search"
+                               value="{{ request('search') }}"
+                               placeholder="Buscar productos..."
+                               class="w-full px-4 py-2 pl-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 outline-none
+                      focus:border-blue-500 focus:ring-2 focus:ring-blue-300 transition">
+                        <svg class="absolute left-4 text-gray-500 dark:text-gray-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M21 21l-4.35-4.35M16.5 10.5a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                        </svg>
+                        <button type="submit"
+                                class="ml-2 px-4 py-2 bg-[#BFF205] text-black font-semibold rounded-lg hover:scale-105 transition">
+                            Buscar
                         </button>
-                    @endforeach
-                </div>
-
-                <!-- Filtro de búsqueda -->
-                <div class="mt-4 md:mt-0 relative flex items-center w-full md:w-96">
-                    <input type="text" id="searchInput" placeholder="Buscar productos..."
-                           class="w-full px-4 py-2 pl-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300 transition">
-                    <svg class="absolute left-4 text-gray-500 dark:text-gray-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.5 10.5a6 6 0 11-12 0 6 6 0 0112 0z" />
-                    </svg>
+                    </form>
                 </div>
             </div>
         </div>
