@@ -12,8 +12,34 @@ class ValoracionController extends Controller
     // Mostrar todas las valoraciones
     public function index()
     {
-        $valoraciones = Valoracion::all();
-        return response()->json($valoraciones);
+        $query = Valoracion::orderBy('id', 'asc');
+
+        $valoraciones = $query->paginate(5);
+
+        $data = $valoraciones->getCollection()->transform(function ($valoracion) {
+            return [
+                'id' => $valoracion->id,
+                'guid' => $valoracion->guid,
+                'comentario' => $valoracion->comentario,
+                'puntuacion' => $valoracion->puntuacion,
+                'clienteValorado_id' => $valoracion->clienteValorado_id,
+                'autor_id' => $valoracion->autor_id,
+                'created_at' => $valoracion->created_at->toDateTimeString(),
+                'updated_at' => $valoracion->updated_at->toDateTimeString(),
+            ];
+        });
+
+        $customResponse = [
+            'valoraciones' => $data,
+            'paginacion' => [
+                'pagina_actual' => $valoraciones->currentPage(),
+                'elementos_por_pagina' => $valoraciones->perPage(),
+                'ultima_pagina' => $valoraciones->lastPage(),
+                'elementos_totales' => $valoraciones->total(),
+            ],
+        ];
+
+        return response()->json($customResponse);
     }
 
     // Mostrar una valoración específica
