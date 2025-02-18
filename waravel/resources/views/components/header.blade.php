@@ -1,7 +1,7 @@
 <header class="bg-[#BFF205] py-4 shadow-md">
     <div class="container mx-auto flex justify-between items-center px-6">
 
-        <a routerLink="/inicio" class="text-3xl font-bold text-gray-800">
+        <a href="{{ route('inicio') }}" class="text-3xl font-bold text-gray-800">
             Waravel
         </a>
 
