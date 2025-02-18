@@ -48,26 +48,30 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
+        $user = Redis::get('user_'. $id);
+
+        if($user) {
+            $user = User::find($id);
+        }
+
         if(!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['message' => 'User no encontrado'], 404);
         }
         $validator = Validator::make($request->all(), [
             'nombre' => 'nullable|string|max:255',
             'email' => 'nullable|string|email|max:255|unique:users,email',
-            'password' => [
-               'string',
-               'min:8',
-               'max:20',
-               'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+            'password' => ['string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
             'role' => 'string|max:20'
         ]);
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
         $user->update($request->all());
-        Cache::forget("user_{$id}");
-        return response()->json($user, 200);
+        Redis::del('user_'. $id);
+        Redis::set('user_'. $id, json_encode($user), 'EX',1800);
+
+        return response()->json($user);
     }
 
     public function destroy($id)
