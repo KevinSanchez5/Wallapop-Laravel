@@ -105,7 +105,7 @@ class ProductoController extends Controller
     {
         $producto = Redis::get('producto_'. $id);
 
-        if ($producto) {
+        if (!$producto) {
             $producto = Producto::find($id);
         }
         if (!$producto) {
@@ -120,7 +120,7 @@ class ProductoController extends Controller
 
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
-    
+
 
     public function addListingPhoto(Request $request, $id) {
         $product = Producto::find($id);

@@ -62,7 +62,7 @@ class ValoracionController extends Controller
     {
         $valoracion = Redis::find($id);
 
-        if ($valoracion) {
+        if (!$valoracion) {
             $valoracion = Valoracion::find($id);
         }
 
@@ -93,7 +93,7 @@ class ValoracionController extends Controller
     {
         $valoracion = Redis::get('valoracion_'. $id);
 
-        if ($valoracion) {
+        if (!$valoracion) {
             $valoracion = Valoracion::find($id);
         }
 
