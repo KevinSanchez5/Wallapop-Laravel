@@ -52,9 +52,7 @@ class ValoracionController extends Controller
         }
 
         $valoracion = Valoracion::create($request->all());
-
-        // Limpiar caché de la lista de valoraciones
-        Cache::forget('valoraciones_all');
+        
 
         return response()->json($valoracion, 201);
     }
