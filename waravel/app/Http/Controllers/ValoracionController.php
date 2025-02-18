@@ -19,13 +19,19 @@ class ValoracionController extends Controller
     // Mostrar una valoración específica
     public function show($id)
     {
-        $valoracion = Cache::remember("valoracion_{$id}", 60, function () use ($id) {
-            return Valoracion::with('clienteValorado', 'creador')->find($id);
-        });
+        $valoracionRedis = Redis::get('valoracion_' . $id);
+
+        if ($valoracionRedis) {
+            return response()->json(json_decode($valoracionRedis));
+        }
+
+        $valoracion = Valoracion::find($id);
 
         if (!$valoracion) {
-            return response()->json(['message' => 'Valoración no encontrada'], 404);
+            return response()->json(['message' => 'Valoracion no encontrada'], 404);
         }
+
+        Redis::set('valoracion_' . $id, json_encode($valoracion), 'EX', 1800);
 
         return response()->json($valoracion);
     }
