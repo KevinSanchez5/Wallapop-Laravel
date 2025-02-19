@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailSender;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -110,4 +113,27 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User eliminado correctamente']);
     }
+
+    public function enviarCorreoRecuperarContrasenya(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email|max:255',
+        ]);
+        $email = $request->email;
+        //$user = User::where('email', $email)->first();
+        $user = DB::select("SELECT * FROM users WHERE email = ? LIMIT 1", [$email]);
+        // $user = DB::table('users')->where('email', $email)->first();
+        if(!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        $codigo = strtoupper(Str::random(10));
+
+        Mail::to($user->email)->send(new EmailSender($user, $codigo, null, "recuperarContrasenya"));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo enviado',
+        ], 200);
+    }
+
 }
