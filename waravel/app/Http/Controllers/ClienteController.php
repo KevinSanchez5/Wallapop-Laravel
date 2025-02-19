@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Models\Producto;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redis;
 
@@ -93,13 +94,21 @@ class ClienteController extends Controller
     public function update(Request $request, $id)
     {
         $cliente = Redis::get('cliente_' . $id);
-
         if (!$cliente) {
             $cliente = Cliente::find($id);
         }
 
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+
+        if (is_string($cliente)) {
+            $clienteArray = json_decode($cliente, true);
+            $clienteModel = Cliente::hydrate([$clienteArray])->first();
+        } elseif ($cliente instanceof Cliente) {
+            $clienteModel = $cliente;
+        } else {
+            $clienteModel = Cliente::hydrate([$cliente])->first();
         }
 
         $validator = Validator::make($request->all(), [
@@ -113,16 +122,19 @@ class ClienteController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'Error de validación',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $cliente->update($request->all());
+        $clienteModel->update($request->all());
 
         // Limpiar caché del cliente
         Redis::del('cliente_' . $id);
-        Redis::set('cliente_' . $id, json_encode($cliente), 'EX', 1800);
-
-        return response()->json($cliente);
+        Redis::set('cliente_' . $id, json_encode($clienteModel->toArray()), 'EX', 1800);
+        Log::info("Cliente actualizado y guardado en Redis");
+        return response()->json($clienteModel);
     }
 
     // Eliminar un cliente
