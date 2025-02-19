@@ -25,7 +25,7 @@
                         <div class="relative inline-block text-left">
                             <!-- Botón hamburguesa -->
                             <button type="button"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-300 bg-gray-100 dark:bg-gray-700 p-1 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-700 dark:text-gray-200 font-semibold transition-all duration-300 hover:bg-[#BFF205] hover:text-black dark:hover:bg-[#BFF205] dark:hover:text-black focus:outline-none"
                                     id="category-menu-button">
                                 <i class="fas fa-bars text-gray-700 dark:text-gray-200"></i>
                             </button>

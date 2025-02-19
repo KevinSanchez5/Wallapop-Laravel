@@ -52,6 +52,13 @@
                 <p class="text-gray-500 dark:text-gray-300 text-sm text-center md:text-left">
                     {{ $producto->categoria }}
                 </p>
+                <div class="mt-6 text-center md:text-left flex">
+                    <p class="text-gray-600 dark:text-gray-400 text-sm"><b>Vendido por:&nbsp;</b></p>
+                    <a href="{{ route('cliente.ver', $producto->vendedor->guid) }}"
+                       class="text-blue-500 dark:text-blue-400 font-semibold hover:underline">
+                        {{ $producto->vendedor->nombre }} {{ $producto->vendedor->apellido }}
+                    </a>
+                </div>
                 <p class="text-gray-700 dark:text-gray-200 text-base mt-4 text-center md:text-left">
                     {{ $producto->descripcion }}
                 </p>
@@ -61,6 +68,23 @@
                 <p class="text-gray-900 dark:text-gray-100 font-semibold text-xl mt-4 text-center md:text-left">
                     {{ $producto->precio }} €
                 </p>
+
+                @if(isset($producto->vendedor->direccion->codigoPostal))
+                    <div class="mt-4">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm text-center md:text-left">
+                            📍 Ubicación del vendedor (Código Postal: {{ $producto->vendedor->direccion->codigoPostal }})
+                        </p>
+                        <iframe
+                            width="100%"
+                            height="250"
+                            style="border:0; border-radius: 10px; margin-top: 8px;"
+                            loading="lazy"
+                            allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBlxJ4a_HfUSAVljwVgN7NkwtBk4IGTX_A&q={{ trim($producto->vendedor->direccion->codigoPostal) }},ES">
+                        </iframe>
+                    </div>
+                @endif
 
                 <!-- Botones -->
                 <div class="mt-6 flex flex-col sm:flex-row items-center sm:justify-center md:justify-start gap-4">
