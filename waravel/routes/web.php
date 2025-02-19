@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
+use App\Http\Controllers\Views\ValoracionesControllerView;
 use Illuminate\Support\Facades\Route;
 
 // Ruta para la página principal
