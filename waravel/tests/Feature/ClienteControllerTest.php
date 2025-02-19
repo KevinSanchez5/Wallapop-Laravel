@@ -100,7 +100,7 @@ class ClienteControllerTest extends TestCase
         $response->assertStatus(200);
         $responseData = $response->json();
         $direccionDecodificada = json_decode($responseData['direccion'], true);
-        
+
         $response->assertJson([
             'id' => $cliente->id,
             'nombre' => $cliente->nombre,
@@ -118,6 +118,113 @@ class ClienteControllerTest extends TestCase
         $this->assertEquals($cliente->nombre, $clienteRedis['nombre']);
         $this->assertEquals($cliente->apellido, $clienteRedis['apellido']);
     }
+
+    public function test_update(): void
+    {
+        $usuario = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 'admin',
+        ]);
+
+        // ✅ Creamos el cliente sin `json_encode()` en `direccion`
+        $cliente = Cliente::create([
+            'guid' => Str::uuid(),
+            'nombre' => 'Pepe',
+            'apellido' => 'Perez',
+            'avatar' => 'avatar.png',
+            'telefono' => '1234567890',
+            'direccion' => [
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
+                'codigoPostal' => 28001
+            ],
+            'activo' => true,
+            'usuario_id' => $usuario->id,
+        ]);
+
+        // ✅ Guardar en Redis el cliente antes de actualizarlo
+        Redis::set('cliente_' . $cliente->id, json_encode($cliente->toArray()));
+
+        // ✅ Datos correctos para actualizar un cliente (no un producto)
+        $data = [
+            'nombre' => 'Juan',
+            'apellido' => 'Gómez',
+            'avatar' => 'nuevo_avatar.png',
+            'telefono' => '9876543210',
+            'direccion' => [
+                'calle' => 'Calle Nueva',
+                'numero' => 123,
+                'piso' => 2,
+                'letra' => 'B',
+                'codigoPostal' => 45000
+            ],
+            'activo' => false,
+        ];
+
+        // ✅ Realizamos la petición PUT
+        $response = $this->putJson("/api/clientes/{$cliente->id}", $data);
+
+        // ✅ Verificamos que la respuesta sea exitosa
+        $response->assertStatus(200);
+
+        // ✅ Verificamos que los datos se actualizaron en la base de datos
+        $this->assertDatabaseHas('clientes', [
+            'id' => $cliente->id,
+            'nombre' => 'Juan',
+            'apellido' => 'Gómez',
+            'avatar' => 'nuevo_avatar.png',
+            'telefono' => '9876543210',
+            'activo' => false,
+        ]);
+
+        // ✅ Verificamos que los datos se actualizaron en Redis
+        $clienteActualizado = json_decode(Redis::get('cliente_' . $cliente->id), true);
+
+        $this->assertEquals($data['nombre'], $clienteActualizado['nombre']);
+        $this->assertEquals($data['apellido'], $clienteActualizado['apellido']);
+        $this->assertEquals($data['avatar'], $clienteActualizado['avatar']);
+        $this->assertEquals($data['telefono'], $clienteActualizado['telefono']);
+        $this->assertEquals($data['activo'], $clienteActualizado['activo']);
+        $this->assertEquals($data['direccion'], json_decode($clienteActualizado['direccion'], true)); // Convertimos `direccion` a array
+    }
+
+    public function test_update_not_found(): void
+    {
+        // ✅ ID de un cliente que no existe
+        $idInexistente = 9999;
+
+        // ✅ Datos de actualización (aunque no se usará porque el cliente no existe)
+        $data = [
+            'nombre' => 'Juan',
+            'apellido' => 'Gómez',
+            'avatar' => 'nuevo_avatar.png',
+            'telefono' => '9876543210',
+            'direccion' => [
+                'calle' => 'Calle Nueva',
+                'numero' => 123,
+                'piso' => 2,
+                'letra' => 'B',
+                'codigoPostal' => 45000
+            ],
+            'activo' => false,
+        ];
+
+        // ✅ Intentamos actualizar un cliente que no existe
+        $response = $this->putJson("/api/clientes/{$idInexistente}", $data);
+
+        // ✅ Verificamos que la respuesta sea 404 (Not Found)
+        $response->assertStatus(404);
+
+        // ✅ Verificamos que el mensaje de error es el esperado
+        $response->assertJson([
+            'message' => 'Cliente no encontrado',
+        ]);
+    }
+
 
 
 
