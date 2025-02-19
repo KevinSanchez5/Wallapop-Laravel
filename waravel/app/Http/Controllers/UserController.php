@@ -19,12 +19,11 @@ class UserController extends Controller
         $userRedis = Redis::get('user_'.$id);
         if($userRedis) {
             return response()->json(json_decode($userRedis));
-
         }
 
         $user = User::find($id);
 
-          if(!$userRedis) {
+          if(!$user) {
               return response()->json(['message' => 'User not found'], 404);
           }
 
@@ -49,7 +48,6 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = Redis::get('user_'. $id);
-
         if(!$user) {
             $user = User::find($id);
         }
@@ -57,6 +55,16 @@ class UserController extends Controller
         if(!$user) {
             return response()->json(['message' => 'User no encontrado'], 404);
         }
+
+        if (is_string($user)) {
+            $userArray = json_decode($user, true);
+            $userModel = User::hydrate([$userArray])->first();
+        } elseif ($user instanceof User) {
+            $userModel = $user;
+        } else {
+            $userModel = User::hydrate([$user])->first();
+        }
+
         $validator = Validator::make($request->all(), [
             'nombre' => 'nullable|string|max:255',
             'email' => 'nullable|string|email|max:255|unique:users,email',
@@ -65,26 +73,39 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message'=> 'Error de validación',
+                'errors' => $validator->errors()
+            ], 422);
         }
-        $user->update($request->all());
-        Redis::del('user_'. $id);
-        Redis::set('user_'. $id, json_encode($user), 'EX',1800);
 
-        return response()->json($user);
+        $userModel->update($request->all());
+        Redis::del('user_'. $id);
+        Redis::set('user_'. $id, json_encode($userModel), 'EX',1800);
+
+        return response()->json($userModel);
     }
 
     public function destroy($id)
     {
         $user = Redis::get('user_' . $id);
-        if(!$user) {
+        if ($user) {
+            $user = json_decode($user, true);
+        } else {
             $user = User::find($id);
         }
 
         if(!$user) {
             return response()->json(['message' => 'User no encontrado'], 404);
         }
-        $user->delete();
+
+        if (is_array($user)) {
+            $userModel = User::hydrate([$user])->first();
+        } else {
+            $userModel = $user;
+        }
+
+        $userModel->delete();
         Redis::del('user_'. $id);
 
         return response()->json(['message' => 'User eliminado correctamente']);
