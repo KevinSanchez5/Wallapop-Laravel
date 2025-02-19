@@ -261,7 +261,7 @@ class ClienteControllerTest extends TestCase
             'role' => 'cliente',
         ]);
 
-        // ✅ Crear un cliente en la base de datos
+
         $cliente = Cliente::create([
             'guid' => Str::uuid(),
             'nombre' => 'Pepe',
@@ -279,28 +279,127 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $usuario->id,
         ]);
 
-        // ✅ Enviar petición DELETE
         $response = $this->deleteJson("/api/clientes/{$cliente->id}");
 
-        // ✅ Verificar que la respuesta sea 200 (Cliente eliminado)
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Cliente eliminado correctamente']);
 
-        // ✅ Verificar que el cliente ya no está en la base de datos
         $this->assertDatabaseMissing('clientes', ['id' => $cliente->id]);
     }
 
     public function test_destroy_cliente_no_existe(): void
     {
-        // ❌ Intentar eliminar un cliente con un ID inexistente
         $response = $this->deleteJson("/api/clientes/9999");
-
-        // ❌ Verificar que la respuesta sea 404 (Cliente no encontrado)
         $response->assertStatus(404);
         $response->assertJson(['message' => 'Cliente no encontrado']);
     }
 
+    public function test_search_favorites_cliente_existe(): void
+    {
+        $cliente = Cliente::factory()->create();
+        $producto = Producto::factory()->create();
 
+        $cliente->favoritos()->attach($producto->id);
+
+        $response = $this->getJson("/api/clientes/{$cliente->id}/favoritos");
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['id' => $producto->id]);
+    }
+
+    public function test_search_favorites_cliente_no_existe(): void
+    {
+        $response = $this->getJson("/api/clientes/9999/favoritos");
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Cliente no encontrado']);
+    }
+
+    public function test_add_to_favorites_exitoso(): void
+    {
+        $cliente = Cliente::factory()->create();
+        $producto = Producto::factory()->create();
+
+        $response = $this->postJson("/api/clientes/{$cliente->id}/favoritos", [
+            'producto_id' => $producto->id
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Producto agregado a favoritos']);
+
+        $this->assertDatabaseHas('cliente_producto', [
+            'cliente_id' => $cliente->id,
+            'producto_id' => $producto->id
+        ]);
+    }
+
+    public function test_add_to_favorites_cliente_no_existe(): void
+    {
+        $producto = Producto::factory()->create();
+
+        $response = $this->postJson("/api/clientes/9999/favoritos", [
+            'producto_id' => $producto->id
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Cliente no encontrado']);
+    }
+
+    public function test_add_to_favorites_producto_no_existe(): void
+    {
+        $cliente = Cliente::factory()->create();
+
+        $response = $this->postJson("/api/clientes/{$cliente->id}/favoritos", [
+            'producto_id' => 9999
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Producto no encontrado']);
+    }
+
+    public function test_remove_from_favorites_exitoso(): void
+    {
+        $cliente = Cliente::factory()->create();
+        $producto = Producto::factory()->create();
+
+        $cliente->favoritos()->attach($producto->id);
+
+        $response = $this->deleteJson("/api/clientes/{$cliente->id}/favoritos", [
+            'producto_id' => $producto->id
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Producto eliminado de favoritos']);
+
+        $this->assertDatabaseMissing('cliente_producto', [
+            'cliente_id' => $cliente->id,
+            'producto_id' => $producto->id
+        ]);
+    }
+
+    public function test_remove_from_favorites_cliente_no_existe(): void
+    {
+        $producto = Producto::factory()->create();
+
+        $response = $this->deleteJson("/api/clientes/9999/favoritos", [
+            'producto_id' => $producto->id
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Cliente no encontrado']);
+    }
+
+    public function test_remove_from_favorites_producto_no_existe(): void
+    {
+        $cliente = Cliente::factory()->create();
+
+        $response = $this->deleteJson("/api/clientes/{$cliente->id}/favoritos", [
+            'producto_id' => 9999
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Producto no encontrado']);
+    }
 
 
 }
