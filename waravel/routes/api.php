@@ -4,6 +4,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValoracionController;
+use App\Http\Controllers\VentaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
