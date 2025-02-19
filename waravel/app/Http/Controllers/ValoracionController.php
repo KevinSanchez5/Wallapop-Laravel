@@ -66,7 +66,7 @@ class ValoracionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'guid' => 'required|unique:valoracions,guid',
+            'guid' => 'required|unique:valoraciones,guid',
             'comentario' => 'required|string|max:1000',
             'puntuacion' => 'required|integer|min:1|max:5',
             'clienteValorado_id' => 'required|exists:clientes,id',
@@ -79,39 +79,7 @@ class ValoracionController extends Controller
 
         $valoracion = Valoracion::create($request->all());
 
-
         return response()->json($valoracion, 201);
-    }
-
-    // Actualizar una valoración existente
-    public function update(Request $request, $id)
-    {
-        $valoracion = Redis::find($id);
-
-        if (!$valoracion) {
-            $valoracion = Valoracion::find($id);
-        }
-
-        if (!$valoracion) {
-            return response()->json(['message' => 'Valoración no encontrada'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'comentario' => 'string|max:1000',
-            'puntuacion' => 'integer|min:1|max:5',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $valoracion->update($request->all());
-
-        // Limpiar caché de la valoración y de la lista
-        Redis::del('valoracion_'. $id);
-        Redis::set('valoracion_' . $id, json_encode($valoracion), 'EX', 1800);
-
-        return response()->json($valoracion);
     }
 
     // Eliminar una valoración
@@ -121,18 +89,25 @@ class ValoracionController extends Controller
 
         if (!$valoracion) {
             $valoracion = Valoracion::find($id);
+        } else {
+            $valoracion = Valoracion::find($id);
         }
 
         if (!$valoracion) {
-            return response()->json(['message' => 'Valoración no encontrada'], 404);
+            return response()->json(['message' => 'Valoracion no encontrada'], 404);
         }
 
-        $valoracion->delete();
+        if (is_array($valoracion)) {
+            $valoracionModel = Valoracion::hydrate([$valoracion])->first();
+        } else {
+            $valoracionModel = $valoracion;
+        }
+
+        $valoracionModel->delete();
 
         // Limpiar caché de la valoración y de la lista
         Redis::del('valoracion_'. $id);
 
-
-        return response()->json(['message' => 'Valoración eliminada correctamente']);
+        return response()->json(['message' => 'Valoracion eliminada correctamente']);
     }
 }
