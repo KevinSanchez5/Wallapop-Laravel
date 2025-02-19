@@ -12,7 +12,7 @@ class UsersSeeder extends Seeder
         User::create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
-            'password' => 'adminPassword123',
+            'password' => 'adminPassword123?',
             'role' => 'admin',
             'email_verified_at' => now(),
             'remember_token' => '',
@@ -22,7 +22,7 @@ class UsersSeeder extends Seeder
         User::create([
             'name' => 'Juan Pérez',
             'email' => 'juan@example.com',
-            'password' => 'Password123',
+            'password' => 'Password123?',
             'role' => 'cliente',
             'email_verified_at' => now(),
             'remember_token' => '',
@@ -32,7 +32,7 @@ class UsersSeeder extends Seeder
         User::create([
             'name' => 'María García',
             'email' =>'maria@example.com',
-            'password' => 'Password123',
+            'password' => 'Password123?',
             'role' => 'cliente',
             'email_verified_at' => now(),
             'remember_token' => '',
@@ -42,7 +42,7 @@ class UsersSeeder extends Seeder
         User::create([
             'name' => 'Pedro Martínez',
             'email' => 'pedro@example.com',
-            'password' => 'Password123',
+            'password' => 'Password123?',
             'role' => 'cliente',
             'email_verified_at' => now(),
             'remember_token' => '',
@@ -52,7 +52,7 @@ class UsersSeeder extends Seeder
         User::create([
             'name' => 'Isabella Rodríguez',
             'email' => 'isabella@example.com',
-            'password' => 'Password123',
+            'password' => 'Password123?',
             'role' => 'user',
             'email_verified_at' => now(),
             'remember_token' => '',
