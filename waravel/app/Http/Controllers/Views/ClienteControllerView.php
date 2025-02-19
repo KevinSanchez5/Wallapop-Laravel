@@ -6,13 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Producto;
 
-// Asegúrate de importar el modelo
-
 class ClienteControllerView extends Controller
 {
-    /**
-     * Muestra la vista de "Mi Cuenta" con los datos del cliente y sus productos.
-     */
+
     public function mostrarCliente($guid)
     {
         $cliente = Cliente::where('guid', $guid)->firstOrFail();
@@ -20,9 +16,7 @@ class ClienteControllerView extends Controller
             ->where('estado', 'Disponible')
             ->get();
 
-        return view('client.verCliente', compact('cliente', 'productos'));
+        return view('pages.ver-cliente', compact('cliente', 'productos'));
     }
-
-
 
 }

@@ -27,12 +27,6 @@ Route::middleware('user')->group(function () {
 
     Route::post('passchange', [PasswordResetLinkController::class, 'store'])
         ->name('passchange');
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
 });
 
 Route::middleware('cliente')->group(function () {

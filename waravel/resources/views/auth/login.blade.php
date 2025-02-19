@@ -4,8 +4,6 @@
 
 @section('auth-content')
 
-<x-guest-layout>
-    <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}">
@@ -27,7 +25,7 @@
         <button type="submit" class="w-full bg-black text-white p-2 rounded font-semibold dark:bg-gray-700 dark:text-white">
             {{ __('Iniciar Sesión') }}
         </button>
+        <a class="text-gray-600 dark:text-gray-300" href="{{ route('register') }}">{{ __('¿No tienes cuenta?') }}</a>
     </form>
-</x-guest-layout>
 
 @endsection
