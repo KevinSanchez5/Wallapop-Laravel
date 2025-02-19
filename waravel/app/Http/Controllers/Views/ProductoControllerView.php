@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use App\Models\Producto;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -73,5 +74,4 @@ class ProductoControllerView extends Controller
 
         return view('pages.producto', compact('producto'));
     }
-
 }
