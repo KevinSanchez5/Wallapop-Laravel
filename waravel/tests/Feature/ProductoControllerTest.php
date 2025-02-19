@@ -45,7 +45,7 @@ class ProductoControllerTest extends TestCase
         for ($i = 1; $i <= 20; $i++) {
             Producto::create([
                 'guid' => 'guid-' . $i,
-                'vendedor_id' => 1,
+                'vendedor_id' => $cliente->id,
                 'nombre' => 'Producto ' . $i,
                 'descripcion' => 'Descripción del producto ' . $i,
                 'estadoFisico' => 'Nuevo',
