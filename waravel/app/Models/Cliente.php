@@ -48,6 +48,11 @@ class Cliente extends Model
 
     public function getDireccionAttribute($value)
     {
+        if (is_array($value)) {
+            return $value;
+        }
+
         return json_decode($value);
     }
+
 }
