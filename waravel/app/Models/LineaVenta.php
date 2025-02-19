@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LineaVenta extends Model
 {
-    protected $fillable = ['guid', 'vendedor', 'cantidad', 'producto', 'precio', 'precioTotal'];
+    protected $fillable = ['guid', 'vendedor', 'cantidad', 'producto', 'precioTotal'];
 
     public function setVendedorAttribute($value)
     {
@@ -15,6 +15,10 @@ class LineaVenta extends Model
 
     public function getVendedorAttribute($value)
     {
+        if (is_array($value)) {
+            return $value;
+        }
+
         return json_decode($value);
     }
 
@@ -25,6 +29,10 @@ class LineaVenta extends Model
 
     public function getProductoAttribute($value)
     {
+        if (is_array($value)) {
+            return $value;
+        }
+
         return json_decode($value);
     }
 }

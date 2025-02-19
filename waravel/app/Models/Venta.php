@@ -15,16 +15,20 @@ class Venta extends Model
 
     public function getCompradorAttribute($value)
     {
+        if (is_array($value)) {
+            return $value;
+        }
+
         return json_decode($value);
     }
 
-    public function setLineaVentaAttribute($value)
+    public function setLineaVentasAttribute($value)
     {
         $this->attributes['lineaVentas'] = json_encode($value);
     }
 
-    public function getLineaVentaAttribute($value)
+    public function getLineaVentasAttribute($value)
     {
-        return json_decode($value);
+        return is_array($value) ? $value : json_decode($value, true);
     }
 }

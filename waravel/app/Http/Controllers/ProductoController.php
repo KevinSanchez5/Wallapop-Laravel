@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
+
 use Illuminate\Support\Str;
 
 class ProductoController extends Controller
@@ -14,20 +15,56 @@ class ProductoController extends Controller
     // Mostrar todos los productos
     public function index()
     {
-        $productos = Producto::all();
-        return response()->json($productos);
+        $query = Producto::orderBy('id', 'asc');
+
+        $productos = $query->paginate(15);
+
+        $data = $productos->getCollection()->transform(function ($cliente) {
+           return [
+               'id' => $cliente->id,
+               'guid' => $cliente->guid,
+               'vendedor_id' => $cliente->vendedor_id,
+               'nombre' => $cliente->nombre,
+               'descripcion' => $cliente->descripcion,
+               'estadoFisico' => $cliente->estadoFisico,
+               'precio' => $cliente->precio,
+               'categoria' => $cliente->categoria,
+               'estado' => $cliente->estado,
+               'imagenes' => $cliente->imagenes,
+               'created_at' => $cliente->created_at->toDateTimeString(),
+               'updated_at' => $cliente->updated_at->toDateTimeString(),
+           ];
+        });
+
+        $customResponse = [
+            'productos' => $data,
+            'paginacion' => [
+                'pagina_actual' => $productos->currentPage(),
+                'elementos_por_pagina' => $productos->perPage(),
+                'ultima_pagina' => $productos->lastPage(),
+                'elementos_totales' => $productos->total(),
+            ],
+        ];
+
+        return response()->json($customResponse);
     }
 
     // Mostrar un producto específico
     public function show($id)
     {
-        $producto = Cache::remember("producto_{$id}", 60, function () use ($id) {
-            return Producto::find($id);
-        });
+        $productoRedis = Redis::get('producto_'.$id);
+
+        if ($productoRedis) {
+            return response()->json(json_decode($productoRedis));
+        }
+
+        $producto = Producto::find($id);
 
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
+
+        Redis::set('producto_'. $id, json_encode($producto), 'EX',1800);
 
         return response()->json($producto);
     }
@@ -45,7 +82,6 @@ class ProductoController extends Controller
             'categoria' => 'required|string|max:255',
             'estado' => 'required|string|max:255',
             'imagenes' => 'required|array',
-            'imagenes.*' => 'url',
         ]);
 
         if ($validator->fails()) {
@@ -54,8 +90,6 @@ class ProductoController extends Controller
 
         $producto = Producto::create($request->all());
 
-        // Limpiar caché de la lista de productos
-        Cache::forget('productos_all');
 
         return response()->json($producto, 201);
     }
@@ -63,95 +97,79 @@ class ProductoController extends Controller
     // Actualizar un producto existente
     public function update(Request $request, $id)
     {
-        $producto = Producto::find($id);
+        $producto = Redis::get('producto_'.$id);
+        if (!$producto) {
+            $producto = Producto::find($id);
+        }
+
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
+        if (is_string($producto)) {
+            $productoArray = json_decode($producto, true);
+            $productoModel = Producto::hydrate([$productoArray])->first();
+        } elseif ($producto instanceof Producto) {
+            $productoModel = $producto;
+        } else {
+            $productoModel = Producto::hydrate([$producto])->first();
+        }
+
         $validator = Validator::make($request->all(), [
-            'nombre' => 'string|max:255',
-            'descripcion' => 'required|string',
+            'nombre'       => 'string|max:255',
+            'descripcion'  => 'required|string',
             'estadoFisico' => 'required|string|max:255',
-            'precio' => 'numeric|min:0',
-            'categoria' => 'string|max:255',
-            'estado' => 'string|max:255',
-            'imagenes' => 'required|array',
-            'imagenes.*' => 'url',
+            'precio'       => 'numeric|min:0',
+            'categoria'    => 'string|max:255',
+            'estado'       => 'string|max:255',
+            //'imagenes'   => 'required|array',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'Error de validación',
+                'errors'  => $validator->errors()
+            ], 422);
         }
 
-        $producto->update($request->all());
+        $productoModel->update($request->all());
 
         // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
+        Redis::del('producto_' . $id);
+        Redis::set('producto_' . $id, json_encode($productoModel), 'EX', 1800);
 
-        return response()->json($producto);
+        return response()->json($productoModel);
     }
 
     // Eliminar un producto
     public function destroy($id)
     {
-        $producto = Producto::find($id);
+        $producto = Redis::get('producto_' . $id);
+
+        if ($producto) {
+            $producto = json_decode($producto, true);
+        } else {
+            $producto = Producto::find($id);
+        }
+
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        $producto->delete();
+        if (is_array($producto)) {
+            $productoModel = Producto::hydrate([$producto])->first();
+        } else {
+            $productoModel = $producto;
+        }
 
-        // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
+        $productoModel->delete();
+
+        // Limpiar caché del producto
+        Redis::del('producto_' . $id);
 
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
 
-    // Agregar un producto a favoritos de un cliente
-    public function addToFavorites(Request $request, $id)
-    {
-        $producto = Producto::find($id);
-        if (!$producto) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-
-        $cliente = Cliente::find($request->cliente_id);
-        if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
-        }
-
-        $producto->clientesFavoritos()->attach($cliente->id);
-
-        // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
-
-        return response()->json(['message' => 'Producto agregado a favoritos']);
-    }
-
-    // Quitar un producto de favoritos de un cliente
-    public function removeFromFavorites(Request $request, $id)
-    {
-        $producto = Producto::find($id);
-        if (!$producto) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-
-        $cliente = Cliente::find($request->cliente_id);
-        if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
-        }
-
-        $producto->clientesFavoritos()->detach($cliente->id);
-
-        // Limpiar caché del producto y de la lista
-        Cache::forget("producto_{$id}");
-        Cache::forget('productos_all');
-
-        return response()->json(['message' => 'Producto eliminado de favoritos']);
-    }
 
     public function addListingPhoto(Request $request, $id) {
         $product = Producto::find($id);
@@ -180,37 +198,7 @@ class ProductoController extends Controller
         $product->imagenes = array_merge($images, [$filePath]);
         $product->save();
 
-        // Limpiar caché del producto
-        Cache::forget("producto_{$id}");
 
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
-
-
-    public function indexVista()
-    {
-        // Obtenemos los productos desde la base de datos
-        $productos = Producto::with('vendedor', 'clientesFavoritos')->get();
-
-        // Devolvemos la vista de inicio con los productos
-        return view('pages.home', compact('productos'));
-    }
-
-    public function showVista($id)
-    {
-        if (!is_numeric($id)) {
-            return redirect()->route('inicio')->with('error', 'ID no válido');
-        }
-
-        $producto = Cache::remember("producto_{$id}", 60, function () use ($id) {
-            return Producto::with('vendedor', 'clientesFavoritos')->find($id);
-        });
-
-        if (!$producto) {
-            return redirect()->route('inicio')->with('error', 'Producto no encontrado');
-        }
-
-        return view('productos.show', compact('producto'));
-    }
-
 }
