@@ -119,6 +119,51 @@ class ClienteControllerTest extends TestCase
         $this->assertEquals($cliente->apellido, $clienteRedis['apellido']);
     }
 
+    public function test_store(): void
+    {
+
+        $usuario = User::create([
+            'name' => 'Cliente',
+            'email' => 'cliente@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 'cliente',
+        ]);
+
+
+        $data = [
+            'guid' => Str::uuid(),
+            'nombre' => 'Pepe',
+            'apellido' => 'Perez',
+            'avatar' => 'http://example.com/avatar.png',
+            'telefono' => '1234567890',
+            'direccion' => [
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
+                'codigoPostal' => 28001
+            ],
+            'activo' => true,
+            'usuario_id' => $usuario->id,
+        ];
+
+
+        $response = $this->postJson('/api/clientes', $data);
+
+
+        $response->assertStatus(201);
+
+       
+        $this->assertDatabaseHas('clientes', [
+            'nombre' => 'Pepe',
+            'apellido' => 'Perez',
+            'telefono' => '1234567890',
+            'usuario_id' => $usuario->id,
+        ]);
+    }
+
+
+
     public function test_update(): void
     {
         $usuario = User::create([
