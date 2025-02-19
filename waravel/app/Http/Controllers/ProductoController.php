@@ -172,7 +172,14 @@ class ProductoController extends Controller
 
 
     public function addListingPhoto(Request $request, $id) {
-        $product = Producto::find($id);
+        $product = Redis::get('producto_' . $id);
+
+        if (!$product) {
+            $product = Producto::find($id);
+        }else{
+            $product = Producto::hydrate(json_decode($product, true));
+        }
+
         if (!$product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
