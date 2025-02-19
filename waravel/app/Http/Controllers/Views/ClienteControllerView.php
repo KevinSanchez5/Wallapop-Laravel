@@ -8,7 +8,6 @@ use App\Models\Producto;
 
 class ClienteControllerView extends Controller
 {
-
     public function mostrarCliente($guid)
     {
         $cliente = Cliente::where('guid', $guid)->firstOrFail();
@@ -18,5 +17,4 @@ class ClienteControllerView extends Controller
 
         return view('pages.ver-cliente', compact('cliente', 'productos'));
     }
-
 }

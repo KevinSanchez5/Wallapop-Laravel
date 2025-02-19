@@ -93,7 +93,7 @@
         <div id="productos-container" class="container mx-auto mt-8 px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             @forelse ($productos as $producto)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col">
-                    <img src="{{ asset('storage/productos/' . ($producto->imagenes[0] ?? 'productos/default.jpg')) }}"
+                    <img src="{{ asset('storage/' . ($producto->imagenes[0] ?? 'default.jpg')) }}"
                          alt="Imagen del producto"
                          class="w-full h-40 object-cover rounded-t-lg">
 
@@ -121,6 +121,13 @@
         </div>
 
     </div>
+
+    <script>
+        document.getElementById('category-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('category-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
 
     <!-- Pie de página -->
     <x-footer />
