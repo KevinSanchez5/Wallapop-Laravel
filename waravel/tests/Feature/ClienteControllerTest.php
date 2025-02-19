@@ -147,13 +147,9 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $usuario->id,
         ];
 
-
         $response = $this->postJson('/api/clientes', $data);
-
-
         $response->assertStatus(201);
 
-       
         $this->assertDatabaseHas('clientes', [
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
@@ -173,7 +169,6 @@ class ClienteControllerTest extends TestCase
             'role' => 'admin',
         ]);
 
-        // ✅ Creamos el cliente sin `json_encode()` en `direccion`
         $cliente = Cliente::create([
             'guid' => Str::uuid(),
             'nombre' => 'Pepe',
@@ -191,10 +186,8 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $usuario->id,
         ]);
 
-        // ✅ Guardar en Redis el cliente antes de actualizarlo
         Redis::set('cliente_' . $cliente->id, json_encode($cliente->toArray()));
 
-        // ✅ Datos correctos para actualizar un cliente (no un producto)
         $data = [
             'nombre' => 'Juan',
             'apellido' => 'Gómez',
@@ -210,13 +203,9 @@ class ClienteControllerTest extends TestCase
             'activo' => false,
         ];
 
-        // ✅ Realizamos la petición PUT
         $response = $this->putJson("/api/clientes/{$cliente->id}", $data);
-
-        // ✅ Verificamos que la respuesta sea exitosa
         $response->assertStatus(200);
 
-        // ✅ Verificamos que los datos se actualizaron en la base de datos
         $this->assertDatabaseHas('clientes', [
             'id' => $cliente->id,
             'nombre' => 'Juan',
@@ -226,7 +215,6 @@ class ClienteControllerTest extends TestCase
             'activo' => false,
         ]);
 
-        // ✅ Verificamos que los datos se actualizaron en Redis
         $clienteActualizado = json_decode(Redis::get('cliente_' . $cliente->id), true);
 
         $this->assertEquals($data['nombre'], $clienteActualizado['nombre']);
@@ -239,10 +227,8 @@ class ClienteControllerTest extends TestCase
 
     public function test_update_not_found(): void
     {
-        // ✅ ID de un cliente que no existe
         $idInexistente = 9999;
 
-        // ✅ Datos de actualización (aunque no se usará porque el cliente no existe)
         $data = [
             'nombre' => 'Juan',
             'apellido' => 'Gómez',
@@ -258,16 +244,60 @@ class ClienteControllerTest extends TestCase
             'activo' => false,
         ];
 
-        // ✅ Intentamos actualizar un cliente que no existe
         $response = $this->putJson("/api/clientes/{$idInexistente}", $data);
-
-        // ✅ Verificamos que la respuesta sea 404 (Not Found)
         $response->assertStatus(404);
-
-        // ✅ Verificamos que el mensaje de error es el esperado
         $response->assertJson([
             'message' => 'Cliente no encontrado',
         ]);
+    }
+
+    public function test_destroy_cliente_existe(): void
+    {
+        // ✅ Crear un usuario
+        $usuario = User::create([
+            'name' => 'Cliente',
+            'email' => 'cliente@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 'cliente',
+        ]);
+
+        // ✅ Crear un cliente en la base de datos
+        $cliente = Cliente::create([
+            'guid' => Str::uuid(),
+            'nombre' => 'Pepe',
+            'apellido' => 'Perez',
+            'avatar' => 'http://example.com/avatar.png',
+            'telefono' => '1234567890',
+            'direccion' => json_encode([
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
+                'codigoPostal' => 28001
+            ]),
+            'activo' => true,
+            'usuario_id' => $usuario->id,
+        ]);
+
+        // ✅ Enviar petición DELETE
+        $response = $this->deleteJson("/api/clientes/{$cliente->id}");
+
+        // ✅ Verificar que la respuesta sea 200 (Cliente eliminado)
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Cliente eliminado correctamente']);
+
+        // ✅ Verificar que el cliente ya no está en la base de datos
+        $this->assertDatabaseMissing('clientes', ['id' => $cliente->id]);
+    }
+
+    public function test_destroy_cliente_no_existe(): void
+    {
+        // ❌ Intentar eliminar un cliente con un ID inexistente
+        $response = $this->deleteJson("/api/clientes/9999");
+
+        // ❌ Verificar que la respuesta sea 404 (Cliente no encontrado)
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Cliente no encontrado']);
     }
 
 
