@@ -83,37 +83,6 @@ class ValoracionController extends Controller
         return response()->json($valoracion, 201);
     }
 
-    // Actualizar una valoración existente
-    public function update(Request $request, $id)
-    {
-        $valoracion = Redis::find($id);
-
-        if (!$valoracion) {
-            $valoracion = Valoracion::find($id);
-        }
-
-        if (!$valoracion) {
-            return response()->json(['message' => 'Valoración no encontrada'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'comentario' => 'string|max:1000',
-            'puntuacion' => 'integer|min:1|max:5',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $valoracion->update($request->all());
-
-        // Limpiar caché de la valoración y de la lista
-        Redis::del('valoracion_'. $id);
-        Redis::set('valoracion_' . $id, json_encode($valoracion), 'EX', 1800);
-
-        return response()->json($valoracion);
-    }
-
     // Eliminar una valoración
     public function destroy($id)
     {
