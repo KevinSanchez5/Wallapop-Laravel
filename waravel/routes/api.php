@@ -4,6 +4,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValoracionController;
+use App\Http\Controllers\PagoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,11 +34,13 @@ Route::middleware('api')->group(function () {
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
-    Route::get('/users/{id}/correo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
+    Route::post('/users/correo-codigo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
 
     Route::get('/valoraciones', [ValoracionController::class, 'index']);
     Route::get('/valoraciones/{id}', [ValoracionController::class, 'show']);
     Route::post('/valoraciones', [ValoracionController::class, 'store']);
     Route::put('/valoraciones/{id}', [ValoracionController::class, 'update']);
     Route::delete('/valoraciones/{id}', [ValoracionController::class, 'destroy']);
+
+    Route::get('/crear-sesion-pago',[PagoController::class, 'crearSesionPago']);
 });

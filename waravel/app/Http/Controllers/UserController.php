@@ -85,9 +85,15 @@ class UserController extends Controller
         return response()->json(null, 204);
     }
 
-    public function enviarCorreoRecuperarContrasenya($id)
+    public function enviarCorreoRecuperarContrasenya(Request $request)
     {
-        $user = User::findOrFail($id);
+        $request->validate([
+            'email' => 'required|string|email|max:255',
+        ]);
+        $email = $request->email;
+        //$user = User::where('email', $email)->first();
+        $user = DB::select("SELECT * FROM users WHERE email = ? LIMIT 1", [$email]);
+        // $user = DB::table('users')->where('email', $email)->first();
         if(!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -96,6 +102,7 @@ class UserController extends Controller
         Mail::to($user->email)->send(new EmailSender($user, $codigo, null, "recuperarContrasenya"));
 
         return response()->json([
+            'success' => true,
             'message' => 'Correo enviado',
         ], 200);
     }

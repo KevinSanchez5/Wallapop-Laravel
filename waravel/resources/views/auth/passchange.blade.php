@@ -24,11 +24,12 @@
                     <div class="flex flex-col gap-4 mb-4">
                         <label style="margin-bottom: -15px" class="text-gray-700 dark:text-gray-300">Email</label>
                         <div class="flex gap-2">
-                            <input type="email" name="email" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            <button type="button" class="bg-[#c5fc00] text-black p-2 rounded font-semibold dark:bg-[#c5fc00]">
+                            <input type="email" id="email" name="email" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <button type="button" onclick="enviarCorreoCodigo()" class="bg-[#c5fc00] text-black p-2 rounded font-semibold dark:bg-[#c5fc00]">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
+                        <span id="sendCodeMessage" class="text-sm font-semibold"></span>
                     </div>
 
                     <label class="block text-gray-700 dark:text-gray-300">Nueva Contraseña</label>
