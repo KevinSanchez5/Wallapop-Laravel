@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
 use App\Http\Controllers\Views\ValoracionesControllerView;
 use Illuminate\Support\Facades\Route;
 
-// Ruta para la página principal
 Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('inicio');
 
 Route::get('/productos', [ProductoControllerView::class, 'indexVista'])->name('productos.index');
@@ -15,16 +15,14 @@ Route::get('/cliente/{guid}', [ClienteControllerView::class, 'mostrarCliente'])-
 Route::get('/clientes/{guid}/valoraciones', [ValoracionesControllerView::class, 'index'])->name('cliente.valoraciones');
 Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'promedio'])->name('cliente.puntuacion');
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+Route::get('/', function () {
+    return view('inicio');
+})->middleware(['auth', 'verified'])->name('home');
 
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
-Route::get('/passchange', function () {
-    return view('auth.passchange');
-})->name('passchange');
-
-
+require __DIR__.'/auth.php';
