@@ -12,28 +12,37 @@
             <!-- Contenedor principal con fondo claro/oscuro -->
             <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-5xl mx-auto">
 
-                <!-- Carrusel (Swiper) arriba -->
-                <div class="swiper w-full h-96 mb-6">
-                    <div class="swiper-wrapper">
-                        @foreach ($producto->imagenes as $imagen)
-                            <div class="swiper-slide">
-                                <img src="{{ asset('storage/productos/' . $imagen) }}" alt="Imagen del producto"
-                                     class="w-full h-full object-cover rounded-lg shadow-lg transition-transform transform hover:scale-105 duration-300">
-                            </div>
-                        @endforeach
-
-                        @if (empty($producto->imagenes) || count($producto->imagenes) === 0)
-                            <div class="swiper-slide">
-                                <div class="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center rounded-lg shadow-lg">
-                                    <span class="text-white text-lg font-semibold">Sin Imagen</span>
+                <!-- Carrusel  arriba -->
+                <div x-data="{ open: false, imgSrc: '' }">
+                    <div class="swiper w-full h-96 mb-6">
+                        <div class="swiper-wrapper">
+                            @foreach ($producto->imagenes as $imagen)
+                                <div class="swiper-slide">
+                                    <img src="{{ asset('storage/productos/' . $imagen) }}"
+                                         alt="Imagen del producto"
+                                         class="w-full h-full object-cover rounded-lg shadow-lg transition-transform transform hover:scale-105 duration-300 cursor-pointer"
+                                         @click="open = true; imgSrc = '{{ asset('storage/productos/' . $imagen) }}'">
                                 </div>
-                            </div>
-                        @endif
+                            @endforeach
+
+                            @if (empty($producto->imagenes) || count($producto->imagenes) === 0)
+                                <div class="swiper-slide">
+                                    <div class="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center rounded-lg shadow-lg">
+                                        <span class="text-white text-lg font-semibold">Sin Imagen</span>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
                     </div>
-                    <!-- Controles del carrusel -->
-                    <div class="swiper-pagination"></div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
+
+                    <!-- Modal de imagen ampliada -->
+                    <div x-show="open" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" @click.away="open = false">
+                        <img :src="imgSrc" class="max-w-4xl max-h-screen rounded-lg shadow-lg">
+                        <button class="absolute top-5 right-5 text-white text-3xl font-bold" @click="open = false">&times;</button>
+                    </div>
                 </div>
 
                 <!-- Contenido del producto debajo del carrusel -->
