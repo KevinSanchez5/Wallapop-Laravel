@@ -53,4 +53,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Cliente::class, 'usuario_id');
     }
+
+    //Scope para buscar por email
+    public function scopeByEmail($query, $email)
+    {
+        return $query->where('email', $email);
+    }
 }

@@ -120,20 +120,39 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255',
         ]);
         $email = $request->email;
-        //$user = User::where('email', $email)->first();
-        $user = DB::select("SELECT * FROM users WHERE email = ? LIMIT 1", [$email]);
-        // $user = DB::table('users')->where('email', $email)->first();
+        try {
+            $user = User::byEmail($email)->first();
+        } catch(\Exception $e) {
+            return response()->json(['error' => $e->getMessage()],500);
+        }
+
         if(!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
         $codigo = strtoupper(Str::random(10));
 
-        Mail::to($user->email)->send(new EmailSender($user, $codigo, null, "recuperarContrasenya"));
-
+        try {
+            Mail::to($user->email)->send(new EmailSender($user, $codigo, null, 'recuperarContrasenya'));
+        } catch(\Exception $e) {
+            return response()->json(['error' => $e->getMessage()],500);
+        }
         return response()->json([
             'success' => true,
             'message' => 'Correo enviado',
         ], 200);
+    }
+
+
+    public function showEmail($email)
+    {
+
+        $user = User::where('email', $email)->first();
+
+        if(!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json($user);
     }
 
 }

@@ -31,9 +31,9 @@ Route::middleware('api')->group(function () {
     Route::post('/clientes/favoritos/{id}', [ClienteController::class, 'addToFavorites']);
     Route::delete('/clientes/favoritos/{id}', [ClienteController::class, 'removeFromFavorites']);
 
-
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::get('/users/{email}', [UserController::class, 'showEmail']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
@@ -51,5 +51,5 @@ Route::middleware('api')->group(function () {
     Route::put('/ventas/{id}', [VentaController::class, 'update']);
     Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
 
-    Route::get('/crear-sesion-pago',[PagoController::class, 'crearSesionPago']);
+    Route::post('/crear-sesion-pago',[PagoController::class, 'crearSesionPago']);
 });

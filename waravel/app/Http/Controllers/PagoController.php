@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Stripe\StripeClient;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 class PagoController extends Controller
 {
@@ -14,23 +15,23 @@ class PagoController extends Controller
      */
     public function crearSesionPago(Request $request)
     {
-        $stripeSecretKey = env('STRIPE_SECRET');
-        $stripe = new StripeClient($stripeSecretKey);
+        Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $OUR_DOMAIN = env('APP_URL');
 
         try {
-            $checkoutSession = $stripe->checkout->sessions->create([
-                'ui_mode' => 'embedded',
+            $checkoutSession = Session::create([
                 'line_items' => [[
-                    'price'=> 1,
+                    //recuperar los datos de los articulos y precio desde el request
+                    'price'=> 'price_1QuYJo7AuwO8CXRNNnR51KKo',
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'return_url'=> $OUR_DOMAIN . '/return.html?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => $OUR_DOMAIN . '/pago/success',
+                'cancel_url' => $OUR_DOMAIN . '/pago/cancelled',
             ]);
 
-            return response()-> json(['clientSecret' => $checkoutSession->client_secret]);
+            return redirect()->away($checkoutSession->url);
 
         } catch (\Exception $e){
             return response()-> json(['error' => $e->getMessage()]);
