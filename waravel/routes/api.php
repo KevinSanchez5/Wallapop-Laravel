@@ -33,7 +33,7 @@ Route::middleware('api')->group(function () {
 
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
-    Route::get('/users/{email}', [UserController::class, 'showEmail']);
+    Route::get('/users/email/{email}', [UserController::class, 'showEmail']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);

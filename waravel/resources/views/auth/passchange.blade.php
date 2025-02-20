@@ -1,7 +1,7 @@
 ﻿@extends('layouts.auth')
 
 @section('title', 'Cambio de Contraseña')
-
+<script src="{{asset('js/app.js')}}"></script>
 @section('auth-content')
     <form action="#" method="POST">
         @csrf

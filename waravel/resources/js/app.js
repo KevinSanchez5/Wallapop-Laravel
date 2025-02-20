@@ -41,15 +41,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        fetch("/users/correo-codigo", {
+        fetch("/api/users/correo-codigo", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ email: email })
         })
-            .then(response => response.json())
+            .then(response => response.json()) // Convertir la respuesta a JSON
             .then(data => {
+                console.log(data);  // Esto te ayudará a ver qué datos estás recibiendo del backend
                 if (data.success) {
                     messageSpan.textContent = data.message;
                     messageSpan.style.color = "green";
@@ -59,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => {
+                console.log(error); // Verifica cualquier error en la consola
                 messageSpan.textContent = "Hubo un error al enviar el código.";
                 messageSpan.style.color = "red";
             });
