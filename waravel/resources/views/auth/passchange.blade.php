@@ -1,7 +1,6 @@
 ﻿@extends('layouts.auth')
 
 @section('title', 'Cambio de Contraseña')
-<script src="{{asset('js/app.js')}}"></script>
 @section('auth-content')
     <form action="#" method="POST">
         @csrf
@@ -34,4 +33,44 @@
     <div class="text-center mt-4">
         <p class="text-gray-600 dark:text-gray-300">¿Recordaste tu contraseña? <a href="{{ route('login') }}" class="text-green-600 font-semibold">Iniciar sesión</a></p>
     </div>
+
+    <script>
+        function enviarCorreoCodigo() {
+            let email = document.getElementById('email').value;
+            let messageSpan = document.getElementById('sendCodeMessage');
+
+            // Validación de correo
+            if (!email.trim()) {
+                messageSpan.textContent = "Por favor, ingresa un correo válido.";
+                messageSpan.style.color = "red";
+                return;
+            }
+
+            // Realizar la petición fetch al backend
+            fetch("/api/users/correo-codigo", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: email })
+            })
+                .then(response => response.json()) // Convertir la respuesta a JSON
+                .then(data => {
+                    console.log(data);  // Esto te ayudará a ver qué datos estás recibiendo del backend
+                    if (data.success) {
+                        messageSpan.textContent = data.message;
+                        messageSpan.style.color = "green";
+                    } else {
+                        messageSpan.textContent = "No se encontró un usuario con este correo.";
+                        messageSpan.style.color = "red";
+                    }
+                })
+                .catch(error => {
+                    console.log(error); // Verifica cualquier error en la consola
+                    messageSpan.textContent = "Hubo un error al enviar el código.";
+                    messageSpan.style.color = "red";
+                });
+        }
+    </script>
+
 @endsection
