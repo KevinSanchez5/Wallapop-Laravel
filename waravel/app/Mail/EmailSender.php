@@ -74,7 +74,7 @@ class EmailSender extends Mailable
     }
 
     /**
-     * Adjuntos si los ubiera.
+     * Adjuntos si los hubiera.
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
