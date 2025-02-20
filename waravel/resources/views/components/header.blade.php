@@ -2,7 +2,7 @@
     <div class="container mx-auto flex justify-between items-center px-6">
 
         <!-- Logo -->
-        <a href="{{ route('inicio') }}" class="text-3xl font-bold text-gray-800">
+        <a href="{{ route('pages.home') }}" class="text-3xl font-bold text-gray-800">
             Waravel
         </a>
 

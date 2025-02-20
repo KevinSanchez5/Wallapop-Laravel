@@ -167,7 +167,6 @@
         display: none;
     }
 
-    <!-- Animaciones con Tailwind -->
     @keyframes fadeIn {
         from {
             opacity: 0;
