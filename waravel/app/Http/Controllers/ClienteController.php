@@ -208,4 +208,37 @@ class ClienteController extends Controller
 
         return response()->json(['message' => 'Producto eliminado de favoritos']);
     }
+
+    public function updateProfilePhoto(Request $request, $id) {
+        $cliente = Redis::get('cliente_' . $id);
+
+        if (!$cliente) {
+            $cliente = Cliente::find($id);
+        }else{
+            $cliente = Cliente::hydrate([$cliente])->first();;
+        }
+
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'required|image|mimes:jpg,jpeg,png',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $file = $request->file('avatar');
+        $filename = $cliente->guid . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('clientes/avatares', $filename, 'public');
+
+        Cliente::where('id', $id)->update(['avatar' => $filePath]);
+
+        // Limpiar caché del cliente
+        Redis::del('cliente_' . $id);
+
+        return response()->json(['message' => 'Avatar actualizado', 'cliente' => $cliente]);
+    }
 }
