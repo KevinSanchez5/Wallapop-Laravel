@@ -39,14 +39,12 @@
             let email = document.getElementById('email').value;
             let messageSpan = document.getElementById('sendCodeMessage');
 
-            // Validación de correo
             if (!email.trim()) {
                 messageSpan.textContent = "Por favor, ingresa un correo válido.";
                 messageSpan.style.color = "red";
                 return;
             }
 
-            // Realizar la petición fetch al backend
             fetch("/api/users/correo-codigo", {
                 method: "POST",
                 headers: {
@@ -54,9 +52,9 @@
                 },
                 body: JSON.stringify({ email: email })
             })
-                .then(response => response.json()) // Convertir la respuesta a JSON
+                .then(response => response.json())
                 .then(data => {
-                    console.log(data);  // Esto te ayudará a ver qué datos estás recibiendo del backend
+                    console.log(data);
                     if (data.success) {
                         messageSpan.textContent = data.message;
                         messageSpan.style.color = "green";
@@ -66,7 +64,7 @@
                     }
                 })
                 .catch(error => {
-                    console.log(error); // Verifica cualquier error en la consola
+                    console.log(error);
                     messageSpan.textContent = "Hubo un error al enviar el código.";
                     messageSpan.style.color = "red";
                 });
