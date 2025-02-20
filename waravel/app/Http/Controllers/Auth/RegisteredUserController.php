@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
+use App\Models\Direccion;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -14,14 +15,13 @@ use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
-    // Mostrar formulario de registro
     public function showRegistrationForm()
     {
         Log::info('Mostrando formulario de registro.');
         return view('auth.register');
     }
 
-    // Registrar nuevo usuario
+// Registrar nuevo usuario
     public function register(Request $request)
     {
         Log::info('Intento de registro con email: ' . $request->email);
@@ -54,20 +54,29 @@ class RegisteredUserController extends Controller
 
             Log::info('Usuario creado con ID: ' . $user->id);
 
-            // Crear cliente
-            Cliente::create([
+            // Preparar la dirección como un array asociativo
+            $direccion = [
+                'calle' => $validated['direccion']['calle'],
+                'numero' => $validated['direccion']['numero'],
+                'piso' => $validated['direccion']['piso'],
+                'letra' => $validated['direccion']['letra'],
+                'codigoPostal' => $validated['direccion']['codigoPostal'],
+            ];
+
+            // Crear cliente con la dirección como JSON
+            $cliente = Cliente::create([
                 'guid' => Str::uuid(),
                 'nombre' => $validated['nombre'],
                 'apellido' => $validated['apellidos'],
                 'avatar' => "clientes/avatar.png",
-                'direccion' => json_encode($validated['direccion']), // Guardar como JSON
                 'telefono' => $validated['telefono'],
                 'usuario_id' => $user->id,
-            ]);
+                'direccion' => $direccion
+                ]
+            );
 
             Log::info('Cliente creado con éxito para usuario ID: ' . $user->id);
 
-            // Disparar evento de registro y loguear al usuario
             event(new Registered($user));
             Auth::login($user);
 

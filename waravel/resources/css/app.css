@@ -13,3 +13,8 @@
 .swiper-pagination-bullet-active {
     background-color: #333 !important;
 }
+
+.dropdown-menu {
+    position: absolute;
+    z-index: 1000;
+}

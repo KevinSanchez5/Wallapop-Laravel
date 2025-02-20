@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cliente;
 use App\Models\Producto;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -12,34 +11,25 @@ class ProductoControllerView extends Controller
 {
     public function indexVista()
     {
-        // Obtener productos con relaciones y paginación
-        $productos = Producto::with('vendedor', 'clientesFavoritos')->orderBy('id', 'asc')->paginate(15);
+        $query = Producto::with('vendedor', 'clientesFavoritos')
+            ->where('estado', 'Disponible');
 
-        // Transformar los datos sin perder la paginación
-        $productos->setCollection($productos->getCollection()->map(function ($producto) {
-            return (object) [ // Convertir a objeto para mantener compatibilidad con Blade
-                'id' => $producto->id,
-                'guid' => $producto->guid,
-                'vendedor_id' => $producto->vendedor_id,
-                'nombre' => $producto->nombre,
-                'descripcion' => $producto->descripcion,
-                'estadoFisico' => $producto->estadoFisico,
-                'precio' => $producto->precio,
-                'categoria' => $producto->categoria,
-                'estado' => $producto->estado,
-                'imagenes' => $producto->imagenes,
-                'created_at' => $producto->created_at->toDateTimeString(),
-                'updated_at' => $producto->updated_at->toDateTimeString(),
-            ];
-        }));
+        if (auth()->check()) {
+            $query->where('vendedor_id', '!=', auth()->id());
+        }
 
-        // Retornar la vista con los productos paginados
+        $productos = $query->orderBy('created_at', 'desc')->paginate(15);
+
         return view('pages.home', compact('productos'));
     }
 
     public function search()
     {
-        $query = Producto::query();
+        $query = Producto::query()->where('estado', 'Disponible');
+
+        if (auth()->check()) {
+            $query->where('vendedor_id', '!=', auth()->id());
+        }
 
         if (request()->has('search') && request('search') !== '') {
             $search = request('search');
@@ -57,7 +47,7 @@ class ProductoControllerView extends Controller
             $query->where('categoria', request('categoria'));
         }
 
-        $productos = $query->paginate(15);
+        $productos = $query->orderBy('created_at', 'desc')->paginate(15);
 
         return view('pages.home', compact('productos'));
     }
