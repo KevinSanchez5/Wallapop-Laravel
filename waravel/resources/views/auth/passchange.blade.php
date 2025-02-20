@@ -1,4 +1,4 @@
-﻿@extends('layouts.auth')
+@extends('layouts.auth')
 
 @section('title', 'Cambio de Contraseña')
 @section('auth-content')

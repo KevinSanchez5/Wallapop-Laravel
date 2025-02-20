@@ -72,6 +72,6 @@ class ProductoControllerView extends Controller
             return redirect()->route('inicio')->with('error', 'Producto no encontrado');
         }
 
-        return view('pages.producto', compact('producto'));
+        return view('pages.ver-producto', compact('producto'));
     }
 }

@@ -13,7 +13,7 @@ class ClientesSeeder extends Seeder
             'guid' => 'de6a7d01-af1d-44fb-a615-2583f52da3c4',
             'nombre' => 'Juan',
             'apellido' => 'Perez',
-            'avatar' => 'avatar.png',
+            'avatar' => 'clientes/avatar.png',
             'telefono' => '612345678',
             'direccion' => [
                 'calle' => 'Avenida Siempre Viva',
@@ -31,7 +31,7 @@ class ClientesSeeder extends Seeder
             'guid' => '97b37979-552a-4916-989a-b96031348856',
             'nombre' => 'Maria',
             'apellido' => 'Garcia',
-            'avatar' =>'avatar.png',
+            'avatar' =>'clientes/avatar.png',
             'telefono' => '987654321',
             'direccion' => [
                 'calle' => 'Calle de las Nubes',
@@ -49,7 +49,7 @@ class ClientesSeeder extends Seeder
             'guid' => '81f58779-2a53-4922-b628-16c330d4b28a',
             'nombre' => 'Pedro',
             'apellido' => 'Martinez',
-            'avatar' => 'avatar.png',
+            'avatar' => 'clientes/avatar.png',
             'telefono' => '321456789',
             'direccion' => [
                 'calle' => 'Avenida España',
