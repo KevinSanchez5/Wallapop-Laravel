@@ -232,7 +232,7 @@ class ClienteController extends Controller
 
         $file = $request->file('avatar');
         $filename = $cliente->guid . '.' . $file->getClientOriginalExtension();
-        $filePath = $file->storeAs('clients/avatars', $filename, 'public');
+        $filePath = $file->storeAs('clientes/avatares', $filename, 'public');
 
         Cliente::where('id', $id)->update(['avatar' => $filePath]);
 
