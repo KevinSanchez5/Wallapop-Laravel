@@ -3,6 +3,9 @@
 @section('title', 'Iniciar Sesión')
 
 @section('auth-content')
+<script>
+    window.Laravel = {!! json_encode(['csrfToken' => csrf_token()]) !!};
+</script>
 
 <x-auth-session-status class="mb-4" :status="session('status')" />
 

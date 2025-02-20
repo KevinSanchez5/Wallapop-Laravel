@@ -1,6 +1,8 @@
 ﻿@extends('layouts.app')
 
 @section('content')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <div class="flex min-h-screen">
         <div class="w-1/2 bg-cover bg-center flex items-center justify-center text-white"
              style="background-image: url({{ asset('imgs/fondo_auth.jpg') }});">
