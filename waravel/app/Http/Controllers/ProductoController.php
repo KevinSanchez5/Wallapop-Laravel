@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redis;
 
@@ -172,7 +174,14 @@ class ProductoController extends Controller
 
 
     public function addListingPhoto(Request $request, $id) {
-        $product = Producto::find($id);
+        $product = Redis::get('producto_' . $id);
+
+        if (!$product) {
+            $product = Producto::find($id);
+        }else{
+            $product = Producto::hydrate(json_decode($product, true));
+        }
+
         if (!$product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
@@ -185,7 +194,6 @@ class ProductoController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Verificar que no tiene más de 5 fotos
         $images = $product->imagenes ?? [];
         if (count($images) >= 5) {
             return response()->json(['message' => 'Solo se pueden subir un máximo de 5 fotos'], 422);
@@ -193,12 +201,45 @@ class ProductoController extends Controller
 
         $file = $request->file('image');
         $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-        $filePath = $file->storeAs("products/{$product->guid}", $filename, 'public');
+        $filePath = $file->storeAs("productos/{$product->guid}", $filename, 'public');
 
         $product->imagenes = array_merge($images, [$filePath]);
         $product->save();
 
 
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
+    }
+
+    public function deleteListingPhoto($Id, Request $request) {
+        $filePath = $request->input('image');
+
+        if (!$filePath) {
+            return response()->json(['message' => 'Foto no proporcionada'], 422);
+        }
+
+        $product = Redis::get('producto_' . $Id);
+
+        if (!$product) {
+            $product = Producto::find($Id);
+        } else {
+            $product = Producto::hydrate(json_decode($product, true));
+        }
+
+        if (!$product) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        $images = $product->imagenes?? [];
+        $key = array_search($filePath, $images);
+        if ($key === false) {
+            return response()->json(['message' => 'Foto no encontrada en el producto'], 404);
+        }
+
+        Storage::disk('public')->delete($filePath);
+        unset($images[$key]);
+        $product->imagenes = $images;
+        $product->save();
+
+        return response()->json(['message' => 'Foto eliminada', 'product' => $product]);
     }
 }

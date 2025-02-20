@@ -486,13 +486,13 @@ class ProductoControllerTest extends TestCase
         $response->assertStatus(200);
 
         $filePath = "products/{$producto->guid}/" . $file->hashName();
-        Storage::disk('public')->assertExists("products/{$producto->guid}/");
+        Storage::disk('public')->assertExists("productos/{$producto->guid}/");
 
         $producto->refresh();
 
         $this->assertTrue(
             collect($producto->imagenes)->contains(function ($item) use ($producto) {
-                return strpos($item, "products/{$producto->guid}/") === 0;
+                return strpos($item, "productos/{$producto->guid}/") === 0;
             }),
             "El archivo subido no está en el array de imágenes"
         );
