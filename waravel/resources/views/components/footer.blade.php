@@ -1,7 +1,14 @@
 <footer class="bg-[#BFF205] text-black py-6">
     <div class="container mx-auto flex justify-between items-center px-6">
         <div class="flex items-center">
-            <img src="{{ asset('imgs/logo_negro.png') }}" alt="Waravel Logo" class="w-12 h-12 mr-4">
+            <div class="flex justify-center mb-4 text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34.45 30.81" class="w-12 h-12 mr-4" fill="currentColor">
+                    <circle cx="8.18" cy="6.32" r="6.32"/>
+                    <circle cx="26.27" cy="6.32" r="6.32"/>
+                    <path d="M14.91 30.81a1.44 1.44 0 0 0 1.44-1.44V15.9a1.44 1.44 0 0 0-1.44-1.44H1.44A1.44 1.44 0 0 0 0 15.9c0 7.1 7.6 14.91 14.91 14.91Z"/>
+                    <path d="M19.54 30.81a1.44 1.44 0 0 1-1.44-1.44V15.9a1.44 1.44 0 0 1 1.44-1.44h13.47a1.44 1.44 0 0 1 1.44 1.44c0 7.1-7.6 14.91-14.91 14.91Z"/>
+                </svg>
+            </div>
             <span class="text-3xl font-semibold">Waravel</span>
         </div>
 

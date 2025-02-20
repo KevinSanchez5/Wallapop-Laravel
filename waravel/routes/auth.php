@@ -1,21 +1,14 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ClienteController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('user')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
+Route::middleware('guest')->group(function () {
+    Route::get('register', [RegisteredUserController::class, 'showRegistrationForm'])->name('register');
+    Route::post('register', [RegisteredUserController::class, 'register']);
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -27,32 +20,53 @@ Route::middleware('user')->group(function () {
 
     Route::post('passchange', [PasswordResetLinkController::class, 'store'])
         ->name('passchange');
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
 });
 
-Route::middleware('cliente')->group(function () {
-    Route::get('verify-email', EmailVerificationPromptController::class)
-        ->name('verification.notice');
-
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
-
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
-
+Route::middleware('auth')->group(function () {
+    // Ruta de logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
-    // faltan rutas de cliente de: miperfil, editarperfil, subirproducto, editarproducto, carrito, misventas
+    // Rutas del cliente
+    Route::middleware('cliente')->group(function () {
+        Route::get('miperfil', [ClienteController::class, 'mostrarPerfil'])
+            ->name('cliente.miperfil');
 
-    // faltan rutas de admin de: pagina de inicio de admin(gestion users, gestion productos, storage)
+        Route::get('editarperfil', [ClienteController::class, 'editarPerfil'])
+            ->name('cliente.editarperfil');
+
+        Route::post('editarperfil', [ClienteController::class, 'guardarPerfil'])
+            ->name('cliente.guardarperfil');
+
+        Route::get('subirproducto', [ClienteController::class, 'mostrarFormularioProducto'])
+            ->name('cliente.subirproducto');
+
+        Route::post('subirproducto', [ClienteController::class, 'guardarProducto'])
+            ->name('cliente.guardarproducto');
+
+        Route::get('misproductos', [ClienteController::class, 'misProductos'])
+            ->name('cliente.misproductos');
+
+        Route::get('misventas', [ClienteController::class, 'misVentas'])
+            ->name('cliente.misventas');
+
+        Route::get('carrito', [ClienteController::class, 'verCarrito'])
+            ->name('cliente.carrito');
+    });
+
+    /*
+    // Rutas del administrador
+    Route::middleware('admin')->group(function () {
+        Route::get('admin/dashboard', [AdminController::class, 'dashboard'])
+            ->name('admin.dashboard');
+
+        Route::get('admin/usuarios', [AdminController::class, 'gestionUsuarios'])
+            ->name('admin.gestionUsuarios');
+
+        Route::get('admin/productos', [AdminController::class, 'gestionProductos'])
+            ->name('admin.gestionProductos');
+
+        Route::get('admin/almacen', [AdminController::class, 'almacen'])
+            ->name('admin.almacen');
+    });*/
 });
