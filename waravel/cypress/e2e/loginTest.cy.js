@@ -20,4 +20,27 @@ describe('Iniciar Sesión', () => {
         cy.url().should('include', '/');
         cy.get(".container").contains("Juan Pérez").should("be.visible");
     })
+
+    it("Debe mostrar error si las credenciales son incorrectas", () => {
+        cy.get("input[name='email']").type("juan@example.com");
+        cy.get("input[name='password']").type("incorrecto");
+        cy.get("button[type='submit']").click();
+
+        cy.contains("These credentials do not match our records.").should("be.visible");
+    });
+
+
+    it("Debe permitir cerrar sesión", () => {
+        cy.get('input[name="email"]').type('juan@example.com');
+        cy.get('input[name="password"]').type('Password123?');
+        cy.get('input[name="remember"]').check();
+        cy.get('button[type="submit"]').click();
+
+        cy.url().should('include', '/');
+        cy.get(".container").contains("Juan Pérez").should("be.visible").click();
+        cy.contains("Cerrar sesión").click();
+
+        cy.contains("Iniciar Sesión").should("be.visible");
+    });
+
 });
