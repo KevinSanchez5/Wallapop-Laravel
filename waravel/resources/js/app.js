@@ -31,3 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+document.getElementById('category-menu-button').addEventListener('click', function() {
+    const menu = document.getElementById('category-menu');
+    menu.classList.toggle('hidden');
+});
