@@ -23,9 +23,9 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-          if(!$user) {
-              return response()->json(['message' => 'User not found'], 404);
-          }
+        if(!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
         return response()->json($user);
     }
@@ -36,7 +36,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
-            'role' => 'required|string|max:255'
+            'role' => 'string|in:user,cliente,admin|max:20'
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -61,15 +61,13 @@ class UserController extends Controller
             $userModel = User::hydrate([$userArray])->first();
         } elseif ($user instanceof User) {
             $userModel = $user;
-        } else {
-            $userModel = User::hydrate([$user])->first();
         }
 
         $validator = Validator::make($request->all(), [
-            'nombre' => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255',
             'email' => 'nullable|string|email|max:255|unique:users,email',
             'password' => ['string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
-            'role' => 'string|max:20'
+            'role' => 'string|in:user,cliente,admin|max:20'
         ]);
 
         if ($validator->fails()) {
