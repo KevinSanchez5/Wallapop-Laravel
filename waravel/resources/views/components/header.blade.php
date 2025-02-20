@@ -12,11 +12,11 @@
                 <!-- Dropdown de usuario -->
                 <x-dropdown align="right" width="56">
                     <x-slot name="trigger">
-                        <button class="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition">
+                        <button class="h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-black bg-white transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white dark:text-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-500">
                             <img src="{{ asset('storage/' . (Auth::user()->avatar ?? 'clientes/avatar.png')) }}"
                                  alt="Avatar de {{ Auth::user()->name }}"
                                  class="w-8 h-8 rounded-full object-cover mr-2">
-                            <span>{{ Auth::user()->name }}</span>
+                            <span><b>{{ Auth::user()->name }}</b></span>
                             <svg class="ml-2 w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -29,7 +29,7 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</p>
                         </div>
                         <hr class="border-gray-300 dark:border-gray-600">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile')">
                             {{ __('Perfil') }}
                         </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
