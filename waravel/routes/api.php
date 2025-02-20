@@ -19,6 +19,7 @@ Route::middleware('api')->group(function () {
     Route::put('/productos/{id}', [ProductoController::class, 'update']);
     Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
     Route::post('/productos/{id}/upload', [ProductoController::class, 'addListingPhoto']);
+    Route::delete('/productos/{id}/removeListingPhoto', [ProductoController::class, 'deleteListingPhoto']);
 
     Route::get('/clientes', [ClienteController::class, 'index']);
     Route::get('/clientes/{id}', [ClienteController::class, 'show']);
