@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -274,4 +276,89 @@ class UserControllerTest extends TestCase
         $response->assertNotFound();
         $response->assertJson(['message' => 'User no encontrado']);
     }
+
+    public function testShowEmail_Success()
+    {
+        $user = User::factory()->create(['id' => '50', 'email' => 'test@test.com']);
+
+        $response = $this->get('/api/users/email/' . $user->email);
+
+        $response->assertOk();
+        $response->assertJson($user->toArray());
+        $response->assertJsonFragment(['email' => 'test@test.com']);
+    }
+
+    public function testShowEmail_UserNotFound()
+    {
+        $user = User::factory()->create(['id' => '50', 'email' => 'testqw@test.com']);
+
+        $response = $this->get('/api/users/email/' . 'algo@test.com');
+
+        $response->assertNotFound();
+        $response->assertJson(['message' => 'User not found']);
+    }
+
+    public function testEnviarCorreoRecuperarContrasenya_Unprocessable()
+    {
+        Log::spy();
+        $response = $this->postJson('api/users/correo-codigo', [
+            'email'=>'emailnoemail'
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors(['email']);
+    }
+
+    public function testEnviarCorreoRecuperarContraasenya_UserNotFound()
+    {
+        Log::spy();
+        $response = $this->post('api/users/correo-codigo', [
+            'email'=>'email@email.com'
+        ]);
+        $response->assertNotFound();
+        $response->assertJson(['message' => 'User not found']);
+    }
+
+    public function testEnviarCorreoRecuperarContrasenya_Success(){
+        Log::spy();
+        $user = User::factory()->create(['id' => '51', 'email' => 'test@test.com']);
+
+        Mail::fake();
+
+        $response = $this->postJson('api/users/correo-codigo', [
+            'email'=>'test@test.com'
+        ]);
+        $response->assertOk();
+        $response->assertJson(['message' => 'Correo enviado correctamente']);
+
+        Log::shouldHaveReceived('info')->with('Iniciando proceso de recuperación de contraseña', ['email' => 'test@test.com']);
+        Log::shouldHaveReceived('info')->with('Validación de email completada', ['email' => 'test@test.com']);
+        Log::shouldHaveReceived('info')->with('Buscando usuario por email', ['email' => 'test@test.com']);
+        Log::shouldHaveReceived('info')->with('Usuario encontrado', ['user_id' => $user->id]);
+        Log::shouldHaveReceived('info')->with('Correo de recuperación enviado', ['email' => 'test@test.com']);
+        Log::shouldHaveReceived('info')->with('Proceso de recuperación de contraseña completado', ['email' => 'test@test.com']);
+
+    }
+
+
+    public function testEnviarCorreoRecuperarContrasenya_ErrorEnviarCorreo()
+    {
+        Log::spy();
+
+        $user = User::factory()->create([
+            'email' => 'test@example.com'
+        ]);
+
+        // Simula una excepción al enviar el correo
+        Mail::shouldReceive('to->send')
+            ->andThrow(new \Exception('Error al enviar correo'));
+
+        $response = $this->postJson('api/users/correo-codigo', [
+            'email' => $user->email
+        ]);
+
+        $response->assertStatus(503);
+        $response->assertJson(['error' => 'Error al enviar correo']);
+    }
+
 }
