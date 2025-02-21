@@ -30,7 +30,7 @@ class ProductoControllerTest extends TestCase
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
-            'telefono' => '1234567890',
+            'telefono' => '123456789',
             'direccion' => json_encode([
                 'calle' => 'Avenida Siempre Viva',
                 'numero' => 742,
@@ -92,7 +92,7 @@ class ProductoControllerTest extends TestCase
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
-            'telefono' => '1234567890',
+            'telefono' => '123456789',
             'direccion' => json_encode([
                 'calle' => 'Avenida Siempre Viva',
                 'numero' => 742,
@@ -137,9 +137,68 @@ class ProductoControllerTest extends TestCase
         $this->assertEquals($producto->descripcion, $productoEnRedis['descripcion']);
     }
 
+    public function test_show_from_redis(): void
+    {
+        $usuario = User::create([
+            'name' => 'Cliente',
+            'email' => 'cliente@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 'cliente',
+        ]);
+
+        $cliente = Cliente::create([
+            'guid' => Str::uuid(),
+            'nombre' => 'Pepe',
+            'apellido' => 'Perez',
+            'avatar' => 'avatar.png',
+            'telefono' => '123456789',
+            'direccion' => json_encode([
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
+                'codigoPostal' => 28001
+            ]),
+            'activo' => true,
+            'usuario_id' => $usuario->id,
+        ]);
+
+        $producto = Producto::create([
+            'guid' => 'guidProductoShow',
+            'vendedor_id' => $cliente->id,
+            'nombre' => 'Producto de prueba',
+            'descripcion' => 'Este es un producto de prueba',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 99.99,
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible',
+            'imagenes' => json_encode(['imagenProducto.png']),
+        ]);
+
+        Redis::del('producto_' . $producto->id);
+
+        $response = $this->getJson("/api/productos/{$producto->id}");
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'id' => $producto->id,
+            'nombre' => $producto->nombre,
+            'descripcion' => $producto->descripcion,
+            'precio' => $producto->precio,
+            'categoria' => $producto->categoria,
+            'estado' => $producto->estado,
+        ]);
+
+        $productoEnRedis = json_decode(Redis::get('producto_' . $producto->id), true);
+        $this->assertEquals($producto->id, $productoEnRedis['id']);
+        $this->assertEquals($producto->nombre, $productoEnRedis['nombre']);
+        $this->assertEquals($producto->descripcion, $productoEnRedis['descripcion']);
+    }
+
     public function test_show_not_found(): void
     {
-        $response = $this->getJson("/api/productos/9999");
+        $response = $this->getJson("/api/productos/999");
 
         $response->assertStatus(404);
 
@@ -162,7 +221,7 @@ class ProductoControllerTest extends TestCase
             'nombre' => 'pepe',
             'apellido' => 'perez',
             'avatar' => 'avatar.png',
-            'telefono' => '1234567890',
+            'telefono' => '123456789',
             'direccion' => [
                 'calle' => 'Avenida Siempre Viva',
                 'numero' => 742,
@@ -300,7 +359,7 @@ class ProductoControllerTest extends TestCase
 
     public function test_update_not_found(): void
     {
-        $response = $this->putJson("/api/productos/9999", [
+        $response = $this->putJson("/api/productos/999", [
             'nombre' => 'Producto inexistente',
             'descripcion' => 'Este producto no existe',
             'estadoFisico' => 'Nuevo',
@@ -389,7 +448,7 @@ class ProductoControllerTest extends TestCase
             'nombre' => 'pepe',
             'apellido' => 'perez',
             'avatar' => 'avatar.png',
-            'telefono' => '1234567890',
+            'telefono' => '123456789',
             'direccion' => [
                 'calle' => 'Avenida Siempre Viva',
                 'numero' => 742,
@@ -428,7 +487,7 @@ class ProductoControllerTest extends TestCase
 
     public function test_destroy_not_found(): void
     {
-        $response = $this->deleteJson("/api/productos/9999");
+        $response = $this->deleteJson("/api/productos/999");
 
         $response->assertStatus(404);
 
@@ -503,6 +562,151 @@ class ProductoControllerTest extends TestCase
                 'id' => $producto->id,
                 'imagenes' => $producto->imagenes,
             ]
+        ]);
+    }
+
+    public function test_add_listing_photo_producto_not_found(): void
+    {
+        Storage::fake('public');
+
+        $file = UploadedFile::fake()->image('photo.jpg');
+
+        $response = $this->postJson("/api/productos/999/upload", [
+            'image' => $file,
+        ]);
+
+        $response->assertStatus(404);
+
+        $response->assertJson([
+            'message' => 'Producto no encontrado'
+        ]);
+    }
+
+    public function test_add_listing_photo_not_valid(): void
+    {
+        Storage::fake('public');
+
+        $usuario = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 'admin',
+        ]);
+
+        $cliente = Cliente::create([
+            'guid' => Str::uuid(),
+            'nombre' => 'pepe',
+            'apellido' => 'perez',
+            'avatar' => 'avatar.png',
+            'telefono' => '1234567890',
+            'direccion' => [
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
+                'codigoPostal' => 28001
+            ],
+            'activo' => true,
+            'usuario_id' => $usuario->id,
+        ]);
+
+        $producto = Producto::create([
+            'guid' => 'guidProductoFoto',
+            'vendedor_id' => $cliente->id,
+            'nombre' => 'Producto Test',
+            'descripcion' => 'Descripción de prueba',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 99.99,
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible',
+            'imagenes' => [],
+        ]);
+
+        $file = UploadedFile::fake()->image('photo.svg');
+
+        $response = $this->postJson("/api/productos/$producto->id/upload", [
+            'image' => $file,
+        ]);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonStructure([
+            'errors' => [
+                'image'
+            ],
+        ]);
+    }
+
+    public function test_add_listing_photo_max_five(): void
+    {
+        Storage::fake('public');
+
+        $usuario = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 'admin',
+        ]);
+
+        $cliente = Cliente::create([
+            'guid' => Str::uuid(),
+            'nombre' => 'pepe',
+            'apellido' => 'perez',
+            'avatar' => 'avatar.png',
+            'telefono' => '1234567890',
+            'direccion' => [
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
+                'codigoPostal' => 28001
+            ],
+            'activo' => true,
+            'usuario_id' => $usuario->id,
+        ]);
+
+        $producto = Producto::create([
+            'guid' => 'guidProductoFoto',
+            'vendedor_id' => $cliente->id,
+            'nombre' => 'Producto Test',
+            'descripcion' => 'Descripción de prueba',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 99.99,
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible',
+            'imagenes' => [],
+        ]);
+
+        $file = UploadedFile::fake()->image('photo.jpg');
+
+        $this->postJson("/api/productos/{$producto->id}/upload", [
+            'image' => $file,
+        ]);
+
+        $this->postJson("/api/productos/{$producto->id}/upload", [
+            'image' => $file,
+        ]);
+
+        $this->postJson("/api/productos/{$producto->id}/upload", [
+            'image' => $file,
+        ]);
+
+        $this->postJson("/api/productos/{$producto->id}/upload", [
+            'image' => $file,
+        ]);
+
+        $this->postJson("/api/productos/{$producto->id}/upload", [
+            'image' => $file,
+        ]);
+
+        $response = $this->postJson("/api/productos/{$producto->id}/upload", [
+            'image' => $file,
+        ]);
+
+        $response->assertStatus(422);
+
+        $response->assertJson([
+            'message' => 'Solo se pueden subir un máximo de 5 fotos'
         ]);
     }
 }
