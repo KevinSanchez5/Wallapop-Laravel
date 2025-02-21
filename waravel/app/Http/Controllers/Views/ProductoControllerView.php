@@ -116,7 +116,19 @@ class ProductoControllerView extends Controller
 
         for ($i = 1; $i <= 5; $i++) {
             if ($request->hasFile("imagen$i")) {
-                $this->addListingPhoto($request, $producto->id);
+                $imagenRequest = Request::create('/', 'POST', [], [], ['image' => $request->file("imagen$i")], []);
+
+                if (!$imagenRequest->hasFile('image')) {
+                    return response()->json(['error' => "Error procesando imagen$i"], 400);
+                }
+
+                $this->addListingPhoto($imagenRequest, $producto->id);
+
+                try {
+                    $producto->refresh();
+                } catch (\Exception $e) {
+                    Log::error("Error al refrescar el producto: " . $e->getMessage());
+                }
             }
         }
 
@@ -125,6 +137,7 @@ class ProductoControllerView extends Controller
         return redirect()->route('profile')->with('success', 'Producto añadido correctamente.');
     }
 
+
     public function showAddForm()
     {
         Log::info('Acceso al formulario de creación de producto');
@@ -132,40 +145,36 @@ class ProductoControllerView extends Controller
     }
 
     public function addListingPhoto(Request $request, $id) {
-        $product = Redis::get('producto_' . $id);
-
-        if (!$product) {
-            $product = Producto::find($id);
-        }else{
-            $product = Producto::hydrate(json_decode($product, true));
-        }
+        $product = Producto::find($id);
 
         if (!$product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpg,jpeg,png',
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $images = $product->imagenes ?? [];
+        $images = is_array($product->imagenes) ? $product->imagenes : [];
+
         if (count($images) >= 5) {
-            return response()->json(['message' => 'Solo se pueden subir un máximo de 5 fotos'], 422);
+            return response()->json(['message' => 'Máximo de 5 imágenes alcanzado'], 422);
         }
 
         $file = $request->file('image');
         $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-        $filePath = $file->storeAs("productos/{$product->guid}", $filename, 'public');
+        $filePath = "productos/{$product->guid}/" . $filename;
+        $file->storeAs("public/productos/{$product->guid}", $filename);
 
         $product->imagenes = array_merge($images, [$filePath]);
         $product->save();
 
+        Redis::set('producto_' . $id, json_encode($product->fresh()->toArray()));
 
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
-
 }
