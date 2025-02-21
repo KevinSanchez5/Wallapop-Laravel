@@ -15,8 +15,9 @@ use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     public function index(){
-        Log::info("Obteniendo todos los usuarios");
+        Log::info("Obteniendo todos los usuarios desde la base de datos");
         $users = User::all();
+        Log::info("Usuarios obtenidos correctamente");
         return response()->json($users);
     }
 
@@ -25,10 +26,10 @@ class UserController extends Controller
         Log::info("Buscando usuario con ID: {$id}");
         $userRedis = Redis::get('user_'.$id);
         if($userRedis) {
-            Log::info("Usuario obtenido desde Redis", ['user_id' => $id]);
+            Log::info("Usuario obtenido desde Redis");
             return response()->json(json_decode($userRedis));
         }
-
+        Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
         $user = User::find($id);
 
         if(!$user) {
@@ -53,7 +54,7 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
         $user = User::create($request->all());
-        Log::info("Usuario creado exitosamente", ['user_id' => $user->id]);
+        Log::info("Usuario creado exitosamente");
         return response()->json($user, 201);
     }
 
@@ -62,6 +63,7 @@ class UserController extends Controller
         Log::info("Intentando actualizar usuario con ID: {$id}");
         $user = Redis::get('user_'. $id);
         if(!$user) {
+            Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
             $user = User::find($id);
         }
 
@@ -91,11 +93,13 @@ class UserController extends Controller
             ], 422);
         }
 
+        Log::info("Actualizando el usuario con ID: {$id}");
+
         $userModel->update($request->all());
         Redis::del('user_'. $id);
         Redis::set('user_'. $id, json_encode($userModel), 'EX',1800);
 
-        Log::info("Usuario actualizado exitosamente", ['user_id' => $id]);
+        Log::info("Usuario actualizado exitosamente");
 
         return response()->json($userModel);
     }
@@ -106,7 +110,9 @@ class UserController extends Controller
         $user = Redis::get('user_' . $id);
         if ($user) {
             $user = json_decode($user, true);
+            Log::info("Usuario encontrado en Redis");
         } else {
+            Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
             $user = User::find($id);
         }
 
@@ -120,6 +126,7 @@ class UserController extends Controller
             $userModel = $user;
         }
 
+        Log::info("Eliminando el usuario con ID: {$id}");
         $userModel->delete();
 
         Redis::del('user_'. $id);
