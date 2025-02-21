@@ -90,7 +90,7 @@
                 <div class="mt-6 flex flex-col sm:flex-row items-center sm:justify-center md:justify-start gap-4">
                     <!-- Botón Agregar a Cesta con el color personalizado -->
                     <a href="#" class="bg-[#BFF205] text-white font-semibold py-2 px-6 rounded-md
-       hover:bg-[#A8D403] transition duration-300 transform hover:scale-105">
+       hover:bg-[#A8D403] transition duration-300 transform hover:scale-105" onclick="addToCart({{$producto}}, 1); return false">
                         Agregar a Cesta
                     </a>
 
@@ -110,3 +110,19 @@
     <x-footer />
     </div>
 @endsection
+
+<script>
+    function addToCart(product, amount) {
+        fetch("{{ route('carrito.add') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": " {{ csrf_token() }}",
+            },
+            body: JSON.stringify({
+                producto: product,
+                amount: amount,
+            }),
+        }).then(response => console.log(response));
+    }
+</script>

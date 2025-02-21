@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
 use Illuminate\Support\Facades\Route;
@@ -25,5 +26,8 @@ Route::get('/register', function () {
 Route::get('/passchange', function () {
     return view('auth.passchange');
 })->name('passchange');
+
+Route::get('/carrito', [CarritoControllerView::class, 'showCart'])->name('carrito');
+Route::post('/product/addToCart', [CarritoControllerView::class, 'addToCartOrEditSetProduct'])->name('carrito.add');
 
 
