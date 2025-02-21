@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailSender;
 use App\Models\Cliente;
 use App\Models\Direccion;
 use App\Models\User;
@@ -10,6 +11,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -77,6 +79,7 @@ class RegisteredUserController extends Controller
 
             Log::info('Cliente creado con éxito para usuario ID: ' . $user->id);
 
+            Mail::to($user->email)->send(new EmailSender($user, null, null, 'bienvenido'));
             event(new Registered($user));
             Auth::login($user);
 

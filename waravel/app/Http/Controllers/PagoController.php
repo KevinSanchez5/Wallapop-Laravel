@@ -22,7 +22,8 @@ class PagoController extends Controller
         try {
             $checkoutSession = Session::create([
                 'line_items' => [[
-                    //recuperar los datos de los articulos y precio desde el request
+                    //TODO
+                    // Cuando este carrito recuperar los datos de los articulos y precio desde el request
                     'price'=> 'price_1QuYJo7AuwO8CXRNNnR51KKo',
                     'quantity' => 1,
                 ]],

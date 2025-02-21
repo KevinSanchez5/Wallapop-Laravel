@@ -46,6 +46,9 @@ class EmailSender extends Mailable
             'productoComprado' => new Envelope(
                 subject: 'Producto Comprado en Waravel'
             ),
+            'bienvenido' => new Envelope(
+                subject: 'Bienvenido a Waravel'
+            )
         };
     }
 
@@ -70,6 +73,12 @@ class EmailSender extends Mailable
                     'producto' => $this->producto,
                 ]
             ),
+            'bienvenido' => new Content(
+                view: 'emails.bienvenido',
+                with: [
+                    'usuario' => $this->usuario,
+                ]
+            )
         };
     }
 

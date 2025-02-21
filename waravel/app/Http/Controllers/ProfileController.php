@@ -25,7 +25,7 @@ class ProfileController extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         $productos = Producto::where('vendedor_id', $cliente->id)->get();
