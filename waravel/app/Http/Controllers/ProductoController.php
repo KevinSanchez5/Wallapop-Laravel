@@ -71,6 +71,7 @@ class ProductoController extends Controller
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
+        Log::info('Guardando producto en cache redis');
         Redis::set('producto_'. $id, json_encode($producto), 'EX',1800);
 
         Log::info('Producto obtenido correctamente');
@@ -80,6 +81,7 @@ class ProductoController extends Controller
     // Crear un nuevo producto
     public function store(Request $request)
     {
+        Log::info('Validando producto');
         $validator = Validator::make($request->all(), [
             'guid' => 'required|unique:productos,guid',
             'vendedor_id' => 'required|exists:clientes,id',
@@ -96,17 +98,20 @@ class ProductoController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        Log::info('Guardando producto en base de datos');
         $producto = Producto::create($request->all());
 
-
+        Log::info('Producto guardado correctamente');
         return response()->json($producto, 201);
     }
 
     // Actualizar un producto existente
     public function update(Request $request, $id)
     {
+        Log::info('Buscando producto de la cache en Redis');
         $producto = Redis::get('producto_'.$id);
         if (!$producto) {
+            Log::info('Buscando producto de la base de datos');
             $producto = Producto::find($id);
         }
 
@@ -123,6 +128,7 @@ class ProductoController extends Controller
             $productoModel = Producto::hydrate([$producto])->first();
         }
 
+        Log::info('Validando producto');
         $validator = Validator::make($request->all(), [
             'nombre'       => 'string|max:255',
             'descripcion'  => 'required|string',
@@ -140,23 +146,29 @@ class ProductoController extends Controller
             ], 422);
         }
 
+        Log::info('Actualizando producto en base de datos');
         $productoModel->update($request->all());
 
-        // Limpiar caché del producto y de la lista
+        Log::info('Eliminando producto de la cache');
         Redis::del('producto_' . $id);
+
+        Log::info('Actualizando producto en cache');
         Redis::set('producto_' . $id, json_encode($productoModel), 'EX', 1800);
 
+        Log::info('Producto actualizado correctamente');
         return response()->json($productoModel);
     }
 
     // Eliminar un producto
     public function destroy($id)
     {
+        Log::info('Buscando producto de la cache en Redis');
         $producto = Redis::get('producto_' . $id);
 
         if ($producto) {
             $producto = json_decode($producto, true);
         } else {
+            Log::info('Buscando producto de la base de datos');
             $producto = Producto::find($id);
         }
 
@@ -170,19 +182,23 @@ class ProductoController extends Controller
             $productoModel = $producto;
         }
 
+        Log::info('Eliminando producto de la base de datos');
         $productoModel->delete();
 
-        // Limpiar caché del producto
+        Log::info('Eliminando producto de la cache');
         Redis::del('producto_' . $id);
 
+        Log::info('Producto eliminado correctamente');
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
 
 
     public function addListingPhoto(Request $request, $id) {
+        Log::info('Buscando producto de la cache en Redis');
         $product = Redis::get('producto_' . $id);
 
         if (!$product) {
+            Log::info('Buscando producto de la base de datos');
             $product = Producto::find($id);
         }else{
             $product = Producto::hydrate(json_decode($product, true));
@@ -192,6 +208,7 @@ class ProductoController extends Controller
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
+        Log::info('Validando producto');
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpg,jpeg,png',
         ]);
@@ -200,19 +217,22 @@ class ProductoController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        Log::info('Verificando numero de imagenes');
         $images = $product->imagenes ?? [];
         if (count($images) >= 5) {
             return response()->json(['message' => 'Solo se pueden subir un máximo de 5 fotos'], 422);
         }
 
+        Log::info('Guardando imagen del producto en storage');
         $file = $request->file('image');
         $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         $filePath = $file->storeAs("productos/{$product->guid}", $filename, 'public');
 
         $product->imagenes = array_merge($images, [$filePath]);
+        Log::info('Guardando imagen del producto');
         $product->save();
 
-
+        Log::info('Imagen guardada correctamente');
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
 
@@ -223,9 +243,11 @@ class ProductoController extends Controller
             return response()->json(['message' => 'Foto no proporcionada'], 422);
         }
 
+        Log::info('Buscando producto de la cache en Redis');
         $product = Redis::get('producto_' . $Id);
 
         if (!$product) {
+            Log::info('Buscando producto de la base de datos');
             $product = Producto::find($Id);
         } else {
             $product = Producto::hydrate(json_decode($product, true));
@@ -241,11 +263,14 @@ class ProductoController extends Controller
             return response()->json(['message' => 'Foto no encontrada en el producto'], 404);
         }
 
+        Log::info('Eliminando imagen del storage');
         Storage::disk('public')->delete($filePath);
         unset($images[$key]);
         $product->imagenes = $images;
+        Log::info('Eliminando imagen del producto');
         $product->save();
 
+        Log::info('Imagen eliminada correctamente');
         return response()->json(['message' => 'Foto eliminada', 'product' => $product]);
     }
 }
