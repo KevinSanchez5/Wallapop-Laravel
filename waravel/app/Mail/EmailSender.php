@@ -29,7 +29,7 @@ class EmailSender extends Mailable
         $this->producto = $producto;
         $this->tipo = $tipo;
 
-        if (!in_array($tipo,['recuperarContrasenya', 'productoComprado'])){
+        if (!in_array($tipo,['recuperarContrasenya', 'productoComprado', 'bienvenido'])){
             throw new InvalidArgumentException("Tipo de email no válido: $tipo");
         }
     }
