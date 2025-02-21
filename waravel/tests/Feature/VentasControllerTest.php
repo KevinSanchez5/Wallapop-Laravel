@@ -92,7 +92,7 @@ class VentasControllerTest extends TestCase
                 'guid' => $venta->guid,
                 'comprador' => $venta->comprador,
                 'lineaVentas' => $venta->lineaVentas,
-                'precioTotal' => $venta->precioTotal,
+                'precioTotal' => round($venta->precioTotal, 2),
             ]);
     }
 
