@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('pages.home');
 
-Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');
 Route::get('/productos/search', [ProductoControllerView::class, 'search'])->name('productos.search');
 Route::get('/producto/add', [ProductoControllerView::class, 'showAddForm'])->name('producto.add');
 Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
+Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');
 
 Route::get('/cliente/{guid}', [ClienteControllerView::class, 'mostrarCliente'])->name('cliente.ver');
 Route::get('/clientes/{guid}/valoraciones', [ValoracionesControllerView::class, 'index'])->name('cliente.valoraciones');

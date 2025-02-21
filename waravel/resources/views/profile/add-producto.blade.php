@@ -6,67 +6,60 @@
 
         <form action="{{ route('producto.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="mb-4">
+
+            <div class="grid grid-cols-5 gap-4">
+                @for ($i = 1; $i <= 5; $i++)
+                    <div class="border border-dashed border-gray-400 rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 relative">
+                        <label for="imagen{{ $i }}" class="flex flex-col items-center cursor-pointer">
+                            <img id="preview{{ $i }}" class="hidden w-16 h-16 object-cover rounded-md" />
+                            <svg class="mx-auto size-10 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-xs text-gray-600 dark:text-gray-400 mt-2">Subir imagen {{ $i }}</span>
+                            <input type="file" id="imagen{{ $i }}" name="imagen{{ $i }}" class="sr-only" accept="image/*" onchange="previewImage(event, {{ $i }})">
+                        </label>
+                    </div>
+                @endfor
+            </div>
+
+            <div>
                 <label for="nombre" class="block text-gray-700 dark:text-gray-300">Nombre del producto</label>
                 <input type="text" id="nombre" name="nombre" value="{{ old('nombre') }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                @error('nombre')
-                <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
             </div>
 
-            <div class="mb-4">
-                <label for="descripcion" class="block text-gray-700 dark:text-gray-300">Descripción del producto</label>
+            <div>
+                <label for="descripcion" class="block text-gray-700 dark:text-gray-300">Descripción</label>
                 <textarea id="descripcion" name="descripcion" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>{{ old('descripcion') }}</textarea>
-                @error('descripcion')
-                <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
             </div>
 
-            <div class="mb-4">
+            <div>
                 <label for="estadoFisico" class="block text-gray-700 dark:text-gray-300">Estado físico</label>
                 <select id="estadoFisico" name="estadoFisico" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                    <option value="Nuevo" {{ old('estadoFisico') == 'Nuevo' ? 'selected' : '' }}>Nuevo</option>
-                    <option value="Usado" {{ old('estadoFisico') == 'Usado' ? 'selected' : '' }}>Usado</option>
-                    <option value="Deteriorado" {{ old('estadoFisico') == 'Deteriorado' ? 'selected' : '' }}>Deteriorado</option>
+                    <option value="Nuevo">Nuevo</option>
+                    <option value="Usado">Usado</option>
+                    <option value="Deteriorado">Deteriorado</option>
                 </select>
-                @error('estadoFisico')
-                <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
             </div>
 
-            <div class="mb-4">
+            <div>
                 <label for="precio" class="block text-gray-700 dark:text-gray-300">Precio</label>
                 <input type="number" id="precio" name="precio" value="{{ old('precio') }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" step="0.01" required>
-                @error('precio')
-                <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
             </div>
 
-            <div class="mb-4">
+            <div>
                 <label for="categoria" class="block text-gray-700 dark:text-gray-300">Categoría</label>
                 <select id="categoria" name="categoria" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                    <option value="Tecnologia" {{ old('categoria') == 'Tecnologia' ? 'selected' : '' }}>Tecnología</option>
-                    <option value="Ropa" {{ old('categoria') == 'Ropa' ? 'selected' : '' }}>Ropa</option>
-                    <option value="Hogar" {{ old('categoria') == 'Hogar' ? 'selected' : '' }}>Hogar</option>
-                    <option value="Coleccionismo" {{ old('categoria') == 'Coleccionismo' ? 'selected' : '' }}>Coleccionismo</option>
-                    <option value="Vehiculos" {{ old('categoria') == 'Vehiculos' ? 'selected' : '' }}>Vehículos</option>
-                    <option value="Videojuegos" {{ old('categoria') == 'Videojuegos' ? 'selected' : '' }}>Videojuegos</option>
-                    <option value="Musica" {{ old('categoria') == 'Musica' ? 'selected' : '' }}>Música</option>
-                    <option value="Deporte" {{ old('categoria') == 'Deporte' ? 'selected' : '' }}>Deporte</option>
-                    <option value="Cine" {{ old('categoria') == 'Cine' ? 'selected' : '' }}>Cine</option>
-                    <option value="Cocina" {{ old('categoria') == 'Cocina' ? 'selected' : '' }}>Cocina</option>
+                    <option value="Tecnologia">Tecnología</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Coleccionismo">Coleccionismo</option>
+                    <option value="Vehiculos">Vehículos</option>
+                    <option value="Videojuegos">Videojuegos</option>
+                    <option value="Musica">Música</option>
+                    <option value="Deporte">Deporte</option>
+                    <option value="Cine">Cine</option>
+                    <option value="Cocina">Cocina</option>
                 </select>
-                @error('categoria')
-                <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="mb-4">
-                <label for="imagenes" class="block text-gray-700 dark:text-gray-300">Imágenes (Mínimo una imagen)</label>
-                <input type="file" id="imagenes" name="imagenes[]" multiple class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                @error('imagenes')
-                <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
             </div>
 
             <div class="flex justify-end">
@@ -76,4 +69,16 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function previewImage(event, index) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const imgElement = document.getElementById(`preview${index}`);
+                imgElement.src = reader.result;
+                imgElement.classList.remove('hidden');
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
 @endsection

@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
 use App\Models\Producto;
-use Illuminate\Http\Client\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -88,59 +89,83 @@ class ProductoControllerView extends Controller
 
     public function store(Request $request)
     {
-        Log::info('Creación de nuevo producto iniciada', ['request_data' => $request->all()]);
-
-        $validator = Validator::make($request->all(), [
-            'guid' => 'required|unique:productos,guid',
-            'vendedor_id' => 'required|exists:clientes,id',
+        $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'estadoFisico' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
             'categoria' => 'required|string|max:255',
-            'estado' => 'required|string|max:255',
-            'imagenes' => 'required|array|min:1',
-            'imagenes.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'imagen1' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'imagen2' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'imagen3' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'imagen4' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'imagen5' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        if ($validator->fails()) {
-            Log::error('Error de validación al crear producto', ['errors' => $validator->errors()]);
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $producto = Producto::create([
-            'guid' => $request->guid,
-            'vendedor_id' => $request->vendedor_id,
+            'guid' => Str::uuid()->toString(),
+            'vendedor_id' => auth()->user()->cliente->id ?? null,
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
             'estadoFisico' => $request->estadoFisico,
             'precio' => $request->precio,
             'categoria' => $request->categoria,
-            'estado' => $request->estado,
+            'estado' => 'Disponible',
             'imagenes' => [],
         ]);
 
-        Log::info('Producto creado correctamente', ['producto_id' => $producto->id]);
-
-        $imagenes = [];
-        foreach ($request->file('imagenes') as $imagen) {
-            $filename = time() . '_' . Str::random(10) . '.' . $imagen->getClientOriginalExtension();
-            $filePath = $imagen->storeAs("productos/{$producto->guid}", $filename, 'public');
-            $imagenes[] = $filePath;
-            Log::info('Imagen subida correctamente', ['file_path' => $filePath]);
+        for ($i = 1; $i <= 5; $i++) {
+            if ($request->hasFile("imagen$i")) {
+                $this->addListingPhoto($request, $producto->id);
+            }
         }
 
-        $producto->imagenes = $imagenes;
-        $producto->save();
+        Cache::put("producto_{$producto->guid}", $producto, now()->addMinutes(60));
 
-        Log::info('Producto actualizado con imágenes', ['producto_id' => $producto->id]);
-
-        return response()->json($producto, 201);
+        return redirect()->route('profile')->with('success', 'Producto añadido correctamente.');
     }
 
     public function showAddForm()
     {
         Log::info('Acceso al formulario de creación de producto');
-        return view('add-producto');
+        return view('profile.add-producto');
     }
+
+    public function addListingPhoto(Request $request, $id) {
+        $product = Redis::get('producto_' . $id);
+
+        if (!$product) {
+            $product = Producto::find($id);
+        }else{
+            $product = Producto::hydrate(json_decode($product, true));
+        }
+
+        if (!$product) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpg,jpeg,png',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $images = $product->imagenes ?? [];
+        if (count($images) >= 5) {
+            return response()->json(['message' => 'Solo se pueden subir un máximo de 5 fotos'], 422);
+        }
+
+        $file = $request->file('image');
+        $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs("productos/{$product->guid}", $filename, 'public');
+
+        $product->imagenes = array_merge($images, [$filePath]);
+        $product->save();
+
+
+        return response()->json(['message' => 'Foto añadida', 'product' => $product]);
+    }
+
 }
