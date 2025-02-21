@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redis;
@@ -21,20 +22,21 @@ class ProductoController extends Controller
 
         $productos = $query->paginate(15);
 
-        $data = $productos->getCollection()->transform(function ($cliente) {
+        Log::info('Obteniendo todos los productos de la base de datos');
+        $data = $productos->getCollection()->transform(function ($producto) {
            return [
-               'id' => $cliente->id,
-               'guid' => $cliente->guid,
-               'vendedor_id' => $cliente->vendedor_id,
-               'nombre' => $cliente->nombre,
-               'descripcion' => $cliente->descripcion,
-               'estadoFisico' => $cliente->estadoFisico,
-               'precio' => $cliente->precio,
-               'categoria' => $cliente->categoria,
-               'estado' => $cliente->estado,
-               'imagenes' => $cliente->imagenes,
-               'created_at' => $cliente->created_at->toDateTimeString(),
-               'updated_at' => $cliente->updated_at->toDateTimeString(),
+               'id' => $producto->id,
+               'guid' => $producto->guid,
+               'vendedor_id' => $producto->vendedor_id,
+               'nombre' => $producto->nombre,
+               'descripcion' => $producto->descripcion,
+               'estadoFisico' => $producto->estadoFisico,
+               'precio' => $producto->precio,
+               'categoria' => $producto->categoria,
+               'estado' => $producto->estado,
+               'imagenes' => $producto->imagenes,
+               'created_at' => $producto->created_at->toDateTimeString(),
+               'updated_at' => $producto->updated_at->toDateTimeString(),
            ];
         });
 
@@ -48,18 +50,21 @@ class ProductoController extends Controller
             ],
         ];
 
+        Log::info('Productos obtenidos de la base de datos correctamente');
         return response()->json($customResponse);
     }
 
     // Mostrar un producto específico
     public function show($id)
     {
+        Log::info('Buscando producto de la cache en Redis');
         $productoRedis = Redis::get('producto_'.$id);
 
         if ($productoRedis) {
             return response()->json(json_decode($productoRedis));
         }
 
+        Log::info('Buscando producto de la base de datos');
         $producto = Producto::find($id);
 
         if (!$producto) {
@@ -68,6 +73,7 @@ class ProductoController extends Controller
 
         Redis::set('producto_'. $id, json_encode($producto), 'EX',1800);
 
+        Log::info('Producto obtenido correctamente');
         return response()->json($producto);
     }
 
