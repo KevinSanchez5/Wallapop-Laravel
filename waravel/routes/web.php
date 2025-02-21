@@ -10,12 +10,16 @@ Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('pages.home
 
 Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');
 Route::get('/productos/search', [ProductoControllerView::class, 'search'])->name('productos.search');
+Route::get('/producto/add', [ProductoControllerView::class, 'showAddForm'])->name('producto.add');
+Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
+
 Route::get('/cliente/{guid}', [ClienteControllerView::class, 'mostrarCliente'])->name('cliente.ver');
 Route::get('/clientes/{guid}/valoraciones', [ValoracionesControllerView::class, 'index'])->name('cliente.valoraciones');
 Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'promedio'])->name('cliente.puntuacion');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
