@@ -49,9 +49,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('misventas', [ClienteController::class, 'misVentas'])
             ->name('cliente.misventas');
-
-        Route::get('carrito', [ClienteController::class, 'verCarrito'])
-            ->name('cliente.carrito');
     });
 
     /*

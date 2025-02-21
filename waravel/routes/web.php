@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
 use App\Http\Controllers\Views\ValoracionesControllerView;
@@ -23,6 +24,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/carrito', [CarritoControllerView::class, 'showCart'])->name('carrito');
+Route::post('/product/addToCart', [CarritoControllerView::class, 'addToCartOrEditSetProduct'])->name('carrito.add');
+Route::delete('/product/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
 
 Route::get('/passchange', function () {
     return view('auth.passchange');
