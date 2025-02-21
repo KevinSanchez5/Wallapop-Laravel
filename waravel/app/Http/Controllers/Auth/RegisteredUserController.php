@@ -78,7 +78,7 @@ class RegisteredUserController extends Controller
             );
 
             Log::info('Cliente creado con éxito para usuario ID: ' . $user->id);
-
+            Log::info('Enviando email de bienvenida a ' . $user->email);
             Mail::to($user->email)->send(new EmailSender($user, null, null, 'bienvenido'));
             event(new Registered($user));
             Auth::login($user);
