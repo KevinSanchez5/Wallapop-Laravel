@@ -15,28 +15,34 @@ use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     public function index(){
+        Log::info("Obteniendo todos los usuarios desde la base de datos");
         $users = User::all();
+        Log::info("Usuarios obtenidos correctamente");
         return response()->json($users);
     }
 
     public function show($id)
     {
+        Log::info("Buscando usuario con ID: {$id}");
         $userRedis = Redis::get('user_'.$id);
         if($userRedis) {
+            Log::info("Usuario obtenido desde Redis");
             return response()->json(json_decode($userRedis));
         }
-
+        Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
         $user = User::find($id);
 
         if(!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
+        Log::info("Usuario encontrado", ['user_id' => $id]);
         return response()->json($user);
     }
 
     public function store(Request $request)
     {
+        Log::info("Intentando crear un nuevo usuario");
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -44,16 +50,20 @@ class UserController extends Controller
             'role' => 'string|in:user,cliente,admin|max:20'
         ]);
         if ($validator->fails()) {
+            Log::info("Error de validación al crear usuario", ['errors' => $validator->errors()]);
             return response()->json(['errors' => $validator->errors()], 422);
         }
         $user = User::create($request->all());
+        Log::info("Usuario creado exitosamente");
         return response()->json($user, 201);
     }
 
     public function update(Request $request, $id)
     {
+        Log::info("Intentando actualizar usuario con ID: {$id}");
         $user = Redis::get('user_'. $id);
         if(!$user) {
+            Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
             $user = User::find($id);
         }
 
@@ -76,25 +86,33 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::info("Error de validación al actualizar usuario", ['errors' => $validator->errors()]);
             return response()->json([
                 'message'=> 'Error de validación',
                 'errors' => $validator->errors()
             ], 422);
         }
 
+        Log::info("Actualizando el usuario con ID: {$id}");
+
         $userModel->update($request->all());
         Redis::del('user_'. $id);
         Redis::set('user_'. $id, json_encode($userModel), 'EX',1800);
+
+        Log::info("Usuario actualizado exitosamente");
 
         return response()->json($userModel);
     }
 
     public function destroy($id)
     {
+        Log::info("Intentando eliminar usuario con ID: {$id}");
         $user = Redis::get('user_' . $id);
         if ($user) {
             $user = json_decode($user, true);
+            Log::info("Usuario encontrado en Redis");
         } else {
+            Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
             $user = User::find($id);
         }
 
@@ -108,8 +126,12 @@ class UserController extends Controller
             $userModel = $user;
         }
 
+        Log::info("Eliminando el usuario con ID: {$id}");
         $userModel->delete();
+
         Redis::del('user_'. $id);
+
+        Log::info("Usuario eliminado correctamente", ['user_id' => $id]);
 
         return response()->json(['message' => 'User eliminado correctamente']);
     }
@@ -165,6 +187,7 @@ class UserController extends Controller
 
     public function showEmail($email)
     {
+        Log::info("Buscando usuario por email", ['email' => $email]);
 
         $user = User::where('email', $email)->first();
 
@@ -172,6 +195,7 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
+        Log::info("Usuario encontrado", ['email' => $email, 'user_id' => $user->id]);
         return response()->json($user);
     }
 

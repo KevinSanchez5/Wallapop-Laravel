@@ -6,6 +6,7 @@ use App\Models\Cliente;
 use App\Models\User;
 use App\Models\Valoracion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
@@ -21,6 +22,7 @@ class ValoracionControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Log::spy();
 
         $this->usuario = User::create([
             'name'     => 'usuario',
@@ -106,6 +108,42 @@ class ValoracionControllerTest extends TestCase
     }
 
     public function test_show(): void
+    {
+        $valoracion = Valoracion::create([
+            'guid' => 'guid-1',
+            'comentario' => 'Comentario de la valoracion',
+            'puntuacion' => 5,
+            'clienteValorado_id' => $this->cliente->id,
+            'autor_id' => $this->cliente2->id,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        Redis::del('valoracion_' . $valoracion->id, json_encode($valoracion));
+
+        $response = $this->getJson("/api/valoraciones/{$valoracion->id}");
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'id' => $valoracion->id,
+            'guid' => $valoracion->guid,
+            'comentario' => $valoracion->comentario,
+            'puntuacion' => $valoracion->puntuacion,
+            'clienteValorado_id' => $valoracion->clienteValorado_id,
+            'autor_id' => $valoracion->autor_id,
+        ]);
+
+        $valoracionRedis = json_decode(Redis::get('valoracion_' . $valoracion->id), true);
+        $this->assertEquals($valoracion->id, $valoracionRedis['id']);
+        $this->assertEquals($valoracion->guid, $valoracionRedis['guid']);
+        $this->assertEquals($valoracion->comentario, $valoracionRedis['comentario']);
+        $this->assertEquals($valoracion->puntuacion, $valoracionRedis['puntuacion']);
+        $this->assertEquals($valoracion->clienteValorado_id, $valoracionRedis['clienteValorado_id']);
+        $this->assertEquals($valoracion->autor_id, $valoracionRedis['autor_id']);
+    }
+
+    public function test_show_from_redis(): void
     {
         $valoracion = Valoracion::create([
             'guid' => 'guid-1',
