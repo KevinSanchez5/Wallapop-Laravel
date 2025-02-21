@@ -18,6 +18,8 @@ class ClienteController extends Controller
 
         $clientes = $query->paginate(5);
 
+        Log::info('Obteniendo todos los clientes de la base de datos');
+
         $data = $clientes->getCollection()->transform(function ($cliente) {
             return [
                 'id' => $cliente->id,
@@ -43,33 +45,37 @@ class ClienteController extends Controller
                 'elementos_totales' => $clientes->total(),
             ],
         ];
-
+        Log::info('Clientes obtenidos de la base de datos correctamente');
         return response()->json($customResponse);
     }
 
     // Mostrar un cliente específico
     public function show($id)
     {
+        Log::info('Buscando cliente de la cache en Redis');
         $clienteRedis = Redis::get('cliente_' . $id);
 
         if ($clienteRedis) {
             return response()->json(json_decode($clienteRedis));
         }
-
+        Log::info('Buscando cliente de la base de datos');
         $cliente = Cliente::find($id);
 
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
+        Log::info('Guardando cliente en cache redis');
         Redis::set('cliente_' . $id, json_encode($cliente), 'EX', 1800);
 
+        Log::info('Cliente obtenido correctamente');
         return response()->json($cliente);
     }
 
     // Crear un nuevo cliente
     public function store(Request $request)
     {
+        Log::info('Validando cliente');
         $validator = Validator::make($request->all(), [
             'guid' => 'required|unique:clientes,guid',
             'nombre' => 'required|string|max:255',
@@ -87,11 +93,14 @@ class ClienteController extends Controller
 
         $data = $request->all();
 
+        Log::info('Guardando cliente en base de datos');
+
         // Si no hay avatar se añade el valor por defecto
         if (empty($data['avatar'])) {
             $data['avatar'] = 'avatar.png';
         }
 
+        Log::info('Cliente guardado correctamente');
         $cliente = Cliente::create($data);
 
         return response()->json($cliente, 201);
@@ -100,8 +109,11 @@ class ClienteController extends Controller
     // Actualizar un cliente existente
     public function update(Request $request, $id)
     {
+
+        Log::info('Buscando Cliente de la cache en Redis');
         $cliente = Redis::get('cliente_' . $id);
         if (!$cliente) {
+            Log::info('Buscando cliente de la base de datos');
             $cliente = Cliente::find($id);
         }
 
@@ -118,6 +130,7 @@ class ClienteController extends Controller
             $clienteModel = Cliente::hydrate([$cliente])->first();
         }
 
+        Log::info('Validando cliente');
         $validator = Validator::make($request->all(), [
             'nombre' => 'string|max:255',
             'apellido' => 'string|max:255',
@@ -135,21 +148,26 @@ class ClienteController extends Controller
             ], 422);
         }
 
+        Log::info('Actualizando cliente en base de datos');
         $clienteModel->update($request->all());
 
         // Limpiar caché del cliente
+        Log::info('Eliminando cliente de la cache');
         Redis::del('cliente_' . $id);
+        Log::info('Actualizando cliente en cache');
         Redis::set('cliente_' . $id, json_encode($clienteModel->toArray()), 'EX', 1800);
-        Log::info("Cliente actualizado y guardado en Redis");
+        Log::info('Cliente actualizado correctamente');
         return response()->json($clienteModel);
     }
 
     // Eliminar un cliente
     public function destroy($id)
     {
+        Log::info('Buscando cliente de la cache en Redis');
         $cliente = Redis::get('cliente_' . $id);
 
         if (!$cliente) {
+            Log::info('Buscando cliente de la base de datos');
             $cliente = Cliente::find($id);
         }
 
@@ -157,17 +175,22 @@ class ClienteController extends Controller
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
+        Log::info('Eliminando cliente de la base de datos');
         $cliente->delete();
 
-        // Limpiar caché del cliente
+        Log::info('Eliminando cliente de la cache');
         Redis::del('cliente_' . $id);
 
+
+        Log::info('Cliente eliminado correctamente');
         return response()->json(['message' => 'Cliente eliminado correctamente']);
     }
 
     // Buscar favoritos
     public function searchFavorites($id)
     {
+        Log::info("Buscando favoritos para el cliente con ID: {$id}");
+
         $cliente = Cliente::find($id);
 
         if (!$cliente) {
@@ -175,6 +198,7 @@ class ClienteController extends Controller
         }
 
         $favoritos = $cliente->favoritos;
+        Log::info("Se encontraron " . count($favoritos) . " favoritos para el cliente con ID: {$id}");
 
         return response()->json($favoritos);
     }
@@ -182,18 +206,22 @@ class ClienteController extends Controller
     // Agregar un producto a favoritos
     public function addToFavorites(Request $request, $id)
     {
-        $cliente = Cliente::find($id);
+        Log::info("Intentando agregar un producto a favoritos para el cliente con ID: {$id}");
 
+        $cliente = Cliente::find($id);
         if (!$cliente) {
+            Log::info("Cliente con ID {$id} no encontrado");
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
         $producto = Producto::find($request->producto_id);
         if (!$producto) {
+            Log::info("Producto con ID {$request->producto_id} no encontrado");
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
         $cliente->favoritos()->attach($producto->id);
+        Log::info("Producto con ID {$producto->id} agregado a favoritos");
 
         return response()->json(['message' => 'Producto agregado a favoritos']);
     }
@@ -201,6 +229,7 @@ class ClienteController extends Controller
     // Quitar un producto de favoritos
     public function removeFromFavorites(Request $request, $id)
     {
+        Log::info("Intentando eliminar un producto de favoritos para el cliente con ID: {$id}");
         $cliente = Cliente::find($id);
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
@@ -212,11 +241,13 @@ class ClienteController extends Controller
         }
 
         $cliente->favoritos()->detach($producto->id);
+        Log::info("Producto con ID {$producto->id} eliminado de favoritos para el cliente con ID: {$id}");
 
         return response()->json(['message' => 'Producto eliminado de favoritos']);
     }
 
     public function updateProfilePhoto(Request $request, $id) {
+        Log::info("Intentando actualizar la foto de perfil para el cliente con ID: {$id}");
         $cliente = Redis::get('cliente_' . $id);
 
         if (!$cliente) {
@@ -242,6 +273,7 @@ class ClienteController extends Controller
         $filePath = $file->storeAs('clientes/avatares', $filename, 'public');
 
         Cliente::where('id', $id)->update(['avatar' => $filePath]);
+        Log::info("Avatar actualizado para el cliente con ID: {$id}");
 
         // Limpiar caché del cliente
         Redis::del('cliente_' . $id);

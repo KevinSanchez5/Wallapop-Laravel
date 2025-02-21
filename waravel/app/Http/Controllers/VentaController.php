@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Validator;
 class VentaController extends Controller
 {
     public function index(){
+        Log::info('Obteniendo todas las ventas');
+
         $query = Venta::orderBy('id', 'asc');
 
         $ventas = $query->paginate(5);
@@ -36,17 +38,21 @@ class VentaController extends Controller
             ],
         ];
 
+        Log::info('Ventas obtenidas de la base de datos correctamente');
         return response()->json($customResponse);
     }
 
     public function show($id)
     {
+        Log::info('Obteniendo venta');
         $ventaRedis = Redis::get('venta_'.$id);
 
         if ($ventaRedis) {
+            Log::info('Venta obtenida desde Redis');
             return response()->json(json_decode($ventaRedis, true));
         }
 
+        Log::info('Buscando venta de la base de datos');
         $venta = Venta::find($id);
 
         if (!$venta) {
@@ -63,13 +69,17 @@ class VentaController extends Controller
             'updated_at' => $venta->updated_at->toDateTimeString(),
         ];
 
+        Log::info('Guardando venta en cache redis');
         Redis::set('venta_'. $id, json_encode($data), 'EX',1800);
 
+        Log::info('Venta obtenida correctamente');
         return response()->json($data);
     }
 
     public function store(Request $request)
     {
+        Log::info('Validando venta');
+
         $validator = Validator::make($request->all(), [
             'guid' => 'required|string|max:255|unique:ventas',
             'comprador' => 'required|array',
@@ -81,13 +91,17 @@ class VentaController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        Log::info('Guardando venta en base de datos');
+
         $venta = Venta::create($request->all());
+        Log::info('Venta creada exitosamente');
 
         return response()->json($venta, 201);
     }
 
     public function destroy($id)
     {
+        Log::info('Intentando eliminar venta');
         $venta = Redis::get('venta_' . $id);
         if(!$venta) {
             $venta = Venta::find($id);
@@ -96,8 +110,11 @@ class VentaController extends Controller
         if(!$venta) {
             return response()->json(['message' => 'Venta no encontrada'], 404);
         }
+        Log::info('Eliminando venta de la base de datos');
         $venta->delete();
+        Log::info('Eliminando venta de la cache');
         Redis::del('venta_'. $id);
+        Log::info('Venta eliminada correctamente');
 
         return response()->json(['message' => 'Venta eliminada correctamente']);
     }
