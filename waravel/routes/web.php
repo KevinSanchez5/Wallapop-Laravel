@@ -29,5 +29,6 @@ Route::get('/passchange', function () {
 
 Route::get('/carrito', [CarritoControllerView::class, 'showCart'])->name('carrito');
 Route::post('/product/addToCart', [CarritoControllerView::class, 'addToCartOrEditSetProduct'])->name('carrito.add');
+Route::delete('/product/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
 
 

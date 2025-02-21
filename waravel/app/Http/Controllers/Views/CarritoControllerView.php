@@ -7,6 +7,7 @@ use App\Models\Carrito;
 use App\Models\LineaCarrito;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CarritoControllerView extends Controller
 {
@@ -21,31 +22,59 @@ class CarritoControllerView extends Controller
 
     public function removeFromCart(Request $request)
     {
-        $producto = response();
-        $carrito = session('carrito', new Carrito([
-            'guid' => uniqid(),
-            'cliente' => null,
+        $validator = Validator::make($request->all(), [
+            'productId' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $productId = $request->input('productId');
+
+        $cart = session()->get('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0
         ]));
 
-        foreach ($carrito->lineasCarrito as $key => &$linea) {
-            if ($linea['producto_id'] == $producto->id) {
-                unset($carrito->lineasCarrito[$key]);
+        if ($cart->lineasCarrito == null) {
+            return response()->json($validator->errors(), 404);
+        }
+
+        $lineas = $cart->lineasCarrito;
+        $found = false;
+
+        foreach ($lineas as $key => &$linea) {
+            if ($linea->producto->id == $productId) {
+                $cart->precioTotal -= $linea->precioTotal;
+                \Illuminate\Log\log('found');
+                unset($lineas[$key]);
+                $found = true;
                 break;
             }
         }
 
-        $carrito->lineasCarrito = array_values($carrito->lineasCarrito);
+        if ($found) {
+            $cart->lineasCarrito = array_values($lineas);
+            session()->put('carrito', $cart);
+            return response()->json("Success");
+        }
 
-        session(['carrito' => $carrito]);
-
-        return redirect()->back();
+        return response()->json("Error", 404);
     }
 
 
     public function addToCartOrEditSetProduct(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'producto' => 'required',
+            'amount'  => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
         $cart = session('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0
