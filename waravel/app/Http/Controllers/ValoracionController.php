@@ -12,6 +12,7 @@ class ValoracionController extends Controller
     // Mostrar todas las valoraciones
     public function index()
     {
+        Log::info('Obteniendo todas las valoraciones');
         $query = Valoracion::orderBy('id', 'asc');
 
         $valoraciones = $query->paginate(5);
@@ -45,9 +46,11 @@ class ValoracionController extends Controller
     // Mostrar una valoración específica
     public function show($id)
     {
+        Log::info('Obteniendo valoración', ['id' => $id]);
         $valoracionRedis = Redis::get('valoracion_' . $id);
 
         if ($valoracionRedis) {
+            Log::info('Valoración obtenida desde Redis');
             return response()->json(json_decode($valoracionRedis));
         }
 
@@ -65,6 +68,7 @@ class ValoracionController extends Controller
     // Crear una nueva valoración
     public function store(Request $request)
     {
+        Log::info('Intentando crear una nueva valoración', ['request' => $request->all()]);
         $validator = Validator::make($request->all(), [
             'guid' => 'required|unique:valoraciones,guid',
             'comentario' => 'required|string|max:1000',
@@ -79,12 +83,15 @@ class ValoracionController extends Controller
 
         $valoracion = Valoracion::create($request->all());
 
+        Log::info('Valoración creada exitosamente');
+
         return response()->json($valoracion, 201);
     }
 
     // Eliminar una valoración
     public function destroy($id)
     {
+        Log::info('Intentando eliminar valoración');
         $valoracion = Redis::get('valoracion_'. $id);
 
         if (!$valoracion) {
@@ -104,6 +111,7 @@ class ValoracionController extends Controller
         }
 
         $valoracionModel->delete();
+        Log::info('Valoración eliminada correctamente');
 
         // Limpiar caché de la valoración y de la lista
         Redis::del('valoracion_'. $id);
