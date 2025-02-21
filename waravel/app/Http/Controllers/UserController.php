@@ -133,12 +133,12 @@ class UserController extends Controller
                 'email' => $email,
                 'exception' => $e->getMessage()
             ]);
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], 503);//fallo en la base de datos se podria eliminar
         }
 
         if (!$user) {
             Log::warning('Usuario no encontrado', ['email' => $email]);
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
 
         $codigo = strtoupper(Str::random(10));
@@ -152,13 +152,13 @@ class UserController extends Controller
                 'email' => $user->email,
                 'exception' => $e->getMessage()
             ]);
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], 503);//fallo al enviar email
         }
 
         Log::info('Proceso de recuperación de contraseña completado', ['email' => $user->email]);
         return response()->json([
             'success' => true,
-            'message' => 'Correo enviado',
+            'message' => 'Correo enviado correctamente',
         ], 200);
     }
 
