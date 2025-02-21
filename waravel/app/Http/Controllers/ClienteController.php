@@ -74,8 +74,8 @@ class ClienteController extends Controller
             'guid' => 'required|unique:clientes,guid',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'avatar' => 'default|url',
-            'telefono' => 'required|string|max:20',
+            'avatar' => 'nullable|string',
+            'telefono' => 'required|string|min:9|max:9',
             'direccion' => 'required|array',
             'activo' => 'required|boolean',
             'usuario_id' => 'required|exists:users,id',
@@ -85,7 +85,14 @@ class ClienteController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $cliente = Cliente::create($request->all());
+        $data = $request->all();
+
+        // Si no hay avatar se añade el valor por defecto
+        if (empty($data['avatar'])) {
+            $data['avatar'] = 'avatar.png';
+        }
+
+        $cliente = Cliente::create($data);
 
         return response()->json($cliente, 201);
     }
@@ -114,8 +121,8 @@ class ClienteController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'string|max:255',
             'apellido' => 'string|max:255',
-            'avatar' => 'nullable|url',
-            'telefono' => 'nullable|string|max:20',
+            'avatar' => 'nullable|string',
+            'telefono' => 'nullable|string|min:9|max:9',
             'direccion' => 'nullable|array',
             'activo' => 'boolean',
             'usuario_id' => 'exists:users,id',

@@ -6,9 +6,7 @@ use App\Models\Cliente;
 use App\Models\User;
 use App\Models\Valoracion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ValoracionControllerTest extends TestCase
@@ -169,8 +167,11 @@ class ValoracionControllerTest extends TestCase
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('valoraciones', [
+            'guid' => 'guid-1',
             'comentario' => 'Comentario de la valoracion',
-            'puntuacion' => 5
+            'puntuacion' => 5,
+            'clienteValorado_id' => $this->cliente->id,
+            'autor_id' => $this->cliente2->id
         ]);
     }
 
