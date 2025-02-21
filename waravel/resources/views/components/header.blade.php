@@ -68,7 +68,7 @@
             </button>
 
             <!-- Carrito -->
-            <a href="/" class="relative">
+            <a href="{{ route('carrito') }}" class="relative">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                      stroke="currentColor" class="w-8 h-8 text-gray-800 hover:text-gray-900 transition-all duration-300">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -77,7 +77,7 @@
 
                 <!-- el numero de carrito cambia según el numero de lineas que tengamos, por defecto es 0 -->
                 <span class="absolute -top-2 -right-2 bg-black text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
-                {{ $lineasCarrito ?? 0 }}
+                {{ count(session('carrito')->lineasCarrito) ?? 0 }}
             </span>
             </a>
         </div>

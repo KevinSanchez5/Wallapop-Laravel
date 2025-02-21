@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+class LineaCarrito {
+    public $producto;
+    public $cantidad;
+    public $precioTotal;
 
-class LineaCarrito extends Model
-{
-    protected $fillable = ['guid', 'producto', 'cantidad', 'precioTotal'];
-
-    public function setProductoAttribute($value)
-    {
-        $this->attributes['producto'] = json_encode($value);
+    public function __construct($attributes = []) {
+        $this->producto = $attributes['producto'] ?? null;
+        $this->cantidad = $attributes['cantidad'] ?? 1;
+        $this->precioTotal = $attributes['precioTotal'] ?? 0;
     }
 
-    public function getProductoAttribute($value)
+    public function __toString()
     {
-        return json_decode($value);
+        return "Producto: {$this->producto->nombre}, Cantidad: {$this->cantidad}, Total: {$this->precioTotal}";
     }
+
 }
