@@ -97,6 +97,10 @@
             <!-- Productos -->
             <div id="productos" class="seccion">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Productos en venta</h2>
+                <div class="flex justify-end mb-4">
+                    <a href="{{ route('producto.add') }}" class="px-4 py-2 bg-[#BFF205] text-white rounded-md hover:bg-[#A0D500]">Añadir Producto</a>
+                </div>
+
                 <ul>
                     @isset($productos)
                         @forelse ($productos as $producto)
