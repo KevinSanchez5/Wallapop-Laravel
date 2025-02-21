@@ -40,6 +40,7 @@ class ValoracionController extends Controller
             ],
         ];
 
+        Log::info('Valoraciones obtenidas');
         return response()->json($customResponse);
     }
 
@@ -54,6 +55,7 @@ class ValoracionController extends Controller
             return response()->json(json_decode($valoracionRedis));
         }
 
+        Log::info('Valoración no encontrada en Redis, buscando en la base de datos');
         $valoracion = Valoracion::find($id);
 
         if (!$valoracion) {
@@ -61,6 +63,7 @@ class ValoracionController extends Controller
         }
 
         Redis::set('valoracion_' . $id, json_encode($valoracion), 'EX', 1800);
+        Log::info('Valoración obtenida de la base de datos y almacenada en Redis');
 
         return response()->json($valoracion);
     }
@@ -95,6 +98,7 @@ class ValoracionController extends Controller
         $valoracion = Redis::get('valoracion_'. $id);
 
         if (!$valoracion) {
+            Log::info('Valoración no encontrada en Redis, buscando en la base de datos');
             $valoracion = Valoracion::find($id);
         } else {
             $valoracion = Valoracion::find($id);
@@ -110,11 +114,12 @@ class ValoracionController extends Controller
             $valoracionModel = $valoracion;
         }
 
+        Log::info('Eliminando valoración con ID: ' . $id);
         $valoracionModel->delete();
-        Log::info('Valoración eliminada correctamente');
 
         // Limpiar caché de la valoración y de la lista
         Redis::del('valoracion_'. $id);
+        Log::info('Valoración eliminada correctamente y caché limpiado');
 
         return response()->json(['message' => 'Valoracion eliminada correctamente']);
     }
