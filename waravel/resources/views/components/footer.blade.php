@@ -1,7 +1,8 @@
 <footer class="bg-[#BFF205] text-black py-6">
-    <div class="container mx-auto flex justify-between items-center px-6">
-        <div class="flex items-center">
-            <div class="flex justify-center mb-4 text-black">
+    <div class="container mx-auto flex flex-col sm:flex-row justify-center sm:justify-between items-center px-6">
+        <!-- Logo y nombre -->
+        <div class="flex items-center mb-4 sm:mb-0 justify-center sm:justify-start">
+            <div class="flex justify-center mb-4 sm:mb-0 text-black">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34.45 30.81" class="w-12 h-12 mr-4" fill="currentColor">
                     <circle cx="8.18" cy="6.32" r="6.32"/>
                     <circle cx="26.27" cy="6.32" r="6.32"/>
@@ -12,13 +13,15 @@
             <span class="text-3xl font-semibold">Waravel</span>
         </div>
 
-        <div class="flex space-x-8">
+        <!-- Enlaces -->
+        <div class="flex flex-wrap justify-center space-x-8 sm:space-x-6 mb-4 sm:mb-0">
             <a href="" class="font-medium hover:text-white transition-colors">Quiénes somos</a>
             <a href="" class="font-medium hover:text-white transition-colors">Contacto</a>
             <a href="" class="font-medium hover:text-white transition-colors">Términos y condiciones</a>
         </div>
 
-        <div class="flex space-x-6">
+        <!-- Redes Sociales -->
+        <div class="flex justify-center space-x-6">
             <a href="" target="_blank" class="font-medium hover:text-white transition-colors">
                 <i class="fab fa-facebook-f"></i>
             </a>
@@ -37,6 +40,7 @@
         </div>
     </div>
 
+    <!-- Texto de derechos reservados -->
     <div class="mt-4 text-center">
         <p class="text-sm font-medium">&copy; {{ date('Y') }} Waravel. Todos los derechos reservados.</p>
     </div>
