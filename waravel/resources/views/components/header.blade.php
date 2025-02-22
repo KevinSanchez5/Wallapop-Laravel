@@ -2,8 +2,8 @@
     <div class="container mx-auto flex justify-between items-center px-6">
 
         <!-- Logo -->
-        <a href="{{ route('pages.home') }}" class="text-3xl font-bold text-gray-800">
-            <b>Waravel</b>
+        <a href="{{ route('pages.home') }}" class="text-3xl font-extrabold text-gray-800" style="font-family: 'Inter', sans-serif;">
+            Waravel
         </a>
 
         <!-- Navegación -->
@@ -12,7 +12,7 @@
                 <!-- Dropdown de usuario -->
                 <x-dropdown align="right" width="56" class="dropdown-menu">
                     <x-slot name="trigger">
-                        <button class="h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-black bg-white transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white dark:text-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-500">
+                        <button class="h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-black bg-white transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white dark:text-white dark:bg-black dark:hover:bg-gray-700 dark:hover:border-gray-500">
                             <img src="{{ asset('storage/' . (Auth::user()->avatar ?? 'clientes/avatar.png')) }}"
                                  alt="Avatar de {{ Auth::user()->name }}"
                                  class="w-8 h-8 rounded-full object-cover mr-2">
@@ -50,8 +50,8 @@
             @endauth
 
             <!-- Modo oscuro -->
-            <button id="modoOscuroBtn" class="p-2 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition" aria-label="Cambiar modo de tema">
-                <svg id="modoOscuroIconLuz" class="hidden w-6 h-6 text-gray-800 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button id="modoOscuroBtn" class="p-2 rounded-lg bg-white dark:bg-black hover:bg-gray-300 dark:hover:bg-gray-700 transition" aria-label="Cambiar modo de tema">
+                <svg id="modoOscuroIconLuz" class="hidden w-6 h-6 text-black dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
                     <line x1="12" y1="21" x2="12" y2="23"></line>

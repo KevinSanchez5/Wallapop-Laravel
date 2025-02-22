@@ -14,6 +14,7 @@
             <!-- Carrusel  arriba -->
             <div x-data="{ open: false, imgSrc: '' }">
                 <div class="swiper w-full h-96 mb-6">
+
                     <div class="swiper-wrapper">
                         @foreach ($producto->imagenes as $imagen)
                             <div class="swiper-slide">
