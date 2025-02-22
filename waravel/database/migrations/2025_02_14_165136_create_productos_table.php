@@ -31,7 +31,7 @@ return new class extends Migration
                 'Cine',
                 'Cocina'
             ]);
-            $table->enum('estado', ['Disponible', 'Vendido', 'Desactivado']);
+            $table->enum('estado', ['Disponible', 'Vendido', 'Desactivado', 'Baneado']);
             $table->json('imagenes'); // TODO - Cuidado a la hora de hacer la lógica
             $table->timestamps();
         });
