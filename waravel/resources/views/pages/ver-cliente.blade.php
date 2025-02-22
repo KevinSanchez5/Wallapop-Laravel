@@ -76,12 +76,12 @@
         <!-- Botones -->
         <div class="flex justify-center mb-4">
             <button onclick="mostrarSeccion('productos')"
-                    class="px-4 py-2 rounded-lg text-white bg-[#BFF205] hover:bg-[#A0D500]">
-                Productos
+                    class="px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                <b>Productos</b>
             </button>
             <button onclick="mostrarSeccion('valoraciones')"
-                    class="ml-2 px-4 py-2 rounded-lg text-white bg-[#BFF205] hover:bg-[#A0D500]">
-                Valoraciones
+                    class="ml-2 px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                <b>Valoraciones</b>
             </button>
         </div>
 

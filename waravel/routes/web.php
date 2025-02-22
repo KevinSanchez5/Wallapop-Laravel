@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('pages.home');
 
 Route::get('/productos/search', [ProductoControllerView::class, 'search'])->name('productos.search');
-Route::get('/producto/add', [ProductoControllerView::class, 'showAddForm'])->name('producto.add');
-Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
 Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');
 
 Route::get('/cliente/{guid}', [ClienteControllerView::class, 'mostrarCliente'])->name('cliente.ver');
@@ -23,6 +21,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/producto/add', [ProductoControllerView::class, 'showAddForm'])->name('producto.add');
+    Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
+
+    Route::get('/producto/{guid}/edit', [ProductoControllerView::class, 'edit'])->name('producto.edit');
+    Route::put('/producto/{guid}', [ProductoControllerView::class, 'update'])->name('producto.update');
+
+    Route::post('/producto/{guid}/changestatus', [ProductoControllerView::class, 'changestatus'])->name('producto.changestatus');
+
+    Route::delete('/producto/{guid}', [ProductoControllerView::class, 'destroy'])->name('producto.destroy');
 });
 
 Route::get('/carrito', [CarritoControllerView::class, 'showCart'])->name('carrito');
