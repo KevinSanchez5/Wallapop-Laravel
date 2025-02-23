@@ -80,8 +80,15 @@ class ProductoControllerView extends Controller
     {
         Log::info('Acceso al producto con GUID: ' . $guid);
 
-        $producto = Cache::remember("producto_{$guid}", 60, function () use ($guid) {
-            return Producto::with('vendedor', 'clientesFavoritos')->where('guid', $guid)->first();
+        if (!is_string($guid) || empty($guid)) {
+            Log::warning('GUID inválido', ['guid' => $guid]);
+            return redirect()->route('pages.home')->with('error', 'Producto no encontrado');
+        }
+
+        $cacheTime = 60;
+
+        $producto = Cache::remember("producto_{$guid}", $cacheTime, function () use ($guid) {
+            return Producto::with(['vendedor', 'clientesFavoritos'])->where('guid', $guid)->first();
         });
 
         if (!$producto) {
@@ -89,10 +96,11 @@ class ProductoControllerView extends Controller
             return redirect()->route('pages.home')->with('error', 'Producto no encontrado');
         }
 
-        Log::info('Producto encontrado', ['producto' => $producto]);
+        Log::info('Producto encontrado', ['producto_id' => $producto->id]);
 
         return view('pages.ver-producto', compact('producto'));
     }
+
 
     public function store(Request $request)
     {
@@ -264,8 +272,7 @@ class ProductoControllerView extends Controller
 
         if ($file && $file->isValid()) {
             $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs("productos/{$product->guid}", $filename, 'public');
-
+            $filePath = $file->storeAs("productos/{$product->guid}", $filename,'public');
             Log::info('Imagen almacenada', ['filePath' => $filePath]);
 
             $imagePath = "productos/{$product->guid}/{$filename}";
