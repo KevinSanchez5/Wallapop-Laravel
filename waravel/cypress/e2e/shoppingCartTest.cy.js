@@ -1,10 +1,6 @@
 describe('Carrito', () => {
     it('Añadir al carrito', () => {
 
-        /*
-         ### AÑADIR AL CARRITO ###
-         */
-
         // Abre la página principal
         cy.visit('http://localhost');
 
@@ -26,7 +22,7 @@ describe('Carrito', () => {
         cy.contains('Continuar explorando');
         cy.contains('Eliminar');
     })
-    it('Borrar del carrito', () => {
+    it('Quitar uno del carrito cuando la cantidad es uno lo borra', () => {
 
         // Añadir un producto
         cy.visit('http://localhost');
@@ -49,7 +45,9 @@ describe('Carrito', () => {
            .should('equal', '0.00 €');
         cy.get('#finalTotal').invoke('text')
             .should('equal', '0.00 €');
+
     })
+
     it('Añadir uno de un producto en la cesta', () => {
 
         // Añadir un producto
@@ -73,6 +71,7 @@ describe('Carrito', () => {
             .should('include', '2');
 
     })
+
     it('Borrar uno de un producto en la cesta cuando la cantidad es más de uno', () => {
 
         // Añadir un producto
@@ -98,6 +97,7 @@ describe('Carrito', () => {
             .should('include', '1');
 
     })
+
     it('Borrar el producto de la cesta', () => {
 
         // Añadir un producto
