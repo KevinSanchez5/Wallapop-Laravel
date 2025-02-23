@@ -98,29 +98,44 @@
         }
 
         function showSpinner(productId) {
-            document.getElementById(`amount_of_items_for_${productId}`).classList.add("hidden");
-            document.getElementById(`spinner_${productId}`).classList.remove("hidden");
+            const input = document.getElementById(`amount_of_items_for_${productId}`);
+            const spinner = document.getElementById(`spinner_${productId}`);
+
+            if(spinner!= null && input != null){
+                spinner.classList.remove("hidden");
+                input.classList.add("hidden");
+            }
         }
 
         function hideSpinner(productId) {
-            document.getElementById(`amount_of_items_for_${productId}`).classList.remove("hidden");
-            document.getElementById(`spinner_${productId}`).classList.add("hidden");
+            const input = document.getElementById(`amount_of_items_for_${productId}`);
+            const spinner = document.getElementById(`spinner_${productId}`);
+
+            if(spinner!= null && input != null){
+                input.classList.remove("hidden");
+                spinner.classList.add("hidden");
+            }
         }
 
         function disableButtons(productId) {
             const addOneButton = document.getElementById(`increment-button-for-${productId}`);
             const removeOneButton = document.getElementById(`decrement-button-for-${productId}`);
 
-            addOneButton.disabled = true;
-            removeOneButton.disabled = true;
+            if(addOneButton != null && removeOneButton != null){
+                addOneButton.disabled = true;
+                removeOneButton.disabled = true;
+            }
         }
 
         function enableButtons(productId) {
             const addOneButton = document.getElementById(`increment-button-for-${productId}`);
             const removeOneButton = document.getElementById(`decrement-button-for-${productId}`);
 
-            addOneButton.disabled = false;
-            removeOneButton.disabled = false;
+            if(addOneButton != null && removeOneButton != null){
+                addOneButton.disabled = false;
+                removeOneButton.disabled = false;
+            }
+
         }
         function deleteLineaCarrito(productId, itemsLeft) {
             const linea = document.getElementById(`linea-${productId}`);
@@ -221,7 +236,7 @@
                                             <a href="{{ route('producto.show', $linea->producto->guid) }}" class="text-base font-medium text-gray-900 hover:underline dark:text-white"> {{ $linea->producto->nombre }}</a>
 
                                             <div class="flex items-center gap-4">
-                                                <button onclick="removeFromCart({{ $linea->producto->id }})" type="button" class="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">
+                                                <button id="delete-button-for-{{$linea->producto->id}}" onclick="removeFromCart({{ $linea->producto->id }})" type="button" class="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">
                                                     <svg class="me-1.5 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
                                                     </svg>
