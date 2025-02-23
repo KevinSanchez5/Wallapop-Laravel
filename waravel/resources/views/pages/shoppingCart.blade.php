@@ -168,7 +168,7 @@
                     break;
                 }
             }
-            priceElement.innerHTML = precio.toFixed(2);
+            priceElement.innerHTML = precio.toFixed(2) + " €";
         }
     </script>
 
