@@ -1,5 +1,5 @@
 describe('Carrito', () => {
-    it('Debería añadir un producto al carrito', () => {
+    it('Tests de carrito', () => {
 
         /*
          ### AÑADIR AL CARRITO ###
