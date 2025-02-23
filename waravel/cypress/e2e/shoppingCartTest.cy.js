@@ -1,5 +1,5 @@
 describe('Carrito', () => {
-    it('Tests de carrito', () => {
+    it('Añadir al carrito', () => {
 
         /*
          ### AÑADIR AL CARRITO ###
@@ -25,19 +25,21 @@ describe('Carrito', () => {
         // Contiene todos los botones
         cy.contains('Continuar explorando');
         cy.contains('Eliminar');
+    })
+    it('Borrar del carrito', () => {
 
-        /*
-        ### BORRAR ###
-        */
+        // Añadir un producto
+        cy.visit('http://localhost');
+        cy.contains('Ver detalles').click();
+        cy.contains('Agregar a Cesta').click();
+        cy.wait(1000);
 
-        // Esperar a que se agregue el producto a la cesta
+        // Ir al carrito
         cy.visit('http://localhost/carrito');
 
         // Hacer clic para borrar el producto de la cesta
         cy.get('[id^=decrement-button-for-]').click();
 
-        // Esperar a que se elimine el producto de la cesta
-        cy.wait(1000);
 
         // Asegurarse que el carrito está vacío
         cy.contains('No hay productos en el carrito').should('be.visible');
@@ -47,16 +49,13 @@ describe('Carrito', () => {
            .should('equal', '0.00 €');
         cy.get('#finalTotal').invoke('text')
             .should('equal', '0.00 €');
+    })
+    it('Añadir uno de un producto en la cesta', () => {
 
-        /*
-         ### AÑADIR UNO ###
-         */
-
-        // Ir a la página principal
+        // Añadir un producto
         cy.visit('http://localhost');
         cy.contains('Ver detalles').click();
         cy.contains('Agregar a Cesta').click();
-        cy.wait(1000);
 
         // Ir al carrito
         cy.visit('http://localhost/carrito');
@@ -73,12 +72,19 @@ describe('Carrito', () => {
             .invoke('text')
             .should('include', '2');
 
+    })
+    it('Borrar uno de un producto en la cesta cuando la cantidad es más de uno', () => {
 
-        /*
-        ### BORRAR UNO CUANDO LA CANTIDAD ES MAS DE UNO ###
-        */
+        // Añadir un producto
+        cy.visit('http://localhost');
+        cy.contains('Ver detalles').click();
+        cy.contains('Agregar a Cesta').click();
+        cy.contains('Agregar a Cesta').click();
 
-        // Hacer clic para borrar el producto de la cesta
+        // Ir al carrito
+        cy.visit('http://localhost/carrito');
+
+        // Hacer clic para borrar uno
         cy.get('[id^=decrement-button-for-]').click();
 
         // Asegurarse que pone 1 de ese elemento
@@ -91,9 +97,16 @@ describe('Carrito', () => {
             .invoke('text')
             .should('include', '1');
 
-        /*
-        ### BORRAR EL PRODUCTO DE LA CESTA ###
-        */
+    })
+    it('Borrar el producto de la cesta', () => {
+
+        // Añadir un producto
+        cy.visit('http://localhost');
+        cy.contains('Ver detalles').click();
+        cy.contains('Agregar a Cesta').click();
+
+        // Ir al carrito
+        cy.visit('http://localhost/carrito');
 
         // Hacer clic para borrar el producto de la cesta
         cy.get('[id^=delete-button-for-]').click();
