@@ -3,30 +3,147 @@
 @section('title', 'Carrito')
 
 @section('content')
-    <!-- Este es el header que cambia según el modo -->
     <script>
-        function removeFromCart(productId) {
-            fetch("{{route('carrito.remove')}}", {
-                method: "DELETE",
+        let cartUpdateQueue = Promise.resolve();
+
+        function queueCartUpdate(updateFunction) {
+            cartUpdateQueue = cartUpdateQueue.then(() => updateFunction()).catch(console.error);
+        }
+
+        async function removeFromCart(productId) {
+            queueCartUpdate(() => {
+                fetch("{{route('carrito.remove')}}", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        amount: 1
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 200) {
+                            console.log("Cart updated:", data);
+                            const carrito = JSON.parse(data.carrito);
+                            deleteLineaCarrito(productId, carrito.itemAmount);
+                            updateTotal(carrito.precioTotal);
+                            updateCartLogo(carrito.itemAmount);
+                        } else {
+                            console.warn("Failed to update cart:", data);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error:', error);
+                    });
+            });
+        }
+
+        async function removeOneOrDeleteIt(productId) {
+            fetch("{{route('carrito.removeOne')}}", {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": "{{ csrf_token() }}",
                 },
                 body: JSON.stringify({
-                    productId: productId,
+                    productId: productId
                 })
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        location.reload();
+                    if (data.status === 200) {
+                        const carrito = JSON.parse(data.carrito);
+                        if (data.deletedTheItem){
+                            deleteLineaCarrito(productId, carrito.itemAmount);
+                        }else{
+                            removeOneFromTheCounter(productId);
+                            updateCurrentLineaPrice(carrito, productId)
+                        }
+                        updateTotal(carrito.precioTotal);
+                        updateCartLogo(carrito.itemAmount);
                     } else {
-                        console.log('Error removing product');
+                        console.warn("Failed to update cart:", data);
                     }
                 })
-                .catch(error => {
-                    console.log('Error:', error);
-                });
+        }
+
+        async function addOne(product, productId) {
+            fetch("{{route('carrito.add')}}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                },
+                body: JSON.stringify({
+                    producto: product,
+                    amount: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 200) {
+                    console.log("Cart updated:", data);
+                    const carrito = JSON.parse(data.carrito);
+                    updateTotal(carrito.precioTotal);
+                    updateCartLogo(carrito.itemAmount);
+                    addOneToTheCounter(productId);
+                    updateCurrentLineaPrice(carrito, productId)
+                } else {
+                    console.warn("Failed to update cart:", data);
+                }
+            })
+        }
+
+        function deleteLineaCarrito(productId, itemsLeft) {
+            const linea = document.getElementById(`linea-${productId}`);
+            const parent = linea.parentNode;
+            parent.removeChild(linea);
+            if (itemsLeft === 0) {
+                parent.innerHTML = "<p class='text-base font-normal text-gray-500 dark:text-gray-400 text-center' style='height: 10rem; line-height: 10rem'>No hay productos en el carrito </p>"
+            }
+        }
+
+        function updateTotal(newTotal) {
+            const totalPrice = document.getElementById('totalPrice');
+            const finalTotal = document.getElementById('finalTotal');
+
+            totalPrice.innerHTML = newTotal.toFixed(2) + " €";
+            finalTotal.innerHTML = newTotal.toFixed(2) + " €";
+        }
+
+        function updateCartLogo(amountOfItems) {
+            const cartLogo = document.getElementById('itemCount');
+            cartLogo.innerHTML = amountOfItems;
+        }
+
+        function addOneToTheCounter(productId){
+            const input = document.getElementById("amount_of_items_for_" + productId);
+            const currentValue = parseInt(input.value);
+            input.value = currentValue + 1;
+        }
+
+        function removeOneFromTheCounter(productId){
+            const input = document.getElementById("amount_of_items_for_" + productId);
+            const currentValue = parseInt(input.value);
+            if(currentValue > 0){
+                input.value = currentValue - 1;
+            }
+        }
+
+        function updateCurrentLineaPrice(carrito, idProducto){
+            const priceElement = document.getElementById(idProducto + '_total');
+            const lineas = carrito.lineasCarrito;
+            let precio = 0;
+            for(let linea of lineas){
+                if(linea.producto.id === idProducto){
+                    precio = linea.precioTotal;
+                    break;
+                }
+            }
+            priceElement.innerHTML = precio.toFixed(2);
         }
     </script>
 
@@ -41,7 +158,7 @@
                     <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300">
                         <div class="space-y-3">
                             @forelse($cart->lineasCarrito as $linea)
-                                <div class="rounded-lg p-4 md:p-6">
+                                <div id="linea-{{$linea->producto->id}}" class="rounded-lg p-4 md:p-6">
                                     <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
                                         <a href="{{ route('producto.show', $linea->producto->guid) }}" class="shrink-0 md:order-1">
                                             <img class="h-20 w-20" style="border-radius: 0.5rem" src=" {{asset('storage/' . $linea->producto->imagenes[0])}}" alt="image" />
@@ -50,20 +167,20 @@
                                         <label for="counter-input" class="sr-only">Elegir cantidad:</label>
                                         <div class="flex items-center justify-between md:order-3 md:justify-end">
                                             <div class="flex items-center">
-                                                <button type="button" id="decrement-button" data-input-counter-decrement="counter-input" class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
+                                                <button onclick="removeOneOrDeleteIt({{$linea->producto->id}})" type="button" id="decrement-button" data-input-counter-decrement="counter-input" class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
                                                     <svg class="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
                                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h16" />
                                                     </svg>
                                                 </button>
-                                                <input type="text" id="counter-input" data-input-counter class="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white" placeholder="" value=" {{ $linea->cantidad }}" required />
-                                                <button type="button" id="increment-button" data-input-counter-increment="counter-input" class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
+                                                <input id="amount_of_items_for_{{ $linea->producto->id }}" type="text" data-input-counter class="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white" placeholder="" value="{{ $linea->cantidad }}" required />
+                                                <button onclick="addOne({{$linea->producto}}, {{ $linea->producto->id }})" type="button" id="increment-button" data-input-counter-increment="counter-input" class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
                                                     <svg class="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
                                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16" />
                                                     </svg>
                                                 </button>
                                             </div>
                                             <div class="text-end md:order-4 md:w-32">
-                                                <p class="text-base font-bold text-gray-900 dark:text-white">
+                                                <p id="{{ $linea->producto->id }}_total" class="text-base font-bold text-gray-900 dark:text-white">
                                                     {{ $linea->precioTotal }} €
                                                 </p>
                                             </div>
@@ -85,7 +202,7 @@
                                 </div>
                             @empty
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem">
-                                    No hay elementos en el carrito
+                                    No hay productos en el carrito
                                 </p>
                             @endforelse
                         </div>
@@ -99,13 +216,13 @@
                                 <div class="space-y-2">
                                     <dl class="flex items-center justify-between gap-4">
                                         <dt class="text-base font-normal text-gray-500 dark:text-gray-400">Precio</dt>
-                                        <dd class="text-base font-medium text-gray-900 dark:text-white">{{ $cart->precioTotal }} €</dd>
+                                        <dd id="totalPrice" class="text-base font-medium text-gray-900 dark:text-white">{{ $cart->precioTotal }} €</dd>
                                     </dl>
                                 </div>
 
                                 <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
                                     <dt class="text-base font-bold text-gray-900 dark:text-white">Total</dt>
-                                    <dd class="text-base font-bold text-gray-900 dark:text-white"> {{ $cart->precioTotal }} €</dd>
+                                    <dd id="finalTotal" class="text-base font-bold text-gray-900 dark:text-white"> {{ $cart->precioTotal }} €</dd>
                                 </dl>
                             </div>
 

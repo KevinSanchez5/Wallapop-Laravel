@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/carrito', [CarritoControllerView::class, 'showCart'])->name('carrito');
 Route::post('/product/addToCart', [CarritoControllerView::class, 'addToCartOrEditSetProduct'])->name('carrito.add');
+Route::put('/product/removeOne', [CarritoControllerView::class, 'deleteOneFromCart'])->name('carrito.removeOne');
 Route::delete('/product/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
 
 Route::get('/passchange', function () {

@@ -7,6 +7,17 @@
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <x-header/>
 
+    <!-- Notificación -->
+    <div id="toast-success" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
+            <svg class="w-10 h-10" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+            </svg>
+            <span class="sr-only">Check icon</span>
+        </div>
+        <div class="ms-3 text-md font-normal ml-5">Artículo añadido al carrito.</div>
+    </div>
+
     <div class="container mx-auto px-4 py-10">
         <!-- Contenedor principal con fondo claro/oscuro -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-5xl mx-auto">
@@ -88,7 +99,7 @@
             <!-- Botones -->
             <div class="mt-6 flex flex-col sm:flex-row items-center sm:justify-center md:justify-start gap-4">
                 <!-- Botón Agregar a Cesta con el color personalizado -->
-                <a href="#" onclick="addToCart({{ $producto }}, 1)" class="bg-[#BFF205] text-gray-800 font-semibold py-2 px-6 rounded-md
+                <a href="#" onclick="addToCart({{ $producto }}, 1); return false" class="bg-[#BFF205] text-gray-800 font-semibold py-2 px-6 rounded-md
    hover:bg-[#A8D403] transition duration-300 transform hover:scale-105">
                     Agregar a Cesta
                 </a>
@@ -120,7 +131,42 @@
                 producto: product,
                 amount: amount,
             }),
-        }).then(response => console.log(response));
+        }).then(response => response.json())
+        .then(data => {
+            if (data.status === 200) {
+                const carrito = JSON.parse(data.carrito);
+                updateCartLogo(carrito.itemAmount);
+                showNotification();
+            }
+        });
     }
+
+    function showNotification() {
+        let toast = document.getElementById('toast-success');
+
+        toast.classList.remove("hidden");
+        toast.classList.remove("opacity-0");
+        toast.classList.add("opacity-100");
+
+        setTimeout(() => {
+            toast.classList.remove("opacity-100");
+            toast.classList.add("opacity-0");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 500);
+        }, 3000)
+    }
+    function updateCartLogo(amountOfItems) {
+        const cartLogo = document.getElementById('itemCount');
+        cartLogo.innerHTML = amountOfItems;
+    }
+
+    function hideToastOnScroll() {
+        const toast = document.getElementById("toast-success");
+        toast.classList.add("hidden");
+    }
+
+    window.addEventListener('scroll', hideToastOnScroll);
 </script>
 

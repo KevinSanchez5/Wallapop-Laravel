@@ -1,5 +1,6 @@
 import './bootstrap';
 import './carousel'
+import 'flowbite';
 
 document.addEventListener('DOMContentLoaded', function () {
     const html = document.documentElement;
