@@ -7,6 +7,7 @@
     <x-header />
 
     <div class="container mx-auto py-6 flex flex-col md:flex-row gap-6">
+
         <div style="min-height: 600px" class="w-full md:w-1/4 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6">
             <div class="relative w-32 h-32 mx-auto">
                 <img src="{{ asset('storage/' . ($cliente->avatar ?? 'clientes/default.jpg')) }}"
@@ -138,6 +139,7 @@
                 </ul>
             </div>
         </div>
+
     </div>
 
     <x-footer />
