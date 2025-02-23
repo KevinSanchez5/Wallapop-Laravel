@@ -75,8 +75,8 @@
                 </svg>
 
                 <!-- el numero de carrito cambia según el numero de lineas que tengamos, por defecto es 0 -->
-                <span class="absolute -top-2 -right-2 bg-black text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
-                {{ count(optional(session('carrito'))->lineasCarrito ?? []) }}
+                <span id="itemCount" class="absolute -top-2 -right-2 bg-black text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
+                {{ optional(session('carrito'))->itemAmount ?? 0 }}
             </span>
             </a>
         </div>

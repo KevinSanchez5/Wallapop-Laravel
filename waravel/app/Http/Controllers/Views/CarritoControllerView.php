@@ -34,7 +34,8 @@ class CarritoControllerView extends Controller
 
         $cart = session()->get('carrito', new Carrito([
             'lineasCarrito' => [],
-            'precioTotal' => 0
+            'precioTotal' => 0,
+            'itemAmount' => 0
         ]));
 
         if ($cart->lineasCarrito == null) {
@@ -47,7 +48,7 @@ class CarritoControllerView extends Controller
         foreach ($lineas as $key => &$linea) {
             if ($linea->producto->id == $productId) {
                 $cart->precioTotal -= $linea->precioTotal;
-                \Illuminate\Log\log('found');
+                $cart->itemAmount -= $linea->cantidad;
                 unset($lineas[$key]);
                 $found = true;
                 break;
@@ -57,7 +58,69 @@ class CarritoControllerView extends Controller
         if ($found) {
             $cart->lineasCarrito = array_values($lineas);
             session()->put('carrito', $cart);
-            return response()->json("Success");
+            return response()->json( [
+                "carrito" => json_encode($cart),
+                "status" => 200
+            ]);
+        }
+
+        return response()->json("Error", 404);
+    }
+
+    public function deleteOneFromCart(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'productId' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $productId = $request->input('productId');
+
+        $cart = session()->get('carrito', new Carrito([
+            'lineasCarrito' => [],
+            'precioTotal' => 0
+        ]));
+
+        if ($cart->lineasCarrito == null) {
+            return response()->json($validator->errors(), 404);
+        }
+
+        $lineas = $cart->lineasCarrito;
+        $found = false;
+        $deletedTheItem = false;
+
+        foreach ($lineas as $key => &$linea) {
+            if ($linea->producto->id == $productId) {
+                if ($linea->cantidad == 1){
+                    $cart->precioTotal -= $linea->precioTotal;
+                    unset($lineas[$key]);
+                    $found = true;
+                    $deletedTheItem = true;
+                    break;
+                }else{
+                    $cart->precioTotal -= $linea->producto->precio;
+                    $linea->cantidad -= 1;
+                    $linea->precioTotal -= $linea->producto->precio;
+                    $found = true;
+                    break;
+                }
+            }
+        }
+
+        session(['carrito' => $cart]);
+
+        if ($found) {
+            $cart->lineasCarrito = array_values($lineas);
+            $cart->itemAmount -= 1;
+            session()->put('carrito', $cart);
+            return response()->json( [
+                "carrito" => json_encode($cart),
+                "deletedTheItem" => $deletedTheItem,
+                "status" => 200
+            ]);
         }
 
         return response()->json("Error", 404);
@@ -77,7 +140,8 @@ class CarritoControllerView extends Controller
 
         $cart = session('carrito', new Carrito([
             'lineasCarrito' => [],
-            'precioTotal' => 0
+            'precioTotal' => 0,
+            'itemAmount' => 0
         ]));
 
         if ($cart->lineasCarrito == null) {
@@ -114,8 +178,12 @@ class CarritoControllerView extends Controller
         }
 
         $cart->lineasCarrito = $lineas;
+        $cart->itemAmount += $amount;
         session(['carrito' => $cart]);
 
-        return response()->json("success");
+        return response()->json( [
+            "carrito" => json_encode($cart),
+            "status" => 200
+        ]);
     }
 }

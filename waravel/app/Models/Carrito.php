@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;class Carrito
+class Carrito
 {
     public $lineasCarrito;
     public $precioTotal;
+    public $itemAmount;
 
     public function __construct($attributes = [])
     {
         $this->lineasCarrito = $attributes['lineasCarrito'] ?? [];
         $this->precioTotal = $attributes['precioTotal'] ?? 0;
+        $this->itemAmount = $attributes['itemAmount'] ?? 0;
     }
 
     public function __toString()
@@ -20,6 +22,6 @@ use Illuminate\Database\Eloquent\Model;class Carrito
         }, $this->lineasCarrito);
 
         $lineasString = implode(", ", $lineas);
-        return "Lineas: [$lineasString], Precio Total: {$this->precioTotal}";
+        return "Lineas: [$lineasString], Precio Total: {$this->precioTotal}, Cantidad de productos: {$this->itemAmount}";
     }
 }
