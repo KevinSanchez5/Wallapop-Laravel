@@ -247,7 +247,7 @@
                                 <div class="space-y-2">
                                     <dl class="flex items-center justify-between gap-4">
                                         <dt class="text-base font-normal text-gray-500 dark:text-gray-400">Precio</dt>
-                                        <dd id="totalPrice" class="text-base font-medium text-gray-900 dark:text-white">{{ $cart->precioTotal }} €</dd>
+                                        <dd id="totalPrice" class="text-base font-medium text-gray-500 dark:text-gray-400">{{ $cart->precioTotal }} €</dd>
                                     </dl>
                                 </div>
 
