@@ -12,7 +12,7 @@
                 <!-- Dropdown de usuario -->
                 <x-dropdown align="right" width="56" class="dropdown-menu">
                     <x-slot name="trigger">
-                        <button class="h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-black bg-white transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white dark:text-white dark:bg-black dark:hover:bg-gray-700 dark:hover:border-gray-500">
+                        <button class="h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md  transition-all duration-300 ease-in-out bg-white hover:text-white hover:bg-black  dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white">
                             <img src="{{ asset('storage/' . (Auth::user()->avatar ?? 'clientes/avatar.png')) }}"
                                  alt="Avatar de {{ Auth::user()->name }}"
                                  class="w-8 h-8 rounded-full object-cover mr-2">

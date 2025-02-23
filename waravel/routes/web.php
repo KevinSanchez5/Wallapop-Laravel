@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
+use App\Http\Controllers\Views\ProfileControllerView;
 use App\Http\Controllers\Views\ValoracionesControllerView;
 use Illuminate\Support\Facades\Route;
 
@@ -14,10 +14,10 @@ Route::get('/clientes/{guid}/valoraciones', [ValoracionesControllerView::class, 
 Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'promedio'])->name('cliente.puntuacion');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileControllerView::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileControllerView::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
 
