@@ -76,10 +76,9 @@
 
             <!-- Botón de Editar Perfil -->
             <div class="text-center mt-6">
-                <a href="{{ route('profile.edit', $cliente->guid) }}"
-                   class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
+                <button onclick="toggleModal()" class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
                     <b>Editar perfil</b>
-                </a>
+                </button>
             </div>
         </div>
 
@@ -195,33 +194,147 @@
         </div>
     </div>
 
+    <!-- Modal de Edición de Perfil -->
+    <div id="editProfileModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <!-- Fondo semi-transparente -->
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
+            </div>
+            <!-- Contenedor del modal -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 w-full max-w-md mx-auto p-6 relative">
+                <!-- Encabezado -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white">Editar Perfil</h2>
+                    <button onclick="toggleModal()" class="text-gray-600 dark:text-gray-300 text-2xl leading-none">&times;</button>
+                </div>
+                <!-- Formulario -->
+                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- Avatar -->
+                    <div class="flex flex-col items-center">
+                        @if($cliente->avatar)
+                            <img src="{{ asset('storage/' . $cliente->avatar) }}" alt="Avatar" class="w-20 h-20 rounded-full object-cover mb-3">
+                        @else
+                            <div class="w-20 h-20 bg-gray-300 dark:bg-gray-700 flex items-center justify-center rounded-full mb-3">
+                                <span class="text-gray-600 dark:text-gray-300">Sin imagen</span>
+                            </div>
+                        @endif
+                        <label class="block w-full text-center">
+                            <span class="sr-only">Subir nueva imagen</span>
+                            <input type="file" name="avatar" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-md file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-gray-700 dark:file:text-white">
+                        </label>
+                        @error('avatar')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Datos personales (2 columnas) -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+                            <input type="text" name="nombre" id="nombre" value="{{ old('nombre', $cliente->nombre) }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" required>
+                            @error('nombre')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="apellidos" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Apellidos</label>
+                            <input type="text" name="apellidos" id="apellidos" value="{{ old('apellidos', $cliente->apellido) }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" required>
+                            @error('apellidos')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Email (bloqueado) -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</label>
+                        <input type="email" name="email" id="email" value="{{ old('email', Auth::user()->email) }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white cursor-not-allowed" disabled>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div>
+                        <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
+                        <input type="text" name="telefono" id="telefono" value="{{ old('telefono', $cliente->telefono) }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" required>
+                        @error('telefono')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Datos de dirección (organizados en 2 columnas con el código postal en una fila completa) -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="direccion_calle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Calle</label>
+                            <input type="text" name="direccion[calle]" id="direccion_calle" value="{{ old('direccion.calle', $cliente->direccion->calle ?? '') }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" required>
+                            @error('direccion.calle')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="direccion_numero" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Número</label>
+                            <input type="number" name="direccion[numero]" id="direccion_numero" value="{{ old('direccion.numero', $cliente->direccion->numero ?? '') }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" required>
+                            @error('direccion.numero')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="direccion_piso" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Piso</label>
+                            <input type="number" name="direccion[piso]" id="direccion_piso" value="{{ old('direccion.piso', $cliente->direccion->piso ?? '') }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white">
+                            @error('direccion.piso')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="direccion_letra" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Letra</label>
+                            <input type="text" name="direccion[letra]" id="direccion_letra" value="{{ old('direccion.letra', $cliente->direccion->letra ?? '') }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white">
+                            @error('direccion.letra')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="col-span-2">
+                            <label for="direccion_codigoPostal" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Código Postal</label>
+                            <input type="number" name="direccion[codigoPostal]" id="direccion_codigoPostal" value="{{ old('direccion.codigoPostal', $cliente->direccion->codigoPostal ?? '') }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" required>
+                            @error('direccion.codigoPostal')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Botón de Guardar -->
+                    <div class="pt-4">
+                        <button type="submit" class="w-full rounded-lg bg-[#BFF205] hover:bg-[#A0D500] text-black transition font-medium py-2 px-4 rounded-md shadow">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <x-footer />
 
     <script>
+        function toggleModal() {
+            const modal = document.getElementById('editProfileModal');
+            modal.classList.toggle('hidden');
+        }
+
         function mostrarSeccion(seccion) {
             document.getElementById('productos').classList.add('hidden');
             document.getElementById('valoraciones').classList.add('hidden');
-
             document.getElementById(seccion).classList.remove('hidden');
         }
     </script>
-    <style>
-        .hidden {
-            display: none;
-        }
 
+    <style>
+        .hidden { display: none; }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-5px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeIn {
-            animation: fadeIn 0.5s ease-in-out;
-        }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-in-out; }
     </style>
 @endsection
