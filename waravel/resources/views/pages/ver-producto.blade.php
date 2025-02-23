@@ -121,8 +121,8 @@
     <x-footer />
 @endsection
 <script>
-    function addToCart(product, amount) {
-        fetch("{{ route('carrito.add') }}", {
+    async function addToCart(product, amount) {
+        await fetch("{{ route('carrito.add') }}", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
