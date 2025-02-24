@@ -100,10 +100,17 @@
             <!-- Botones -->
             <div class="mt-6 flex flex-col sm:flex-row items-center sm:justify-center md:justify-start gap-4">
                 <!-- Botón Agregar a Cesta con el color personalizado -->
-                <a href="#" onclick="addToCart({{ $producto }}, 1); return false" class="bg-[#BFF205] text-gray-800 font-semibold py-2 px-6 rounded-md
+                <a id="addLink" href="#" onclick="addToCart('{{ $producto->guid }}', 1); return false" class="bg-[#BFF205] text-gray-800 font-semibold py-2 px-6 rounded-md
    hover:bg-[#A8D403] transition duration-300 transform hover:scale-105">
                     Agregar a Cesta
                 </a>
+                <!-- Spinner -->
+                <div id="spinner" class="hidden inset-0 flex items-center justify-center bg-[#A8D403]" style="width:8.85rem; margin-left: 0.75rem; margin-right: 0.75rem">
+                    <svg class="h-4 w-4 animate-spin text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="#111827" stroke-width="4"></circle>
+                        <path d="M2 12a10 10 0 0110-10" stroke="#BFF205" stroke-width="4"></path>
+                    </svg>
+                </div>
 
                 <!-- Botón Añadir a Favoritos con icono de corazón -->
                 <a href="#" class="bg-white text-gray-800 font-semibold py-2 px-6 rounded-md
@@ -121,7 +128,8 @@
     <x-footer />
 @endsection
 <script>
-    async function addToCart(product, amount) {
+    async function addToCart(productId, amount) {
+        showSpinner();
         await fetch("{{ route('carrito.add') }}", {
             method: "POST",
             headers: {
@@ -129,17 +137,40 @@
                 "X-CSRF-TOKEN": " {{ csrf_token() }}",
             },
             body: JSON.stringify({
-                producto: product,
+                productId: productId,
                 amount: amount,
             }),
         }).then(response => response.json())
         .then(data => {
             if (data.status === 200) {
-                const carrito = JSON.parse(data.carrito);
-                updateCartLogo(carrito.itemAmount);
+                updateCartLogo(data.itemAmount);
                 showNotification();
             }
-        });
+        })
+        .catch (error => {
+            console.error(error);
+        })
+        hideSpinner();
+    }
+
+    function showSpinner() {
+        const link = document.getElementById(`addLink`);
+        const spinner = document.getElementById(`spinner`);
+
+        if(spinner!= null && link != null){
+            spinner.classList.remove("hidden");
+            link.classList.add("hidden");
+        }
+    }
+
+    function hideSpinner() {
+        const link = document.getElementById(`addLink`);
+        const spinner = document.getElementById(`spinner`);
+
+        if(spinner!= null && link != null){
+            link.classList.remove("hidden");
+            spinner.classList.add("hidden");
+        }
     }
 
     function showNotification() {
