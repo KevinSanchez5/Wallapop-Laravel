@@ -187,7 +187,7 @@
 
                 <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
                     <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300">
-                        <div class="space-y-3">
+                        <div class="space-y-0">
                             @forelse($cart->lineasCarrito as $linea)
                                 <div id="linea-{{$linea->producto->guid}}" class="rounded-lg p-4 md:p-6">
                                     <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
@@ -237,6 +237,10 @@
                                         </div>
                                     </div>
                                 </div>
+
+                            @if(!$loop->last)
+                                <hr class="my-12 h-0.5 border-t-0 border-t-0 border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
+                            @endif
                             @empty
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem">
                                     No hay productos en el carrito
