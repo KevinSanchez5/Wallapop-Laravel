@@ -239,7 +239,7 @@
                                 </div>
 
                             @if(!$loop->last)
-                                <hr class="my-12 h-0.5 border-t-0 border-t-0 border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
+                                <hr class="my-12 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
                             @endif
                             @empty
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem">
