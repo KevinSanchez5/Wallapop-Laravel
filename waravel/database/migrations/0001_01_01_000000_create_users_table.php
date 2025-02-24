@@ -20,6 +20,8 @@ return new class extends Migration
             $table->enum('role', ['user', 'cliente', 'admin'])->default('user'); // TODO - Revisar si es necesario el rol de user
             $table->rememberToken();
             $table->timestamps();
+            $table->string('password_reset_token')->nullable();
+            $table->timestamp('password_reset_expires_at')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\EmailSender;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -164,7 +165,11 @@ class UserController extends Controller
         }
 
         $codigo = strtoupper(Str::random(10));
-        Log::info('Código de recuperación generado', ['codigo' => $codigo]);
+        $user->password_reset_token = Hash::make($codigo);
+        $user->password_reset_expires_at = now()->addMinutes(5);
+        $user->updated_at = now();
+        $user->save();
+        Log::info('Código de recuperación generado y almacenado en la base de datos');
 
         try {
             Mail::to($user->email)->send(new EmailSender($user, $codigo, null, 'recuperarContrasenya'));
@@ -177,13 +182,43 @@ class UserController extends Controller
             return response()->json(['error' => $e->getMessage()], 503);//fallo al enviar email
         }
 
-        Log::info('Proceso de recuperación de contraseña completado', ['email' => $user->email]);
         return response()->json([
             'success' => true,
             'message' => 'Correo enviado correctamente',
         ], 200);
     }
 
+    public function verificarCodigoCambiarContrasenya(Request $request){
+        Log::info('Verificando código para cambiar la contraseña');
+
+        $request->validate([
+            'codigo' => 'required|string|max:10',
+            'email' => 'required|string|email|max:255|exists:users,email',
+        ]);
+
+        $email = $request->email;
+        $codigo = $request->codigo;
+
+        $user= User::where('email', $email)->first();
+
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            return response()->json(['success'=>false , 'message' => 'User not found'], 404);
+        }
+
+        if(!Hash::check($codigo, $user->password_reset_token)){
+            Log::warning('Codigo incorrecto ingresado');
+            return response()->json(['success'=>false, 'message' => 'Ha ingresado un codigo incorrecto'], 403);
+        }
+
+        if($user->password_reset_expires_at < now()){
+            Log::warning('Codigo expirado');
+            return response()->json(['success'=>false, 'message' => 'Código para recuperar contraseña expirado'], 403);
+        }
+
+        Log::info('Código de recuperación verificado correctamente', ['email' => $user->email]);
+        return response()->json(['success' => true, 'message'=>'Codigo verificado'], 200);
+    }
 
     public function showEmail($email)
     {
