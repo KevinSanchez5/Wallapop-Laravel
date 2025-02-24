@@ -198,7 +198,7 @@
                                 <div id="linea-{{$linea->producto->guid}}" class="rounded-lg p-4 md:p-6">
                                     <div class="lineaCarrito space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
                                         <a href="{{ route('producto.show', $linea->producto->guid) }}" class="shrink-0 md:order-1">
-                                            <img class="h-20 w-20" style="border-radius: 0.5rem" src=" {{asset('storage/' . $linea->producto->imagenes[0])}}" alt="image" />
+                                            <img class="h-20 w-20 object-cover" style="border-radius: 0.5rem" src="{{ asset('storage/' . $linea->producto->imagenes[0])}}" alt="image" />
                                         </a>
 
                                         <label for="counter-input" class="sr-only">Elegir cantidad:</label>
