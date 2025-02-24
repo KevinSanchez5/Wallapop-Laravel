@@ -138,8 +138,13 @@
         }
         function deleteLineaCarrito(productId, itemsLeft) {
             const linea = document.getElementById(`linea-${productId}`);
+            const bottomLines = document.getElementsByClassName('bottomLine');
             const parent = linea.parentNode;
             parent.removeChild(linea);
+            if (bottomLines.length > 0) {
+                const lastElement = bottomLines[bottomLines.length - 1];
+                lastElement.remove();
+            }
             if (itemsLeft === 0) {
                 parent.innerHTML = "<p class='text-base font-normal text-gray-500 dark:text-gray-400 text-center' style='height: 10rem; line-height: 10rem'>No hay productos en el carrito </p>"
             }
@@ -239,7 +244,7 @@
                                 </div>
 
                             @if(!$loop->last)
-                                <hr class="my-12 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
+                                <hr class="bottomLine my-12 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
                             @endif
                             @empty
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem">
