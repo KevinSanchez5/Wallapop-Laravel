@@ -7,16 +7,20 @@ use App\Models\Carrito;
 use App\Models\LineaCarrito;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class CarritoControllerView extends Controller
 {
     public function showCart()
     {
+        Log::info('Buscando el carrito en la sesión');
         $cart = session()->get('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0
         ]));
+
+        Log::info('Devolviendo la vista con el carrito');
         return view('pages.shoppingCart', compact('cart'));
     }
 
@@ -27,11 +31,13 @@ class CarritoControllerView extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::warning('No se han proporcionado los campos necesarios');
             return response()->json($validator->errors(), 400);
         }
 
         $productId = $request->input('productId');
 
+        Log::info('Buscando el carrito en la sesión');
         $cart = session()->get('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0,
@@ -39,6 +45,7 @@ class CarritoControllerView extends Controller
         ]));
 
         if ($cart->lineasCarrito == null) {
+            Log::warning("No hay productos en el carrito");
             return response()->json($validator->errors(), 404);
         }
 
@@ -47,6 +54,7 @@ class CarritoControllerView extends Controller
 
         foreach ($lineas as $key => &$linea) {
             if ($linea->producto->guid == $productId) {
+                Log::info("Producto encontrado en el carrito, editándolo");
                 $cart->precioTotal -= $linea->precioTotal;
                 $cart->itemAmount -= $linea->cantidad;
                 unset($lineas[$key]);
@@ -56,6 +64,7 @@ class CarritoControllerView extends Controller
         }
 
         if ($found) {
+            Log::info("Producto no encontrado en el carrito, añadíendolo");
             $cart->lineasCarrito = array_values($lineas);
             session()->put('carrito', $cart);
             return response()->json( [
@@ -66,6 +75,7 @@ class CarritoControllerView extends Controller
             ]);
         }
 
+        Log::warning("No se ha podido eliminar el producto del carrito");
         return response()->json("Error", 404);
     }
 
@@ -76,17 +86,20 @@ class CarritoControllerView extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::warning('No se han proporcionado los campos necesarios');
             return response()->json($validator->errors(), 400);
         }
 
         $productId = $request->input('productId');
 
+        Log::info('Buscando el carrito en la sesión');
         $cart = session()->get('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0
         ]));
 
         if ($cart->lineasCarrito == null) {
+            Log::warning("No hay productos en el carrito");
             return response()->json($validator->errors(), 404);
         }
 
@@ -98,12 +111,14 @@ class CarritoControllerView extends Controller
         foreach ($lineas as $key => &$linea) {
             if ($linea->producto->guid == $productId) {
                 if ($linea->cantidad == 1){
+                    Log::info("Producto encontrado en el carrito, eliminándolo");
                     $cart->precioTotal -= $linea->precioTotal;
                     unset($lineas[$key]);
                     $found = true;
                     $deletedTheItem = true;
                     break;
                 }else{
+                    Log::info("Producto encontrado en el carrito, disminuyendo la cantidad");
                     $cart->precioTotal -= $linea->producto->precio;
                     $linea->cantidad -= 1;
                     $linea->precioTotal -= $linea->producto->precio;
@@ -119,6 +134,7 @@ class CarritoControllerView extends Controller
         if ($found) {
             $cart->lineasCarrito = array_values($lineas);
             $cart->itemAmount -= 1;
+            Log::info('Actualizando el carrito en la sesión');
             session()->put('carrito', $cart);
             return response()->json( [
                 "precioTotal" => $cart->precioTotal,
@@ -129,6 +145,7 @@ class CarritoControllerView extends Controller
             ]);
         }
 
+        Log::warning("No se ha podido eliminar el producto del carrito");
         return response()->json("Error", 404);
     }
 
@@ -138,11 +155,13 @@ class CarritoControllerView extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::warning('No se han proporcionado los campos necesarios');
             return response()->json($validator->errors(), 400);
         }
 
         $productId = $request->input('productId');
 
+        Log::info('Buscando el carrito en la sesión');
         $cart = session()->get('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0,
@@ -150,6 +169,7 @@ class CarritoControllerView extends Controller
         ]));
 
         if ($cart->lineasCarrito == null) {
+            Log::warning("No hay productos en el carrito");
             return response()->json($validator->errors(), 404);
         }
 
@@ -159,6 +179,7 @@ class CarritoControllerView extends Controller
 
         foreach ($lineas as &$linea) {
             if ($linea->producto->guid == $productId) {
+                Log::info("Producto encontrado en el carrito, aumentando la cantidad");
                 $cart->precioTotal += $linea->producto->precio;
                 $linea->cantidad += 1;
                 $linea->precioTotal += $linea->producto->precio;
@@ -168,11 +189,10 @@ class CarritoControllerView extends Controller
             }
         }
 
-        session(['carrito' => $cart]);
-
         if ($found) {
             $cart->lineasCarrito = array_values($lineas);
             $cart->itemAmount += 1;
+            Log::info('Actualizando el carrito en la sesión');
             session()->put('carrito', $cart);
             return response()->json( [
                 "precioTotal" => $cart->precioTotal,
@@ -182,6 +202,7 @@ class CarritoControllerView extends Controller
             ]);
         }
 
+        Log::warning("No se ha podido eliminar el producto del carrito");
         return response()->json("Error", 404);
     }
 
@@ -195,9 +216,11 @@ class CarritoControllerView extends Controller
 
 
         if ($validator->fails()) {
+            Log::warning('No se han proporcionado los campos necesarios');
             return response()->json($validator->errors(), 400);
         }
 
+        Log::info('Buscando el carrito en la sesión');
         $cart = session('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0,
@@ -218,6 +241,7 @@ class CarritoControllerView extends Controller
 
         foreach ($lineas as &$linea) {
             if ($linea->producto->id == $producto->id) {
+                Log::info("Producto encontrado en el carrito, editándolo");
                 $cart->precioTotal -= $linea->precioTotal;
                 $linea->cantidad += $amount;
                 $linea->precioTotal = $linea->cantidad * $producto->precio;
@@ -229,6 +253,7 @@ class CarritoControllerView extends Controller
         }
 
         if (!$found) {
+            Log::info("Producto no encontrado en el carrito, añadíendolo");
             $lineas[] = new LineaCarrito([
                 'producto' => $producto,
                 'cantidad' => $amount,
@@ -240,6 +265,7 @@ class CarritoControllerView extends Controller
 
         $cart->lineasCarrito = $lineas;
         $cart->itemAmount += $amount;
+        Log::info('Actualizando el carrito en la sesión');
         session(['carrito' => $cart]);
 
         return response()->json( [
