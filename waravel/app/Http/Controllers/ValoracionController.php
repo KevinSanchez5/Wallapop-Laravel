@@ -7,6 +7,7 @@ use App\Models\Valoracion;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redis;
+use App\Notifications\Notificacion;
 
 class ValoracionController extends Controller
 {
@@ -86,6 +87,10 @@ class ValoracionController extends Controller
         }
 
         $valoracion = Valoracion::create($request->all());
+
+        Log::info('Mandando notificacion');
+        $usuarioValorado = User::find($valoracion->clienteValorado_id);
+        $usuarioValorado->notify(new Notificacion(null, null, $valoracion, 'valoracionRecibida'));
 
         Log::info('Valoración creada exitosamente');
 

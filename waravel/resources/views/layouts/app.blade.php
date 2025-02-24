@@ -18,12 +18,16 @@
     <!-- CSS y JS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+<script>
+    window.userId = {{Auth::check() ? Auth::id() : 'null'}};
+</script>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen m-0 p-0">
 
 <!-- Contenido de la página -->
 <main class="min-h-screen m-0 p-0">
     @yield('content')
 </main>
+<div id="notificaciones" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
 </body>
 </html>
