@@ -139,9 +139,10 @@
         function deleteLineaCarrito(productId, itemsLeft) {
             const linea = document.getElementById(`linea-${productId}`);
             const bottomLines = document.getElementsByClassName('bottomLine');
+            const lineasAmount = document.getElementsByClassName('lineaCarrito').length;
             const parent = linea.parentNode;
             parent.removeChild(linea);
-            if (bottomLines.length > 0) {
+            if (bottomLines.length > 0 && bottomLines.length === lineasAmount -1) {
                 const lastElement = bottomLines[bottomLines.length - 1];
                 lastElement.remove();
             }
@@ -195,7 +196,7 @@
                         <div class="space-y-0">
                             @forelse($cart->lineasCarrito as $linea)
                                 <div id="linea-{{$linea->producto->guid}}" class="rounded-lg p-4 md:p-6">
-                                    <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
+                                    <div class="lineaCarrito space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
                                         <a href="{{ route('producto.show', $linea->producto->guid) }}" class="shrink-0 md:order-1">
                                             <img class="h-20 w-20" style="border-radius: 0.5rem" src=" {{asset('storage/' . $linea->producto->imagenes[0])}}" alt="image" />
                                         </a>
