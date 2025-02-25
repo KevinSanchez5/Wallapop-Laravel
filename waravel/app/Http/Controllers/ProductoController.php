@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\Notificacion;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Cliente;
@@ -181,13 +182,17 @@ class ProductoController extends Controller
         } else {
             $productoModel = $producto;
         }
-
+        $userId = $productoModel->user_id;
         Log::info('Eliminando producto de la base de datos');
         $productoModel->delete();
 
         Log::info('Eliminando producto de la cache');
         Redis::del('producto_' . $id);
 
+        //Si el que borra es un admin enviar notificacion
+        Log::info('Enviando notificacion a usuario de producto borrado');
+        $user = User::find($userId);
+        $user->notify(new Notificacion($productoModel, null, null, 'productoEliminadoPorAdmin'));
         Log::info('Producto eliminado correctamente');
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
