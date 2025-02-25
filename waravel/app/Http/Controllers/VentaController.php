@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Venta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
