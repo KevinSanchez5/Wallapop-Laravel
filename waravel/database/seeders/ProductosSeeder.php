@@ -40,7 +40,7 @@ class ProductosSeeder extends Seeder
             ],
             [
                 'guid' => '8b09d444-554b-4b95-9962-d6d64d46719c',
-                'vendedor_id' => 3,
+                'vendedor_id' =>3,
                 'nombre' => 'Guitarra Eléctrica',
                 'descripcion' => 'Guitarra eléctrica de cuerpo sólido con un diseño clásico y un sonido potente. Perfecta para músicos de cualquier nivel que buscan un instrumento versátil para rock, blues, jazz y más. Aunque presenta signos de uso, su sonido sigue siendo excepcional y está lista para conectar y tocar.',
                 'estadoFisico' => 'Deteriorado',

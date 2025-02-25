@@ -171,6 +171,10 @@
       <path value="$PROJECT_DIR$/vendor/psr/clock" />
       <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
       <path value="$PROJECT_DIR$/vendor/laravel/breeze" />
+      <path value="$PROJECT_DIR$/vendor/spatie/temporary-directory" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-backup" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-signal-aware-command" />
+      <path value="$PROJECT_DIR$/vendor/spatie/db-dumper" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">

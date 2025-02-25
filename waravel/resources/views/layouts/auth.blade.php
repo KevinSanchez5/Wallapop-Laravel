@@ -7,6 +7,7 @@
         <!-- Sección de imagen -->
         <div class="w-full md:w-1/2 min-h-[300px] md:min-h-screen bg-cover bg-center flex items-center justify-center text-white"
              style="background-image: url({{ asset('imgs/fondo_auth.jpg') }});">
+            <div class="absolute inset-0 bg-black opacity-25"></div>
         </div>
 
         <!-- Sección de formulario -->
