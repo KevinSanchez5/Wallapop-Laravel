@@ -105,7 +105,7 @@
                     Agregar a Cesta
                 </a>
                 <!-- Spinner -->
-                <div id="spinner" class="hidden inset-0 flex items-center justify-center bg-[#A8D403]" style="width:8.85rem; margin-left: 0.75rem; margin-right: 0.75rem">
+                <div id="spinner" class="hidden inset-0 flex items-center justify-center" style="width:8.85rem; margin-left: 0.75rem; margin-right: 0.75rem">
                     <svg class="h-4 w-4 animate-spin text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="10" stroke="#111827" stroke-width="4"></circle>
                         <path d="M2 12a10 10 0 0110-10" stroke="#BFF205" stroke-width="4"></path>
