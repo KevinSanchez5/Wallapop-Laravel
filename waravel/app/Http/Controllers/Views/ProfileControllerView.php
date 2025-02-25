@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use function Laravel\Prompts\error;
 
@@ -53,7 +54,7 @@ class ProfileControllerView extends Controller
             return redirect()->route('profile')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
-        return view('profile.edit-profile', compact('cliente'));
+        return view('profile.edit', compact('cliente'));
     }
 
     public function update(Request $request)
@@ -68,26 +69,31 @@ class ProfileControllerView extends Controller
             return redirect()->route('profile')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
-        $validated = $request->validate([
-            'nombre'                   => 'required|string|max:255',
-            'apellidos'                => 'required|string|max:255',
-            'email'                    => 'required|email|unique:users,email,' . $usuario->id,
-            'telefono'                 => 'required|string|min:9|max:9',
-            'direccion.calle'          => 'required|string|max:255',
-            'direccion.numero'         => 'required|integer',
-            'direccion.piso'           => 'nullable|integer',
-            'direccion.letra'          => 'nullable|string|max:10',
-            'direccion.codigoPostal'   => 'required|integer',
-            'avatar'                   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
-        ]);
-        Log::info('Validación de datos del formulario completa');
+        Log::info('Validando datos del formulario');
+        try {
+            $validated = $request->validate([
+                'nombre'                   => 'required|string|max:255',
+                'apellidos'                => 'required|string|max:255',
+                'telefono'                 => 'required|string|min:9|max:9',
+                'direccion.calle'          => 'required|string|max:255',
+                'direccion.numero'         => 'required|integer',
+                'direccion.piso'           => 'nullable|integer',
+                'direccion.letra'          => 'nullable|string|max:10',
+                'direccion.codigoPostal'   => 'required|integer',
+                'avatar'                   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            ]);
+        } catch (ValidationException $e) {
+            Log::error('Error de validación', ['errors' => $e->errors()]);
+            throw $e;
+        }
+        Log::info('Validación de datos del formulario completa', ['data' => $validated]);
 
-        // Actualizar datos del usuario
+        Log::info('Actualizando datos del usuario', ['usuario_id' => $usuario->id]);
         $usuario->name  = $validated['nombre'];
-        $usuario->email = $validated['email'];
         $usuario->save();
+        Log::info('Datos del usuario actualizados correctamente');
 
-        // Actualizar datos del cliente
+        Log::info('Actualizando datos del cliente', ['cliente_id' => $cliente->id]);
         $cliente->nombre   = $validated['nombre'];
         $cliente->apellido = $validated['apellidos'];
         $cliente->telefono = $validated['telefono'];
@@ -99,15 +105,17 @@ class ProfileControllerView extends Controller
             'codigoPostal'  => $validated['direccion']['codigoPostal'],
         ];
 
-        // Actualizar avatar si se ha enviado uno nuevo
         if ($request->hasFile('avatar')) {
+            Log::info('Subiendo nuevo avatar');
             $avatarPath = $request->file('avatar')->store('clientes', 'public');
             $cliente->avatar = $avatarPath;
+            Log::info('Avatar subido correctamente', ['avatar_path' => $avatarPath]);
         }
+
         $cliente->save();
+        Log::info('Datos del cliente actualizados correctamente');
 
         Log::info('Perfil actualizado correctamente');
-
         return redirect()->route('profile')->with('success', 'Perfil actualizado correctamente.');
     }
 

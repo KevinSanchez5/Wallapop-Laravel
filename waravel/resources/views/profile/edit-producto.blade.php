@@ -8,10 +8,11 @@
     <div class="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg">
         <h2 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Editar Producto</h2>
 
-        <form action="{{ route('producto.update', $producto->guid) }}" method="POST" enctype="multipart/form-data">
+        <form id="editProductForm" action="{{ route('producto.update', $producto->guid) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
+            <!-- Imágenes del Producto -->
             <div class="mb-4">
                 <label class="block text-gray-700 dark:text-gray-300 mb-2">Imágenes del producto</label>
                 <div class="grid grid-cols-5 gap-4 place-items-center">
@@ -39,6 +40,7 @@
                 @enderror
             </div>
 
+            <!-- Nombre del Producto -->
             <div class="mb-4">
                 <label for="nombre" class="block text-gray-700 dark:text-gray-300">Nombre del producto</label>
                 <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $producto->nombre) }}"
@@ -49,6 +51,7 @@
                 @enderror
             </div>
 
+            <!-- Descripción -->
             <div class="mb-4">
                 <label for="descripcion" class="block text-gray-700 dark:text-gray-300">Descripción</label>
                 <textarea id="descripcion" name="descripcion"
@@ -59,6 +62,7 @@
                 @enderror
             </div>
 
+            <!-- Estado Físico -->
             <div class="mb-4">
                 <label class="block text-gray-700 dark:text-gray-300 mb-2">Estado físico</label>
                 <div class="flex justify-center space-x-4">
@@ -76,6 +80,7 @@
                 @enderror
             </div>
 
+            <!-- Stock -->
             <div class="mb-4">
                 <label for="stock" class="block text-gray-700 dark:text-gray-300">Stock</label>
                 <input type="number" id="stock" name="stock" value="{{ old('stock', $producto->stock) }}"
@@ -86,6 +91,7 @@
                 @enderror
             </div>
 
+            <!-- Precio -->
             <div class="mb-4">
                 <label for="precio" class="block text-gray-700 dark:text-gray-300">Precio</label>
                 <input type="number" id="precio" name="precio" value="{{ old('precio', $producto->precio) }}"
@@ -96,6 +102,7 @@
                 @enderror
             </div>
 
+            <!-- Categoría -->
             <div class="mb-4">
                 <label for="categoria" class="block text-gray-700 dark:text-gray-300">Categoría</label>
                 <select id="categoria" name="categoria"
@@ -116,7 +123,7 @@
                 <a href="{{ route('profile') }}" class="px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-700 dark:text-white hover:bg-gray-400 transition">
                     Volver atrás
                 </a>
-                <button type="submit" class="px-4 py-2 rounded-lg bg-[#BFF205] hover:bg-[#A0D500] text-black transition">
+                <button type="button" onclick="confirmChanges()" class="px-4 py-2 rounded-lg bg-[#BFF205] hover:bg-[#A0D500] text-black transition">
                     Actualizar Producto
                 </button>
             </div>
@@ -125,7 +132,37 @@
     <br><br>
     <x-footer />
 
+    <!-- Toast de Confirmación -->
+    <div id="toast-confirm" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
+            <span class="sr-only">Check icon</span>
+        </div>
+        <div class="ms-3 text-md font-normal ml-5">¿Estás seguro de actualizar el producto?</div>
+        <button type="button" onclick="submitForm()" class="ml-4 bg-[#A0D500] text-black px-3 py-1 rounded-md">Sí</button>
+        <button type="button" onclick="hideToast()" class="ml-2 bg-gray-300 text-black px-3 py-1 rounded-md">No</button>
+    </div>
+
+    <!-- Script para Mostrar el Toast de Confirmación -->
     <script>
+        function confirmChanges() {
+            const toast = document.getElementById('toast-confirm');
+            toast.classList.remove('hidden');
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast-confirm');
+            toast.classList.remove('opacity-100');
+            toast.classList.add('opacity-0');
+            setTimeout(() => toast.classList.add('hidden'), 700); // Espera a que termine la animación
+        }
+
+        function submitForm() {
+            hideToast();
+            document.getElementById('editProductForm').submit();
+        }
+
         function previewImage(event, index) {
             const reader = new FileReader();
             reader.onload = function() {
