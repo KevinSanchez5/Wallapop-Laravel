@@ -68,6 +68,7 @@ class UserController extends Controller
     {
         Log::info("Intentando crear un nuevo usuario");
         $validator = Validator::make($request->all(), [
+            'guid' => 'required|unique:users,guid',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
@@ -88,7 +89,7 @@ class UserController extends Controller
         $user = Redis::get('user_'. $guid);
         if(!$user) {
             Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-            $user = User::where('guid', $guid);
+            $user = User::where('guid', $guid)->firstOrFail();
         }
 
         if(!$user) {
