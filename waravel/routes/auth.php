@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ClienteController;
 use Illuminate\Support\Facades\Route;
@@ -15,11 +15,11 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::get('passchange', [PasswordResetLinkController::class, 'create'])
+    Route::get('passchange', [PasswordResetController::class, 'create'])
         ->name('passchange');
 
-    Route::post('passchange', [PasswordResetLinkController::class, 'store'])
-        ->name('passchange');
+    Route::post('passchange', [PasswordResetController::class, 'store'])
+        ->name('passchange.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -49,9 +49,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('misventas', [ClienteController::class, 'misVentas'])
             ->name('cliente.misventas');
-
-        Route::get('carrito', [ClienteController::class, 'verCarrito'])
-            ->name('cliente.carrito');
     });
 
     /*

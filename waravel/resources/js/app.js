@@ -2,6 +2,7 @@ import './bootstrap';
 import './carousel'
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js'
+import 'flowbite';
 
 document.addEventListener('DOMContentLoaded', function () {
     const html = document.documentElement;
@@ -32,10 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
             iconoNoche.classList.add('hidden');
         }
     });
-});
-document.getElementById('category-menu-button').addEventListener('click', function() {
-    const menu = document.getElementById('category-menu');
-    menu.classList.toggle('hidden');
 });
 
 window.Pusher = Pusher;

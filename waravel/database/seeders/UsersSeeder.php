@@ -18,6 +18,8 @@ class UsersSeeder extends Seeder
             'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
+            'password_reset_token' => null,
+            'password_reset_expires_at' => null,
         ]);
         User::create([
             'name' => 'Juan Pérez',
@@ -28,6 +30,8 @@ class UsersSeeder extends Seeder
             'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
+            'password_reset_token' => null,
+            'password_reset_expires_at' => null,
         ]);
         User::create([
             'name' => 'María García',
@@ -38,6 +42,8 @@ class UsersSeeder extends Seeder
             'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
+            'password_reset_token' => null,
+            'password_reset_expires_at' => null,
         ]);
         User::create([
             'name' => 'Pedro Martínez',
@@ -48,6 +54,8 @@ class UsersSeeder extends Seeder
             'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
+            'password_reset_token' => null,
+            'password_reset_expires_at' => null,
         ]);
         User::create([
             'name' => 'Isabella Rodríguez',
@@ -58,6 +66,8 @@ class UsersSeeder extends Seeder
             'remember_token' => '',
             'created_at' => now(),
             'updated_at' => now(),
+            'password_reset_token' => null,
+            'password_reset_expires_at' => null,
         ]);
     }
 }
