@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('descripcion');
             $table->enum('estadoFisico', ['Nuevo', 'Usado', 'Deteriorado']);
             $table->decimal('precio');
+            $table->integer('stock');
             $table->enum('categoria', [
                 'Tecnologia',
                 'Ropa',
