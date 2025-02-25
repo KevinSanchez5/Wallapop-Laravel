@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UserController;
@@ -54,4 +55,10 @@ Route::middleware('api')->group(function () {
     Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
 
     Route::post('/crear-sesion-pago',[PagoController::class, 'crearSesionPago']);
+
+    Route::post('/backup/create', [BackupController::class, 'createBackup']);
+    Route::post('/backup/database', [BackupController::class, 'backupDatabase']);
+    Route::get('/backup/list', [BackupController::class, 'listBackups']);
+    Route::post('/backup/clean', [BackupController::class, 'cleanBackups']);
+    Route::post('/backup/restore/{filename}', [BackupController::class, 'restoreDatabase']);
 });
