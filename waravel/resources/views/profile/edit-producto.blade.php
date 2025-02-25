@@ -77,6 +77,16 @@
             </div>
 
             <div class="mb-4">
+                <label for="stock" class="block text-gray-700 dark:text-gray-300">Stock</label>
+                <input type="number" id="stock" name="stock" value="{{ old('stock', $producto->stock) }}"
+                       class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
+                       min="1" required>
+                @error('stock')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
                 <label for="precio" class="block text-gray-700 dark:text-gray-300">Precio</label>
                 <input type="number" id="precio" name="precio" value="{{ old('precio', $producto->precio) }}"
                        class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"

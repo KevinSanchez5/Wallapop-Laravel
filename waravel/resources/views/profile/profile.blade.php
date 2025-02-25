@@ -197,13 +197,10 @@
     <!-- Modal de Edición de Perfil -->
     <div id="editProfileModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen px-4">
-            <!-- Fondo semi-transparente -->
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
                 <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
             </div>
-            <!-- Contenedor del modal -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 w-full max-w-md mx-auto p-6 relative">
-                <!-- Encabezado -->
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-gray-800 dark:text-white">Editar Perfil</h2>
                     <button onclick="toggleModal()" class="text-gray-600 dark:text-gray-300 text-2xl leading-none">&times;</button>
