@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use function Laravel\Prompts\error;
 
 class ProfileControllerView extends Controller
 {
@@ -59,10 +60,11 @@ class ProfileControllerView extends Controller
     {
         Log::info('Iniciando actualización del perfil del usuario');
 
-        $usuario = $request->user();
+        $usuario = Auth::user();
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
+            Log::error('No se ha encontrado el perfil del cliente.');
             return redirect()->route('profile')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
@@ -78,6 +80,7 @@ class ProfileControllerView extends Controller
             'direccion.codigoPostal'   => 'required|integer',
             'avatar'                   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+        Log::info('Validación de datos del formulario completa');
 
         // Actualizar datos del usuario
         $usuario->name  = $validated['nombre'];
@@ -108,7 +111,7 @@ class ProfileControllerView extends Controller
         return redirect()->route('profile')->with('success', 'Perfil actualizado correctamente.');
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Log::info('Iniciando proceso de eliminación de la cuenta');
         $request->validateWithBag('userDeletion', [
