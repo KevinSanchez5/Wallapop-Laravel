@@ -3,7 +3,7 @@
 @section('title', 'Cambio de Contraseña')
 @section('auth-content')
     <div x-data="{ step:1 } " class="p-6">
-        <form action="#" method="POST">
+        <form action="{{ route('passchange.store') }}" method="POST">
             @csrf
 
             <!-- Step 1: Ingresar email y pedir correo con código-->
@@ -25,19 +25,22 @@
                 <button type="button" onclick="verificarCodigo()" class="bg-blue-500 text-white p-2 rounded">
                     Verificar Código
                 </button>
+                <button id="botonSiguiente" x-show="step===1" @click="step++" type ="button" class="w-full bg-blue-300 text-white p-2 rounded font-semibold dark:bg-gray-700 dark:text-white" style="display:none;" hidden>
+                    Siguiente
+                </button>
             </div>
 
             <!--Step 2: Cambiar contraseña, repetir contraseña y enviar formulario-->
             <div x-show="step === 2">
                 <label class="block text-gray-700 dark:text-gray-300">Nueva Contraseña</label>
-                <input type="password" name="new_password" class="w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <input type="password" name="new_password" class="w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
 
                 <label class="block text-gray-700 dark:text-gray-300">Repetir Contraseña</label>
-                <input type="password" name="new_password_confirmation" class="w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <input type="password" name="new_password_confirmation" class="w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
 
 
                 <br><br><br>
-                <button type="submit" class="w-full bg-black text-white p-2 rounded font-semibold dark:bg-gray-700 dark:text-white">
+                <button type="submit"  class="w-full bg-black text-white p-2 rounded font-semibold dark:bg-gray-700 dark:text-white">
                     Cambiar Contraseña
                 </button>
             </div>
@@ -88,7 +91,7 @@
             let email = document.getElementById('email').value;
             let codigo = document.getElementById('codigo').value;
             let messageSpan = document.getElementById('verifyCodeMessage');
-            const component = document.querySelector('[x-data]');
+            let botonSiguiente = document.getElementById('botonSiguiente');
 
             if (!email.trim() || !codigo.trim()) {
                 messageSpan.textContent = "Por favor, ingresa el correo y el código.";
@@ -109,8 +112,8 @@
                     if (data.success) {
                         messageSpan.textContent = data.message;
                         messageSpan.style.color = "green";
-                        // Si el código es correcto, pasar al Step 2
-                        Alpine.store('step', 2);
+                        botonSiguiente.hidden = false;
+                        botonSiguiente.style.display = 'inline-block'
                     } else {
                         messageSpan.textContent = data.message;
                         messageSpan.style.color = "red";
