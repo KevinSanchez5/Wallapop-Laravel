@@ -39,6 +39,7 @@ Route::middleware('api')->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::post('/users/correo-codigo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
+    Route::post('/users/verificar-codigo', [UserController::class, 'verificarCodigoCambiarContrasenya']);
 
     Route::get('/valoraciones', [ValoracionController::class, 'index']);
     Route::get('/valoraciones/{id}', [ValoracionController::class, 'show']);

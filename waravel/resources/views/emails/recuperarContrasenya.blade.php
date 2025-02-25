@@ -47,7 +47,7 @@ body {
 <p>Has solicitado restablecer tu contraseña. Usa el siguiente código para completar el proceso:</p>
 <p class="code">{{ $codigo }}</p>
 <p>Si no solicitaste este cambio, ignora este mensaje.</p>
-<!--<p class="footer">Este código expira en 3 minutos.</p> Opcional, añadir en un futuro expiracion-->
+<p class="footer">Este código expira en 5 minutos.</p>
 </div>
 </body>
 </html>
