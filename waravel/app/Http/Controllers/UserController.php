@@ -16,28 +16,51 @@ use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     public function index(){
+        $query = User::orderBy('id', 'asc');
+        $users = $query->paginate(5);
         Log::info("Obteniendo todos los usuarios desde la base de datos");
-        $users = User::all();
+        $data = $users->getCollection()->transform(function ($user) {
+            return [
+                'id' => $user->id,
+                'guid' => $user->guid,
+                'name' => $user->name,
+                'email' => $user->email,
+                'password' => $user->password,
+                'role' => $user->role,
+                'created_at' => $user->created_at->toDateTimeString(),
+                'updated_at' => $user->updated_at->toDateTimeString(),
+            ];
+        });
+
+        $customResponse = [
+            'users' => $data,
+            'paginacion' => [
+                'pagina_actual' => $users->currentPage(),
+                'elementos_por_pagina' => $users->perPage(),
+                'ultima_pagina' => $users->lastPage(),
+                'elementos_totales' => $users->total(),
+            ],
+        ];
         Log::info("Usuarios obtenidos correctamente");
-        return response()->json($users);
+        return response()->json($customResponse);
     }
 
-    public function show($id)
+    public function show($guid)
     {
-        Log::info("Buscando usuario con ID: {$id}");
-        $userRedis = Redis::get('user_'.$id);
+        Log::info("Buscando usuario con guid: {$guid}");
+        $userRedis = Redis::get('user_'.$guid);
         if($userRedis) {
             Log::info("Usuario obtenido desde Redis");
             return response()->json(json_decode($userRedis));
         }
         Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-        $user = User::find($id);
+        $user = User::where('guid', $guid)->firstOrFail();
 
         if(!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        Log::info("Usuario encontrado", ['user_id' => $id]);
+        Log::info("Usuario encontrado", ['user_guid' => $guid]);
         return response()->json($user);
     }
 
@@ -45,6 +68,7 @@ class UserController extends Controller
     {
         Log::info("Intentando crear un nuevo usuario");
         $validator = Validator::make($request->all(), [
+            'guid' => 'required|unique:users,guid',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
@@ -59,13 +83,13 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $guid)
     {
-        Log::info("Intentando actualizar usuario con ID: {$id}");
-        $user = Redis::get('user_'. $id);
+        Log::info("Intentando actualizar usuario con guid: {$guid}");
+        $user = Redis::get('user_'. $guid);
         if(!$user) {
             Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-            $user = User::find($id);
+            $user = User::where('guid', $guid)->firstOrFail();
         }
 
         if(!$user) {
@@ -94,27 +118,27 @@ class UserController extends Controller
             ], 422);
         }
 
-        Log::info("Actualizando el usuario con ID: {$id}");
+        Log::info("Actualizando el usuario con guid: {$guid}");
 
         $userModel->update($request->all());
-        Redis::del('user_'. $id);
-        Redis::set('user_'. $id, json_encode($userModel), 'EX',1800);
+        Redis::del('user_'. $guid);
+        Redis::set('user_'. $guid, json_encode($userModel), 'EX',1800);
 
         Log::info("Usuario actualizado exitosamente");
 
         return response()->json($userModel);
     }
 
-    public function destroy($id)
+    public function destroy($guid)
     {
-        Log::info("Intentando eliminar usuario con ID: {$id}");
-        $user = Redis::get('user_' . $id);
+        Log::info("Intentando eliminar usuario con ID: {$guid}");
+        $user = Redis::get('user_' . $guid);
         if ($user) {
             $user = json_decode($user, true);
             Log::info("Usuario encontrado en Redis");
         } else {
             Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-            $user = User::find($id);
+            $user = User::where('guid',$guid)->firstOrFail();
         }
 
         if(!$user) {
@@ -127,12 +151,12 @@ class UserController extends Controller
             $userModel = $user;
         }
 
-        Log::info("Eliminando el usuario con ID: {$id}");
+        Log::info("Eliminando el usuario con guid: {$guid}");
         $userModel->delete();
 
-        Redis::del('user_'. $id);
+        Redis::del('user_'. $guid);
 
-        Log::info("Usuario eliminado correctamente", ['user_id' => $id]);
+        Log::info("Usuario eliminado correctamente", ['user_guid' => $guid]);
 
         return response()->json(['message' => 'User eliminado correctamente']);
     }

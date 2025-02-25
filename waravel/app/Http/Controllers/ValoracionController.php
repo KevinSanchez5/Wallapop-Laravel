@@ -46,10 +46,10 @@ class ValoracionController extends Controller
     }
 
     // Mostrar una valoración específica
-    public function show($id)
+    public function show($guid)
     {
-        Log::info('Obteniendo valoración', ['id' => $id]);
-        $valoracionRedis = Redis::get('valoracion_' . $id);
+        Log::info('Obteniendo valoración', ['id' => $guid]);
+        $valoracionRedis = Redis::get('valoracion_' . $guid);
 
         if ($valoracionRedis) {
             Log::info('Valoración obtenida desde Redis');
@@ -57,13 +57,13 @@ class ValoracionController extends Controller
         }
 
         Log::info('Valoración no encontrada en Redis, buscando en la base de datos');
-        $valoracion = Valoracion::find($id);
+        $valoracion = Valoracion::where('guid',$guid)->firstOrFail();
 
         if (!$valoracion) {
             return response()->json(['message' => 'Valoracion no encontrada'], 404);
         }
 
-        Redis::set('valoracion_' . $id, json_encode($valoracion), 'EX', 1800);
+        Redis::set('valoracion_' . $guid, json_encode($valoracion), 'EX', 1800);
         Log::info('Valoración obtenida de la base de datos y almacenada en Redis');
 
         return response()->json($valoracion);
@@ -93,16 +93,16 @@ class ValoracionController extends Controller
     }
 
     // Eliminar una valoración
-    public function destroy($id)
+    public function destroy($guid)
     {
         Log::info('Intentando eliminar valoración');
-        $valoracion = Redis::get('valoracion_'. $id);
+        $valoracion = Redis::get('valoracion_'. $guid);
 
         if (!$valoracion) {
             Log::info('Valoración no encontrada en Redis, buscando en la base de datos');
-            $valoracion = Valoracion::find($id);
+            $valoracion = Valoracion::where('guid',$guid)->firstOrFail();
         } else {
-            $valoracion = Valoracion::find($id);
+            $valoracion = Valoracion::where('guid',$guid)->firstOrFail();
         }
 
         if (!$valoracion) {
@@ -115,11 +115,11 @@ class ValoracionController extends Controller
             $valoracionModel = $valoracion;
         }
 
-        Log::info('Eliminando valoración con ID: ' . $id);
+        Log::info('Eliminando valoración con ID: ' . $guid);
         $valoracionModel->delete();
 
         // Limpiar caché de la valoración y de la lista
-        Redis::del('valoracion_'. $id);
+        Redis::del('valoracion_'. $guid);
         Log::info('Valoración eliminada correctamente y caché limpiado');
 
         return response()->json(['message' => 'Valoracion eliminada correctamente']);

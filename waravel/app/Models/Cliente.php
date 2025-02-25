@@ -32,13 +32,13 @@ class Cliente extends Model
     // Relación con las valoraciones que ha recibido un cliente.
     public function valoracionesRecibidas()
     {
-        return $this->hasMany(Valoracion::class, 'clienteValorado_id');
+        return $this->hasMany(Valoracion::class, 'clienteValorado_guid');
     }
 
     // Relación con las valoraciones que ha creado un cliente.
     public function valoracionesCreadas()
     {
-        return $this->hasMany(Valoracion::class, 'creador_id');
+        return $this->hasMany(Valoracion::class, 'creador_guid');
     }
 
     public function setDireccionAttribute($value)
