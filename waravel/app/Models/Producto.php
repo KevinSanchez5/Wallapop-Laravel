@@ -9,7 +9,7 @@ class Producto extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['guid', 'vendedor_guid', 'nombre', 'descripcion', 'estadoFisico', 'precio','stock', 'categoria', 'estado', 'imagenes'];
+    protected $fillable = ['guid', 'vendedor_id', 'nombre', 'descripcion', 'estadoFisico', 'precio','stock', 'categoria', 'estado', 'imagenes'];
 
     protected $casts = [
         'imagenes' => 'array',
@@ -18,12 +18,12 @@ class Producto extends Model
     // Relación N:1 con Cliente (Vendedor)
     public function vendedor()
     {
-        return $this->belongsTo(Cliente::class, 'vendedor_guid');
+        return $this->belongsTo(Cliente::class, 'vendedor_id');
     }
 
     // Relación N:M -> Un producto puede ser favorito de varios clientes
     public function clientesFavoritos()
     {
-        return $this->belongsToMany(Cliente::class, 'cliente_favoritos', 'producto_guid', 'cliente_guid')->withTimestamps();
+        return $this->belongsToMany(Cliente::class, 'cliente_favoritos', 'producto_id', 'cliente_id')->withTimestamps();
     }
 }

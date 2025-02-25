@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('telefono');
             $table->json('direccion'); // TODO - Cuidado, campo embebido
             $table->boolean('activo')->default(true);
-            $table->foreignGuid('usuario_guid')->constrained('users')->onDelete('cascade');
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

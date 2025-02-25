@@ -23,7 +23,7 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28001
             ],
             'activo' => true,
-            'usuario_guid' => '2491f841-0993-4096-82b9-6884a887f683',
+            'usuario_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -41,7 +41,7 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28971
             ],
             'activo' => true,
-            'usuario_guid' => '3ce8a699-56cb-4765-acb2-2b5e36fea78f',
+            'usuario_id' => 2,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -59,7 +59,7 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28970
             ],
             'activo' => false,
-            'usuario_guid' => '5852148c-4d79-4556-a20f-9448b6d55279',
+            'usuario_id' => 3,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

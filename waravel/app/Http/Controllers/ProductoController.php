@@ -85,7 +85,7 @@ class ProductoController extends Controller
         Log::info('Validando producto');
         $validator = Validator::make($request->all(), [
             'guid' => 'required|unique:productos,guid',
-            'vendedor_guid' => 'required|exists:clientes,guid',
+            'vendedor_id' => 'required|exists:clientes,id',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'estadoFisico' => 'required|string|max:255',

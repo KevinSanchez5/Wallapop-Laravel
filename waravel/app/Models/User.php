@@ -54,7 +54,7 @@ class User extends Authenticatable
     // Relación 1-1 con Cliente
     public function cliente()
     {
-        return $this->hasOne(Cliente::class, 'usuario_guid');
+        return $this->hasOne(Cliente::class, 'usuario_id');
     }
 
     //Scope para buscar por email

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
             $table->string('guid');
-            $table->foreignGuid('vendedor_guid')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('vendedor_id')->constrained('clientes')->onDelete('cascade');
             $table->string('nombre');
             $table->text('descripcion');
             $table->enum('estadoFisico', ['Nuevo', 'Usado', 'Deteriorado']);

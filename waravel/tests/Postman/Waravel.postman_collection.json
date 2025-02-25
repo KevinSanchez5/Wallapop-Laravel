@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "681e30ac-6f90-4d18-b0f1-edf95fa40b1e",
+		"_postman_id": "a0e92ccc-1c6e-4b06-8139-57078c8895da",
 		"name": "Waravel",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "38648914"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "38648794"
 	},
 	"item": [
 		{
@@ -14,43 +14,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/clientes",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"clientes"
-							]
-						}
+						"url": "http://127.0.0.1/api/clientes"
 					},
 					"response": []
 				},
 				{
-					"name": "Get Cliente by ID",
+					"name": "GetClienteByGuid",
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/clientes/3",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"clientes",
-								"3"
-							]
-						}
+						"url": "http://127.0.0.1/api/clientes/de6a7d01-af1d-44fb-a615-2583f52da3c4"
 					},
 					"response": []
 				},
@@ -59,20 +32,16 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/clientes",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"clientes"
-							]
-						}
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"guid\": \"123e4567-e89b-12d3-a456-426614174000\",\r\n    \"nombre\": \"Juan\",\r\n    \"apellido\": \"Pérez\",\r\n    \"avatar\": \"\",\r\n    \"telefono\": \"123456789\",\r\n    \"direccion\": {\r\n        \"calle\": \"Calle Falsa\",\r\n        \"numero\": 123,\r\n        \"ciudad\": \"Madrid\"\r\n    },\r\n    \"activo\": true,\r\n    \"usuario_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1/api/clientes"
 					},
 					"response": []
 				},
@@ -90,21 +59,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://127.0.0.1/api/clientes/2",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"clientes",
-								"2"
-							]
-						}
+						"url": "http://127.0.0.1/api/clientes/de6a7d01-af1d-44fb-a615-2583f52da3c4"
 					},
 					"response": []
 				},
@@ -113,21 +68,19 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/clientes/2",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"clientes",
-								"2"
-							]
-						}
+						"url": "http://127.0.0.1/api/clientes/de6a7d01-af1d-44fb-a615-2583f52da3c4"
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarFavoritos",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1/api/clientes/97b37979-552a-4916-989a-b96031348856/favoritos"
 					},
 					"response": []
 				}
@@ -141,20 +94,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/users",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
+						"url": "http://127.0.0.1/api/users"
 					},
 					"response": []
 				},
@@ -163,21 +103,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/users/4",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"users",
-								"4"
-							]
-						}
+						"url": "http://127.0.0.1/api/users/789a7609-624a-49b2-bcf9-a9ea1d034f5e"
 					},
 					"response": []
 				},
@@ -186,20 +112,16 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/users",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"guid\": \"550e8400-e29b-41d4-a716-446655440000\",\r\n    \"name\": \"María López\",\r\n    \"email\": \"maria.lopez@example.com\",\r\n    \"password\": \"Secure@123\",\r\n    \"role\": \"cliente\",\r\n    \"telefono\": \"612345678\",\r\n    \"direccion\": {\r\n        \"calle\": \"Av. Siempre Viva\",\r\n        \"numero\": \"742\",\r\n        \"ciudad\": \"Springfield\",\r\n        \"codigo_postal\": \"12345\",\r\n        \"pais\": \"USA\"\r\n    },\r\n    \"activo\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1/api/users"
 					},
 					"response": []
 				},
@@ -217,21 +139,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "http://127.0.0.1/api/users/4",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"users",
-								"4"
-							]
-						}
+						"url": "http://127.0.0.1/api/users/789a7609-624a-49b2-bcf9-a9ea1d034f5e"
 					},
 					"response": []
 				},
@@ -240,21 +148,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/users/4",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"users",
-								"4"
-							]
-						}
+						"url": "http://127.0.0.1/api/users/789a7609-624a-49b2-bcf9-a9ea1d034f5e"
 					},
 					"response": []
 				}
@@ -268,43 +162,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/productos",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"productos"
-							]
-						}
+						"url": "http://127.0.0.1/api/productos"
 					},
 					"response": []
 				},
 				{
-					"name": "Get Product by ID",
+					"name": "Get Product byGuid",
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/productos/1",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"productos",
-								"1"
-							]
-						}
+						"url": "http://127.0.0.1/api/productos/1f0368b0-5ce9-4099-bd13-0c1cede8d349"
 					},
 					"response": []
 				},
@@ -313,20 +180,16 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/productos",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"productos"
-							]
-						}
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"guid\": \"550e8400-e29b-41d4-a716-446655440000\",\r\n    \"vendedor_id\": \"1\",\r\n    \"nombre\": \"Producto Ejemplo\",\r\n    \"descripcion\": \"Descripción detallada del producto.\",\r\n    \"estadoFisico\": \"Nuevo\",\r\n    \"precio\": 199.99,\r\n    \"stock\": 50,\r\n    \"categoria\": \"Electrónica\",\r\n    \"estado\": \"Disponible\",\r\n    \"imagenes\": [\r\n        \"http://miapi.com/imagenes/producto1.jpg\",\r\n        \"http://miapi.com/imagenes/producto2.jpg\"\r\n    ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1/api/productos"
 					},
 					"response": []
 				},
@@ -337,28 +200,14 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nombre\": \"Portatil Gamer\",\r\n    \"descripcion\": \"Portatil potente para gaming y trabajo pesado.\",\r\n    \"estadoFisico\": \"Usado\",\r\n    \"precio\": \"800.00\",\r\n    \"categoria\": \"Tecnologia\",\r\n    \"estado\": \"Disponible\",\r\n    \"imagenes\": [\r\n        \"portatil1.jpg\",\r\n        \"portatil2.jpg\"\r\n    ],\r\n    \"created_at\": \"2025-02-18T15:50:23.000000Z\",\r\n    \"updated_at\": \"2025-02-18T15:50:23.000000Z\"\r\n}",
+							"raw": "{\r\n    \"nombre\": \"Espejito\",\r\n    \"descripcion\": \"Descripción actualizada del producto\",\r\n    \"estadoFisico\": \"Nuevo estado físico\",\r\n    \"precio\": 150.50,\r\n    \"stock\": 30,\r\n    \"categoria\": \"Electrónica\",\r\n    \"estado\": \"Disponible\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "http://127.0.0.1/api/productos/1",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"productos",
-								"1"
-							]
-						}
+						"url": "http://127.0.0.1/api/productos/1f0368b0-5ce9-4099-bd13-0c1cede8d349"
 					},
 					"response": []
 				},
@@ -367,21 +216,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/productos/2",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"productos",
-								"2"
-							]
-						}
+						"url": "http://127.0.0.1/api/productos/2"
 					},
 					"response": []
 				}
@@ -395,20 +230,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"valoraciones"
-							]
-						}
+						"url": "http://127.0.0.1/api/valoraciones"
 					},
 					"response": []
 				},
@@ -417,21 +239,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones/1",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"valoraciones",
-								"1"
-							]
-						}
+						"url": "http://127.0.0.1/api/valoraciones/1"
 					},
 					"response": []
 				},
@@ -440,20 +248,7 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"valoraciones"
-							]
-						}
+						"url": "http://127.0.0.1/api/valoraciones"
 					},
 					"response": []
 				},
@@ -462,21 +257,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones/1",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"valoraciones",
-								"1"
-							]
-						}
+						"url": "http://127.0.0.1/api/valoraciones/1"
 					},
 					"response": []
 				}
@@ -490,20 +271,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/ventas",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"ventas"
-							]
-						}
+						"url": "http://127.0.0.1/api/ventas"
 					},
 					"response": []
 				},
@@ -512,21 +280,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/ventas/1",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"ventas",
-								"1"
-							]
-						}
+						"url": "http://127.0.0.1/api/ventas/1"
 					},
 					"response": []
 				},
@@ -535,20 +289,7 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/ventas",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"ventas"
-							]
-						}
+						"url": "http://127.0.0.1/api/ventas"
 					},
 					"response": []
 				},
@@ -557,21 +298,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/ventas/2",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"ventas",
-								"2"
-							]
-						}
+						"url": "http://127.0.0.1/api/ventas/2"
 					},
 					"response": []
 				}
