@@ -170,7 +170,7 @@ class ClienteController extends Controller
 
         if ($cliente) {
             Log::info('Cliente encontrado en Redis');
-            $cliente = Cliente::where('guid', $guid)->first(); 
+            $cliente = Cliente::where('guid', $guid)->first();
         }
 
         // Si no está en Redis, buscar en la base de datos
