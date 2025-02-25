@@ -32,9 +32,10 @@ Route::get('/productos/search', [ProductoControllerView::class, 'search'])->name
 Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');
 
 Route::get('/carrito', [CarritoControllerView::class, 'showCart'])->name('carrito');
-Route::post('/product/addToCart', [CarritoControllerView::class, 'addToCartOrEditSetProduct'])->name('carrito.add');
-Route::put('/product/removeOne', [CarritoControllerView::class, 'deleteOneFromCart'])->name('carrito.removeOne');
-Route::delete('/product/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
+Route::post('/carrito/addToCart', [CarritoControllerView::class, 'addToCartOrEditSetProduct'])->name('carrito.add');
+Route::put('/carrito/removeOne', [CarritoControllerView::class, 'deleteOneFromCart'])->name('carrito.removeOne');
+Route::put('/carrito/addOne', [CarritoControllerView::class, 'addOneToCart'])->name('carrito.addOne');
+Route::delete('/carrito/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
 
 Route::get('/passchange', function () {
     return view('auth.passchange');
