@@ -19,6 +19,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'guid',
         'name',
         'email',
         'password',
@@ -53,7 +54,7 @@ class User extends Authenticatable
     // Relación 1-1 con Cliente
     public function cliente()
     {
-        return $this->hasOne(Cliente::class, 'usuario_id');
+        return $this->hasOne(Cliente::class, 'usuario_guid');
     }
 
     //Scope para buscar por email
