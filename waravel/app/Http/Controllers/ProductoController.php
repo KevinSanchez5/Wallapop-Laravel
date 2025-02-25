@@ -56,24 +56,24 @@ class ProductoController extends Controller
     }
 
     // Mostrar un producto específico
-    public function show($id)
+    public function show($guid)
     {
         Log::info('Buscando producto de la cache en Redis');
-        $productoRedis = Redis::get('producto_'.$id);
+        $productoRedis = Redis::get('producto_'.$guid);
 
         if ($productoRedis) {
             return response()->json(json_decode($productoRedis));
         }
 
         Log::info('Buscando producto de la base de datos');
-        $producto = Producto::find($id);
+        $producto = Producto::where('guid',$guid)->firstOrFail();
 
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
         Log::info('Guardando producto en cache redis');
-        Redis::set('producto_'. $id, json_encode($producto), 'EX',1800);
+        Redis::set('producto_'. $guid, json_encode($producto), 'EX',1800);
 
         Log::info('Producto obtenido correctamente');
         return response()->json($producto);
@@ -85,7 +85,7 @@ class ProductoController extends Controller
         Log::info('Validando producto');
         $validator = Validator::make($request->all(), [
             'guid' => 'required|unique:productos,guid',
-            'vendedor_id' => 'required|exists:clientes,id',
+            'vendedor_guid' => 'required|exists:clientes,guid',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'estadoFisico' => 'required|string|max:255',
@@ -108,13 +108,13 @@ class ProductoController extends Controller
     }
 
     // Actualizar un producto existente
-    public function update(Request $request, $id)
+    public function update(Request $request, $guid)
     {
         Log::info('Buscando producto de la cache en Redis');
-        $producto = Redis::get('producto_'.$id);
+        $producto = Redis::get('producto_'.$guid);
         if (!$producto) {
             Log::info('Buscando producto de la base de datos');
-            $producto = Producto::find($id);
+            $producto = Producto::where('guid',$guid)->firstOrFail();
         }
 
         if (!$producto) {
@@ -153,26 +153,26 @@ class ProductoController extends Controller
         $productoModel->update($request->all());
 
         Log::info('Eliminando producto de la cache');
-        Redis::del('producto_' . $id);
+        Redis::del('producto_' . $guid);
 
         Log::info('Actualizando producto en cache');
-        Redis::set('producto_' . $id, json_encode($productoModel), 'EX', 1800);
+        Redis::set('producto_' . $guid, json_encode($productoModel), 'EX', 1800);
 
         Log::info('Producto actualizado correctamente');
         return response()->json($productoModel);
     }
 
     // Eliminar un producto
-    public function destroy($id)
+    public function destroy($guid)
     {
         Log::info('Buscando producto de la cache en Redis');
-        $producto = Redis::get('producto_' . $id);
+        $producto = Redis::get('producto_' . $guid);
 
         if ($producto) {
             $producto = json_decode($producto, true);
         } else {
             Log::info('Buscando producto de la base de datos');
-            $producto = Producto::find($id);
+            $producto = Producto::where('guid',$guid)->firstOrFail();
         }
 
         if (!$producto) {
@@ -189,20 +189,20 @@ class ProductoController extends Controller
         $productoModel->delete();
 
         Log::info('Eliminando producto de la cache');
-        Redis::del('producto_' . $id);
+        Redis::del('producto_' . $guid);
 
         Log::info('Producto eliminado correctamente');
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
 
 
-    public function addListingPhoto(Request $request, $id) {
+    public function addListingPhoto(Request $request, $guid) {
         Log::info('Buscando producto de la cache en Redis');
-        $product = Redis::get('producto_' . $id);
+        $product = Redis::get('producto_' . $guid);
 
         if (!$product) {
             Log::info('Buscando producto de la base de datos');
-            $product = Producto::find($id);
+            $product = Producto::where('guid',$guid)->firstOrFail();
         }else{
             $product = Producto::hydrate(json_decode($product, true));
         }
@@ -239,7 +239,7 @@ class ProductoController extends Controller
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
 
-    public function deleteListingPhoto($Id, Request $request) {
+    public function deleteListingPhoto($guid, Request $request) {
         $filePath = $request->input('image');
 
         if (!$filePath) {
@@ -247,11 +247,11 @@ class ProductoController extends Controller
         }
 
         Log::info('Buscando producto de la cache en Redis');
-        $product = Redis::get('producto_' . $Id);
+        $product = Redis::get('producto_' . $guid);
 
         if (!$product) {
             Log::info('Buscando producto de la base de datos');
-            $product = Producto::find($Id);
+            $product = Producto::where('guid',$guid)->firstOrFail();
         } else {
             $product = Producto::hydrate(json_decode($product, true));
         }
