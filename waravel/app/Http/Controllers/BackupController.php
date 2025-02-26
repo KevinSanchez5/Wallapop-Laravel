@@ -45,11 +45,45 @@ class BackupController extends Controller{
         Artisan::call('backup:list');
         $output = Artisan::output();
 
+        // Mejoramos la legibilidad de la respuesta:
+
+        // Dividir la salida en líneas
+        $lines = explode("\n", trim($output));
+
+        // Filtrar la tabla de backups
+        $backups = [];
+        $parsingBackups = false;
+
+        foreach ($lines as $line) {
+            if (str_contains($line, 'Name') && str_contains($line, 'Disk')) {
+                // Iniciar el análisis de la tabla de backups
+                $parsingBackups = true;
+                continue;
+            }
+
+            if ($parsingBackups && str_contains($line, '|')) {
+                $columns = array_map('trim', explode('|', trim($line, '|')));
+                if (count($columns) >= 7) {
+                    $backups[] = [
+                        'name' => $columns[0],
+                        'disk' => $columns[1],
+                        'reachable' => $columns[2] === '✅',
+                        'healthy' => $columns[3] === '✅',
+                        'backup_count' => (int) $columns[4],
+                        'newest_backup' => $columns[5],
+                        'used_storage' => $columns[6]
+                    ];
+                }
+            }
+        }
+
         return response()->json([
-            'message' => 'Lista de backups',
-            'output' => $output
+            'message' => 'Backup list retrieved successfully',
+            'backups' => $backups
         ]);
     }
+
+
 
     /**
      * Elimina backups antiguos según la configuración
@@ -59,14 +93,38 @@ class BackupController extends Controller{
         Artisan::call('backup:clean');
         $output = Artisan::output();
 
+        // Dividir la salida en líneas
+        $lines = explode("\n", trim($output));
+
+        // Variables para extraer datos clave
+        $usedStorage = null;
+        $status = 'Cleanup completed successfully';
+        $cleaningMessage = null;
+
+        foreach ($lines as $line) {
+            if (str_contains($line, 'Used storage after cleanup:')) {
+                $usedStorage = trim(str_replace('Used storage after cleanup:', '', $line));
+            }
+
+            if (str_contains($line, 'Cleaning backups of')) {
+                $cleaningMessage = trim($line);
+            }
+
+            if (str_contains($line, 'Starting cleanup...')) {
+                $status = 'Cleanup started';
+            }
+        }
+
         return response()->json([
-            'message' => 'Backups antiguos eliminados',
-            'output' => $output
+            'message' => $status,
+            'cleaning' => $cleaningMessage ?? 'No cleaning message found',
+            'used_storage' => $usedStorage ?? 'Unknown'
         ]);
     }
 
+
     /**
-     * Restaura un backup de la base de datos desde un archivo .sql
+     * Restaura un backup de la base de datos desde un archivo
      */
     public function restoreDatabase($filename)
     {
