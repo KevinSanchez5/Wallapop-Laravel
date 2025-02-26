@@ -106,6 +106,10 @@ class ProductoControllerView extends Controller
     {
         Log::info('Creando un nuevo producto');
 
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Debes estar logeado para crear un producto');
+        }
+
         $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
@@ -167,6 +171,10 @@ class ProductoControllerView extends Controller
     public function edit($guid)
     {
         Log::info('Acceso al formulario de edición del producto con GUID: ' . $guid);
+
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Debes estar logeado para editar el producto');
+        }
 
         $producto = Producto::where('guid', $guid)->first();
 
@@ -325,6 +333,10 @@ class ProductoControllerView extends Controller
     {
         Log::info('Eliminando producto con GUID: ' . $guid);
 
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Debes estar logeado para eliminar el producto');
+        }
+
         $producto = Producto::where('guid', $guid)->first();
 
         if (!$producto) {
@@ -348,10 +360,23 @@ class ProductoControllerView extends Controller
 
     public function changestatus($guid)
     {
+        // Verificar si el usuario está autenticado
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Debes estar logeado para cambiar el estado del producto');
+        }
+
+        // Buscar el producto por GUID
         $producto = Producto::where('guid', $guid)->first();
 
         if (!$producto) {
             return redirect()->route('profile')->with('error', 'Producto no encontrado');
+        }
+
+        $clienteId = $this->getClienteId();
+
+        // Verificar si el cliente autenticado es el vendedor del producto
+        if ($clienteId !== $producto->vendedor_id) {
+            return redirect()->route('profile')->with('error', 'No tienes permiso para cambiar el estado de este producto');
         }
 
         // Cambiar el estado del producto
@@ -359,6 +384,8 @@ class ProductoControllerView extends Controller
         $producto->estado = $nuevoEstado;
         $producto->save();
 
+        // Redirigir con mensaje de éxito
         return redirect()->route('profile')->with('success', 'Estado del producto actualizado correctamente.');
     }
+
 }
