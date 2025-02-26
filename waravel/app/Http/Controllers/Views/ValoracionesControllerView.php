@@ -10,14 +10,15 @@ use Illuminate\Http\Request;
 class ValoracionesControllerView extends Controller
 {
 
-  /*  public function index()
+    public function index()
     {
         Log::info('Obteniendo todas las valoraciones');
-        $query = Valoracion::orderBy('id', 'asc');
 
-        $valoraciones = $query->paginate(5);
+        // Consulta de las valoraciones ordenadas por ID
+        $valoraciones = Valoracion::orderBy('id', 'asc')->paginate(5);
 
-        $data = $valoraciones->getCollection()->transform(function ($valoracion) {
+
+        $data = $valoraciones->map(function ($valoracion) {
             return [
                 'id' => $valoracion->id,
                 'guid' => $valoracion->guid,
@@ -30,6 +31,7 @@ class ValoracionesControllerView extends Controller
             ];
         });
 
+        // Respuesta personalizada con los datos de las valoraciones y paginación
         $customResponse = [
             'valoraciones' => $data,
             'paginacion' => [
@@ -41,8 +43,10 @@ class ValoracionesControllerView extends Controller
         ];
 
         Log::info('Valoraciones obtenidas');
-        return view('clientes.valoraciones', compact('valoraciones'));
+
+        return view('clientes.valoraciones', compact('valoraciones', 'customResponse'));
     }
+
     /**
      * Muestra la lista de valoraciones de un cliente específico.
      */
@@ -67,10 +71,34 @@ class ValoracionesControllerView extends Controller
             'estrellas' => str_repeat('⭐', round($promedio))
         ]);
     }
- /*
+
     public function store(Request $request)
     {
         Log::info('Intentando crear una nueva valoración', ['request' => $request->all()]);
+
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Debes estar logeado para crear una valoración');
+        }
+
+        $clienteId = auth()->user()->id;
+
+        // Verificar que el autor de la valoración es el comprador del producto
+        $producto = Producto::where('guid', $request->guid_producto)->first();
+
+        if (!$producto) {
+            return redirect()->route('profile')->with('error', 'Producto no encontrado');
+        }
+
+        // Verificar si el comprador realmente ha comprado este producto
+        $compra = Compra::where('producto_id', $producto->id)
+            ->where('cliente_id', $clienteId)
+            ->first();
+
+        if (!$compra) {
+            return redirect()->route('profile')->with('error', 'Solo el comprador de este producto puede dejar una valoración');
+        }
+
+        // Validación de los datos de la valoración
         $validator = Validator::make($request->all(), [
             'guid' => 'required|unique:valoraciones,guid',
             'comentario' => 'required|string|max:1000',
@@ -83,12 +111,21 @@ class ValoracionesControllerView extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $valoracion = Valoracion::create($request->all());
+        // Crear la valoración
+        $valoracion = Valoracion::create([
+            'guid' => $request->guid,
+            'comentario' => $request->comentario,
+            'puntuacion' => $request->puntuacion,
+            'clienteValorado_id' => $request->clienteValorado_id,
+            'autor_id' => $clienteId,
+            'producto_id' => $producto->id,
+        ]);
 
         Log::info('Valoración creada exitosamente');
 
-        return view('clientes.valoraciones') ->with('success', 'Valoración añadida correctamente.');
+        return redirect()->route('profile')->with('success', 'Valoración añadida correctamente.');
     }
+
 
     public function destroy($guid)
     {
@@ -97,14 +134,22 @@ class ValoracionesControllerView extends Controller
         // Obtener la valoración desde el caché o base de datos
         $valoracion = Cache::get('valoracion_' . $guid);
 
-        if (!$valoracion) {
-            Log::info('Valoración no encontrada en caché, buscando en la base de datos');
-            $valoracion = Valoracion::where('guid', $guid)->firstOrFail();
-        }
-
         // Verificar si la valoración existe
         if (!$valoracion) {
             return response()->json(['message' => 'Valoración no encontrada'], 404);
+        }
+
+        // Verificar si el usuario está autenticado
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Debes estar logeado para eliminar una valoración');
+        }
+
+        $clienteId = auth()->user()->id;
+
+        // Verificar si el usuario es el comprador o un administrador
+        if ($valoracion->autor_id !== $clienteId && !auth()->user()->is_admin) {
+            Log::warning('Usuario no autorizado para eliminar esta valoración', ['guid' => $guid]);
+            return redirect()->route('profile')->with('error', 'No tienes permiso para eliminar esta valoración');
         }
 
         // Si la valoración está en formato de array, hidratarla para convertirla en modelo de Eloquent
@@ -118,10 +163,11 @@ class ValoracionesControllerView extends Controller
         $valoracionModel->delete();
 
         // Limpiar caché de la valoración y de la lista
-        Cache::forget('valoracion_' . $guid); // Usar Cache::forget en lugar de Cache::del
+        Cache::forget('valoracion_' . $guid);
         Log::info('Valoración eliminada correctamente y caché limpiado');
 
-        return view('clientes.valoraciones')->with('success', 'Valoración eliminada.');
-    }*/
+        return redirect()->route('profile')->with('success', 'Valoración eliminada correctamente.');
+    }
+
 
 }
