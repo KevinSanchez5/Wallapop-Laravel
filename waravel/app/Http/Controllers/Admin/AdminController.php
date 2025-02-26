@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
+use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +14,25 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
+
+    public function dashboard()
+    {
+        $totalUsers = User::count();
+        $totalProducts = Producto::count();
+
+        $valoraciones = Valoracion::all();
+        $puntuaciones = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+        foreach ($valoraciones as $valoracion) {
+            $puntuaciones[$valoracion->puntuacion]++;
+        }
+
+        $latestProducts = Producto::orderBy('updated_at', 'desc')->limit(5)->get();
+
+        $latestClients = User::orderBy('updated_at', 'desc')->limit(5)->get();
+
+        return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'latestProducts', 'latestClients'));
+    }
+
     /**
      * Realiza un respaldo de la base de datos y lo almacena en el servidor.
      */
@@ -27,13 +47,13 @@ class AdminController extends Controller
      */
     public function listClients()
     {
-        // Obtener todos los usuarios con rol de cliente
-        Log::info("Obteniendo todos los usuarios clientes");
-        $clientes = Cliente::all();
+        Log::info('Obteniendo clientes cuyo usuario tiene el rol de cliente');
 
-        // Retornar una vista con la lista de clientes
-        Log::info("Redireccionando a la lista de .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return view('pages.ver-cliente', compact('clientes')); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        $clientes = Cliente::whereHas('usuario', function ($query) {
+            $query->where('role', 'cliente'); // Filtra solo usuarios con rol "cliente"
+        })->with('usuario')->get();
+
+        return view('admin.clients', compact('clientes'));
     }
 
     /**
@@ -47,7 +67,7 @@ class AdminController extends Controller
 
         // Retornar una vista con la lista de administradores
         Log::info("Redireccionando a la lista de .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return view('pages.ver-cliente', compact('admins')); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        return view('admin.clients', compact('admins')); // TODO -> CAMBIAR POR LA VISTA DESEADA
     }
 
     /**
@@ -84,7 +104,7 @@ class AdminController extends Controller
 
         // Redireccionar a la lista de administradores
         Log::info("Redireccionando a la lista de administradores");
-        return redirect()->route('admins.list')->with('success', 'Administrador añadido correctamente.');
+        return redirect()->route('admin.admin')->with('success', 'Administrador añadido correctamente.');
     }
 
     /**
@@ -98,7 +118,7 @@ class AdminController extends Controller
 
         // Retornar una vista con la lista de productos
         Log::info("Redireccionando a la lista de .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return view('pages.ver-cliente', compact('productos')); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        return view('admin.clients', compact('productos')); // TODO -> CAMBIAR POR LA VISTA DESEADA
     }
 
     /**
@@ -122,7 +142,7 @@ class AdminController extends Controller
 
         // Retornar a la vista ...
         Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('products.list')->with('success', 'Producto baneado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        return redirect()->route('admin.products')->with('success', 'Producto baneado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
     }
 
     /**
@@ -159,7 +179,7 @@ class AdminController extends Controller
 
         // Retornar a la vista ...
         Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('products.list')->with('success', 'Producto borrado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        return redirect()->route('admin.products')->with('success', 'Producto borrado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
     }
 
     /**
@@ -184,7 +204,7 @@ class AdminController extends Controller
 
         // Retornar a la vista ...
         Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('clients.list')->with('success', 'Cliente borrado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        return redirect()->route('admin.clients')->with('success', 'Cliente borrado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
 
     }
 
@@ -209,6 +229,6 @@ class AdminController extends Controller
 
         // Retornar a la vista ...
         Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('products.list')->with('success', 'Producto baneado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        return redirect()->route('admin.products')->with('success', 'Producto baneado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
     }
 }
