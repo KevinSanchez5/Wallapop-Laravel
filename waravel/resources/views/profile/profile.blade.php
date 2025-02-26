@@ -25,6 +25,36 @@
                 </h2>
             </div>
 
+            <!-- Valoración -->
+            <div class="mt-6">
+                <div class="text-center">
+                    @php
+                        $promedio = Valoracion::where('clienteValorado_id', $cliente->id)->avg('puntuacion') ?? 0;
+                        $estrellasLlenas = round($promedio);
+                        $estrellasVacias = 5 - $estrellasLlenas;
+                    @endphp
+
+                        <!-- Estrellas -->
+                    <div class="flex justify-center space-x-1">
+                        @for ($i = 0; $i < $estrellasLlenas; $i++)
+                            <svg class="w-7 h-7 text-yellow-500 animate-fadeIn" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 17.3l-5.4 3.4 1.4-6-4.6-4 6.1-.5L12 4l2.5 6.1 6.1.5-4.6 4 1.4 6z"/>
+                            </svg>
+                        @endfor
+                        @for ($i = 0; $i < $estrellasVacias; $i++)
+                            <svg class="w-7 h-7 text-gray-400 animate-fadeIn opacity-80" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 17.3l-5.4 3.4 1.4-6-4.6-4 6.1-.5L12 4l2.5 6.1 6.1.5-4.6 4 1.4 6z"/>
+                            </svg>
+                        @endfor
+                    </div>
+
+                    <!-- Puntuación numérica -->
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">
+                        {{ number_format($promedio, 1) }} / 5
+                    </p>
+                </div>
+            </div>
+
             <!-- Información del Cliente -->
             <div class="mt-6 space-y-4">
                 <!-- Correo Electrónico -->
@@ -55,36 +85,6 @@
                         </div>
                     </div>
                 @endif
-            </div>
-
-            <!-- Valoración -->
-            <div class="mt-6">
-                <div class="text-center">
-                    @php
-                        $promedio = Valoracion::where('clienteValorado_id', $cliente->id)->avg('puntuacion') ?? 0;
-                        $estrellasLlenas = round($promedio);
-                        $estrellasVacias = 5 - $estrellasLlenas;
-                    @endphp
-
-                        <!-- Estrellas -->
-                    <div class="flex justify-center space-x-1">
-                        @for ($i = 0; $i < $estrellasLlenas; $i++)
-                            <svg class="w-7 h-7 text-yellow-500 animate-fadeIn" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 17.3l-5.4 3.4 1.4-6-4.6-4 6.1-.5L12 4l2.5 6.1 6.1.5-4.6 4 1.4 6z"/>
-                            </svg>
-                        @endfor
-                        @for ($i = 0; $i < $estrellasVacias; $i++)
-                            <svg class="w-7 h-7 text-gray-400 animate-fadeIn opacity-80" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 17.3l-5.4 3.4 1.4-6-4.6-4 6.1-.5L12 4l2.5 6.1 6.1.5-4.6 4 1.4 6z"/>
-                            </svg>
-                        @endfor
-                    </div>
-
-                    <!-- Puntuación numérica -->
-                    <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                        {{ number_format($promedio, 1) }} / 5
-                    </p>
-                </div>
             </div>
 
             <!-- Mapa (si hay código postal) -->
