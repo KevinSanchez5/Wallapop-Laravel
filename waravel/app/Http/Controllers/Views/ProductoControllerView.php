@@ -111,6 +111,7 @@ class ProductoControllerView extends Controller
             'descripcion' => 'required|string',
             'estadoFisico' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
+            'stock' => 'required|numeric|min:1',
             'categoria' => 'required|string|max:255',
             'imagen1' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
             'imagen2' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -128,10 +129,13 @@ class ProductoControllerView extends Controller
             'descripcion' => $request->descripcion,
             'estadoFisico' => $request->estadoFisico,
             'precio' => $request->precio,
+            'stock' => $request->stock,
             'categoria' => $request->categoria,
             'estado' => 'Disponible',
-            'imagenes' => [],
+            'imagenes' => [],  // Inicializar como array vacío
         ]);
+
+        $imagenes = [];
 
         for ($i = 1; $i <= 5; $i++) {
             if ($request->hasFile("imagen$i")) {
@@ -142,11 +146,18 @@ class ProductoControllerView extends Controller
                     return response()->json(['error' => "Error procesando imagen$i"], 400);
                 }
 
-                $this->addListingPhoto($imagenRequest, $producto->id);
+                // Obtener solo la ruta de la imagen
+                $imagenUrl = $this->addListingPhoto($imagenRequest, $producto->id);
+                $imagenes[] = $imagenUrl;
             }
         }
 
-        Cache::put("producto_{$producto->guid}", $producto, now()->addMinutes(60));
+        // Guarda las rutas de las imágenes
+        $producto->imagenes = $imagenes;
+        $producto->save();
+
+        // Guarda el producto en la caché con las imágenes correctamente guardadas
+        Cache::put("producto_{$producto->guid}", $producto->toArray(), now());
 
         Log::info('Producto creado correctamente', ['producto' => $producto]);
 
@@ -199,6 +210,7 @@ class ProductoControllerView extends Controller
             'descripcion' => 'required|string',
             'estadoFisico' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
+            'stock' => 'required|numeric|min:1',
             'categoria' => 'required|string|max:255',
             'imagen1' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'imagen2' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -207,13 +219,18 @@ class ProductoControllerView extends Controller
             'imagen5' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
+        // Actualizar los campos del producto
         $producto->update([
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
             'estadoFisico' => $request->estadoFisico,
+            'stock' => $request->stock,
             'precio' => $request->precio,
             'categoria' => $request->categoria,
         ]);
+
+        // Manejar las imágenes nuevas
+        $imagenes = $producto->imagenes;  // Mantener las imágenes existentes
 
         for ($i = 1; $i <= 5; $i++) {
             if ($request->hasFile("imagen$i")) {
@@ -224,10 +241,17 @@ class ProductoControllerView extends Controller
                     return response()->json(['error' => "Error procesando imagen$i"], 400);
                 }
 
-                $this->addListingPhoto($imagenRequest, $producto->id);
+                // Obtener la ruta de la imagen y agregarla a las imágenes existentes
+                $imagenUrl = $this->addListingPhoto($imagenRequest, $producto->id);
+                $imagenes[] = $imagenUrl;  // Añadir la nueva imagen al array de imágenes
             }
         }
 
+        // Actualizar las imágenes en el producto
+        $producto->imagenes = $imagenes;
+        $producto->save();
+
+        // Actualizar el cache del producto
         Cache::put("producto_{$producto->guid}", $producto, now()->addMinutes(60));
 
         Log::info('Producto actualizado correctamente', ['producto' => $producto]);
@@ -252,6 +276,7 @@ class ProductoControllerView extends Controller
 
         Log::info('Producto encontrado', ['product' => $product]);
 
+        // Validación de la imagen
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
@@ -261,27 +286,35 @@ class ProductoControllerView extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        // Obtener las imágenes existentes
         $images = is_array($product->imagenes) ? $product->imagenes : [];
 
+        // Verificar si ya se alcanzó el límite de 5 imágenes
         if (count($images) >= 5) {
             Log::warning('Máximo de 5 imágenes alcanzado', ['product' => $product]);
             return response()->json(['message' => 'Máximo de 5 imágenes alcanzado'], 422);
         }
 
+        // Procesar la imagen
         $file = $request->file('image');
 
         if ($file && $file->isValid()) {
+            // Generar nombre único para la imagen
             $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs("productos/{$product->guid}", $filename,'public');
+            $filePath = $file->storeAs("productos/{$product->guid}", $filename, 'public');
             Log::info('Imagen almacenada', ['filePath' => $filePath]);
 
+            // Crear la ruta de la imagen
             $imagePath = "productos/{$product->guid}/{$filename}";
+
+            // Actualizar el array de imágenes del producto
             $product->imagenes = array_merge($images, [$imagePath]);
             $product->save();
 
             Log::info('Producto actualizado con nuevas imágenes', ['product' => $product]);
 
-            return response()->json(['message' => 'Foto añadida', 'product' => $product]);
+            // Retornar solo la ruta de la imagen
+            return $imagePath; // Esto es lo que debes devolver
         } else {
             Log::error('El archivo no es válido o no se cargó correctamente', ['file' => $file]);
             return response()->json(['message' => 'El archivo no es válido'], 422);

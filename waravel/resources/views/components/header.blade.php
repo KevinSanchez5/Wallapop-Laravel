@@ -42,10 +42,15 @@
                     </x-slot>
                 </x-dropdown>
             @else
-                <a href="{{ route('login') }}" style="width: 80px"
-                   class="h-10 flex items-center justify-center text-base font-extrabold tracking-wide bg-white hover:text-white hover:bg-black  dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white rounded-lg transition-all duration-300 border-2 border-transparent shadow-md px-6 sm:px-3 sm:w-10">
-                    <span class="whitespace-nowrap">Account</span>
+                <a href="{{ route('login') }}" style="width: 50px"
+                   class="h-10 flex items-center justify-center text-base font-extrabold tracking-wide bg-white text-black hover:text-white hover:bg-black dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black rounded-lg transition-all border-2 border-transparent shadow-md px-6 sm:px-3 sm:w-10">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                         class="w-6 h-6 transition-colors duration-300">
+                        <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </svg>
                 </a>
+
             @endauth
 
             <!-- Modo oscuro -->
@@ -82,3 +87,36 @@
         </div>
     </div>
 </header>
+
+<script>document
+.addEventListener('DOMContentLoaded', function () {
+    const html = document.documentElement;
+    const botonModoOscuro = document.getElementById('modoOscuroBtn');
+    const iconoLuz = document.getElementById('modoOscuroIconLuz');
+    const iconoNoche = document.getElementById('modoOscuroIconNoche');
+
+    if (localStorage.getItem('modoOscuro') === 'true') {
+        html.classList.add('dark');
+        iconoLuz.classList.remove('hidden');
+        iconoNoche.classList.add('hidden');
+    } else {
+        html.classList.remove('dark');
+        iconoLuz.classList.add('hidden');
+        iconoNoche.classList.remove('hidden');
+    }
+
+    botonModoOscuro.addEventListener('click', function () {
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            localStorage.setItem('modoOscuro', 'false');
+            iconoLuz.classList.add('hidden');
+            iconoNoche.classList.remove('hidden');
+        } else {
+            html.classList.add('dark');
+            localStorage.setItem('modoOscuro', 'true');
+            iconoLuz.classList.remove('hidden');
+            iconoNoche.classList.add('hidden');
+        }
+    });
+});
+</script>

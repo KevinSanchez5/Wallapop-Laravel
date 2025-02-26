@@ -16,7 +16,7 @@ Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'p
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileControllerView::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileControllerView::class, 'update'])->name('profile.update');
+    Route::put('/profile/update', [ProfileControllerView::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
