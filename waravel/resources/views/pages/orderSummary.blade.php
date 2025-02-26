@@ -29,26 +29,33 @@
                         <h3 class="text-md font-normal text-gray-900 transition-all duration-300 sm:text-xl dark:text-white">123 Internet Street, Disney</h3>
                     </div>
 
-                    <hr class="bottomLine my-12 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
+                    <hr class="bottomLine border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 mt-4">
                         <dl class="flex items-center justify-between gap-4">
                             <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">Precio</dt>
-                            <dd id="totalPrice" class="text-xl font-bold text-gray-500 dark:text-gray-400"> 445456 €</dd>
+                            <dd id="totalPrice" class="text-xl font-normal text-gray-500 dark:text-gray-400"> 445456 €</dd>
                         </dl>
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 mb-4">
                         <dl class="flex items-center justify-between gap-4">
                             <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">Iva</dt>
-                            <dd id="totalPrice" class="text-xl font-bold text-gray-500 dark:text-gray-400">566 €</dd>
+                            <dd id="totalPrice" class="text-xl font-normal text-gray-500 dark:text-gray-400">566 €</dd>
                         </dl>
                     </div>
 
-                    <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700 mt-4">
+                    <hr class="bottomLine border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem)"/>
+                    <dl class="flex items-center justify-between gap-4 mt-4">
                         <dt class="text-xl font-bold text-gray-900 text-gray-500 dark:text-gray-400">Total</dt>
                         <dd id="finalTotal" class="text-xl font-bold text-gray-900 dark:text-white"> 557576 €</dd>
                     </dl>
+
+                    <a href="#" class="block w-full mt-4 bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Continuar</a>
+                    <div class="flex items-start sm:items-center">
+                        <input id="terms-checkbox-2" type="checkbox" value="" class="h-4 w-4 mr-2 mt-2 rounded border-gray-300 bg-gray-100 text-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600" />
+                        <label for="terms-checkbox-2" class="ms-2 mt-2 text-sm font-medium text-gray-900 dark:text-gray-300"> Acepto los <a href="#" title="" class="text-primary-700 underline hover:no-underline dark:text-[#BFF205]">Términos y Condiciones</a></label>
+                    </div>
                 </div>
 
             </div>
