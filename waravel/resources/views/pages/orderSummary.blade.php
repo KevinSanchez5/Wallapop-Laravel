@@ -87,9 +87,15 @@
                             {{ number_format($cart->precioTotal, 2) }} €
                         </dd>
                     </dl>
-                    <a href="#" class="block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Continuar</a>
+
+                    <form action="{{ route('pagarcarrito') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+                            Continuar
+                        </button>
+                    </form>
                     <div class="flex items-center justify-end">
-                        <label for="terms-checkbox-2" class="ms-2 mt-2 text-sm font-medium text-gray-900 dark:text-gray-300"> Acepto los <a href="#" title="" class="text-primary-700 underline hover:no-underline dark:text-[#BFF205]">Términos y Condiciones</a></label>
+                        <label for="terms-checkbox-2" class="ms-2 mt-2 text-sm font-medium text-gray-900 dark:text-gray-300"> Acepto los <a href="" title="" class="text-primary-700 underline hover:no-underline dark:text-[#BFF205]">Términos y Condiciones</a></label>
                         <input id="terms-checkbox-2" type="checkbox" value="" class="h-4 w-4 ml-2 mt-2 rounded border-gray-300 bg-gray-100 text-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600" />
                     </div>
                 </div>

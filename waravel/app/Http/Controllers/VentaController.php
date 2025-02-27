@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LineaVenta;
+use App\Models\Cliente;
 use App\Models\Venta;
-use App\Models\Carrito;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -134,10 +133,25 @@ class VentaController extends Controller
     }
 
     //TODO generar guid mejor
-    public function validandoVentaAPartirDeCarrito(Request $carrito)
+    public function validandoVentaAPartirDeCarrito()
     {
         Log::info('Creando venta a partir de carrito');
+
+        $carrito = session()->get('carrito');
+        if (!$carrito || empty($carrito) || empty($carrito->lineasCarrito)) {
+            return redirect()->back()->with('error', 'No hay productos en el carrito');
+        }
         $guid = uniqid();
+        $usuario=Auth::user();
+
+        if (!$usuario){
+            return redirect()->back()->with('error', 'No hay usuario registrado');
+        }
+        $cliente= Cliente::where('usuario_id', $usuario->id)->first();
+        if(!$cliente){
+            return redirect()->back()->with('error', 'No se encontro cliente registrado');
+        }
+
         $lineasVenta = [];
         foreach($carrito->lineasCarrito as $linea){
             $lineasVenta[] = [
@@ -160,13 +174,14 @@ class VentaController extends Controller
                 'precioTotal' => $linea->precioTotal,
             ];
         }
+
         $venta = [
             'guid' => $guid,
             'comprador' => [
-                'id' => Auth::user()->id,
-                'guid' => Auth::user()->guid,
-                'nombre' => Auth::user()->nombre,
-                'apellido' => Auth::user()->apellido
+                'id' => $usuario->id,
+                'guid' => $usuario->guid,
+                'nombre' => $usuario->name,
+                'cliente' =>$cliente->apellido,
             ],
             'lineaVenta' => $lineasVenta,
             'precioTotal' => $carrito->precioTotal,
@@ -177,7 +192,7 @@ class VentaController extends Controller
         $validator = Validator::make($venta, [
             'guid' => 'required|string|max:255|unique:ventas',
             'comprador' => 'required|array',
-            'lineaVentas' => 'required|array',
+            'lineaVenta' => 'required|array',
             'precioTotal' => 'required|numeric|min:0'
         ]);
         if ($validator->fails()) {
@@ -195,11 +210,10 @@ class VentaController extends Controller
         return $venta;
     }
 
-
-    public function procesarCompra(Request $request){
+    public function procesarCompra(){
         Log::info('Iniciando proceso de compra');
 
-        $venta= $this->validandoVentaAPartirDeCarrito($request);
+        $venta= $this->validandoVentaAPartirDeCarrito();
 
         if($venta instanceof JsonResponse){
             return $venta;
@@ -225,8 +239,8 @@ class VentaController extends Controller
     public function guardarVenta(array $venta)
     {
         Log::info('Creando venta en la base de datos');
-        $venta = new Venta($venta);
-        $venta->save();
+        $ventaModel = new Venta($venta);
+        $ventaModel->save();
         Log::info('Venta guardada correctamente');
     }
 

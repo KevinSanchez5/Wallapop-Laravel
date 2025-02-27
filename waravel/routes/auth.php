@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
             ->name('cliente.misventas');
 
         Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])
-            ->name('cliente.pagarcarrito');
+            ->name('pagarcarrito');
     });
 
     /*
