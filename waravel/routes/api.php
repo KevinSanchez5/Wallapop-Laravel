@@ -58,9 +58,9 @@ Route::middleware('api')->group(function () {
 
     Route::post('/crear-sesion-pago',[PagoController::class, 'crearSesionPago']);
 
-    Route::post('/backup/create', [BackupController::class, 'createBackup']);
-    Route::post('/backup/database', [BackupController::class, 'backupDatabase']);
-    Route::get('/backup/list', [BackupController::class, 'listBackups']);
-    Route::post('/backup/clean', [BackupController::class, 'cleanBackups']);
-    Route::post('/backup/restore/{filename}', [BackupController::class, 'restoreDatabase']);
+    Route::get('/backups', [BackupController::class, 'getAllBackups']);
+    Route::post('/backups/create', [BackupController::class, 'createBackup']);
+    Route::delete('/backups/delete-all', [BackupController::class, 'deleteAllBackups']);
+    Route::delete('/backups/delete/{filename}', [BackupController::class, 'deleteBackup']);
+    Route::post('/backups/restore/{filename}', [BackupController::class, 'restoreBackup']);
 });
