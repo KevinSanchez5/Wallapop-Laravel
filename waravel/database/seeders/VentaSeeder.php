@@ -42,6 +42,7 @@ class VentaSeeder extends Seeder
                 ]
             ],
             'precioTotal' => 1600.00, // suma de precioTotal de lineas de venta
+            'estado' => 'Entregado',
             'created_at' => now()
         ]);
         Venta::create([
@@ -93,7 +94,8 @@ class VentaSeeder extends Seeder
                 ]
             ],
             'precioTotal' => 110.00, // suma de precioTotal de lineas de venta
-            'created_at' => now()
+            'estado' => 'Entregado',
+            'created_at' => now(),
         ]);
     }
 }

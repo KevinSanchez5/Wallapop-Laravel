@@ -29,6 +29,8 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::put('/producto/{guid}', [ProductoControllerView::class, 'update'])->name('producto.update');
     Route::post('/producto/{guid}/changestatus', [ProductoControllerView::class, 'changestatus'])->name('producto.changestatus');
     Route::delete('/producto/{guid}', [ProductoControllerView::class, 'destroy'])->name('producto.destroy');
+
+    Route::get('/pedido/overview', [CarritoControllerView::class, 'showOrder'])->name('carrito.checkout');
 });
 
 Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
