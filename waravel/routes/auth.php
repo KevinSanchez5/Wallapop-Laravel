@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -49,6 +50,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('misventas', [ClienteController::class, 'misVentas'])
             ->name('cliente.misventas');
+
+        Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])
+            ->name('cliente.pagarcarrito');
     });
 
     /*
