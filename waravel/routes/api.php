@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValoracionController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\PagoController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,7 @@ Route::middleware('api')->group(function () {
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::post('/users/correo-codigo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
     Route::post('/users/verificar-codigo', [UserController::class, 'verificarCodigoCambiarContrasenya']);
+    Route::get('/users/verificar-correo/{email}', [UserController::class, 'validarEmail']);
 
     Route::get('/valoraciones', [ValoracionController::class, 'index']);
     Route::get('/valoraciones/{id}', [ValoracionController::class, 'show']);
