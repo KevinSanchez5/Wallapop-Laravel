@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValoracionController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\PagoController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,7 @@ Route::middleware('api')->group(function () {
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::post('/users/correo-codigo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
     Route::post('/users/verificar-codigo', [UserController::class, 'verificarCodigoCambiarContrasenya']);
+    Route::get('/users/verificar-correo/{email}', [UserController::class, 'validarEmail']);
 
     Route::get('/valoraciones', [ValoracionController::class, 'index']);
     Route::get('/valoraciones/{id}', [ValoracionController::class, 'show']);
@@ -55,9 +57,9 @@ Route::middleware('api')->group(function () {
     Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
 
 
-    Route::post('/backup/create', [BackupController::class, 'createBackup']);
-    Route::post('/backup/database', [BackupController::class, 'backupDatabase']);
-    Route::get('/backup/list', [BackupController::class, 'listBackups']);
-    Route::post('/backup/clean', [BackupController::class, 'cleanBackups']);
-    Route::post('/backup/restore/{filename}', [BackupController::class, 'restoreDatabase']);
+    Route::get('/backups', [BackupController::class, 'getAllBackups']);
+    Route::post('/backups/create', [BackupController::class, 'createBackup']);
+    Route::delete('/backups/delete-all', [BackupController::class, 'deleteAllBackups']);
+    Route::delete('/backups/delete/{filename}', [BackupController::class, 'deleteBackup']);
+    Route::post('/backups/restore/{filename}', [BackupController::class, 'restoreBackup']);
 });

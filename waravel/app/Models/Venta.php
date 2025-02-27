@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Utils\GuidGenerator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,6 +11,15 @@ class Venta extends Model
 
     use HasFactory;
     protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal', 'estado'/*, 'payment_intent_id*/];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($venta) {
+            $venta->guid = GuidGenerator::generarId();
+        });
+    }
 
     public function setCompradorAttribute($value)
     {

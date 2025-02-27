@@ -4,17 +4,13 @@
 
 @section('content')
     <x-header />
-    <br><br>
-    <div class="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Editar Perfil</h2>
-
+    <div x-data="registro()"  class="max-w-3xl mx-auto my-8 mx-6 p-6 bg-gray-100 dark:bg-gray-800 shadow-md rounded-lg">
         <form id="editProfileForm" action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
             <!-- Avatar -->
             <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-300 mb-2">Imagen de perfil</label>
                 <div class="relative border border-dashed border-gray-400 rounded-lg flex items-center justify-center w-32 h-32 cursor-pointer bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 overflow-hidden transition mx-auto">
                     <label for="avatar" class="absolute inset-0 flex items-center justify-center">
                         <input type="file" id="avatar" name="avatar" class="sr-only" accept="image/*" onchange="previewImage(event)">
@@ -37,21 +33,17 @@
             <div class="flex gap-4 mb-4">
                 <div class="w-1/2">
                     <label for="nombre" class="block text-gray-700 dark:text-gray-300">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $cliente->nombre) }}"
+                    <input type="text" id="nombre" name="nombre" x-model="form.nombre" @input="validarCampo('nombre')"
                            class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
                            required>
-                    @error('nombre')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                    <p x-text="errors.nombre" class="text-red-500 text-sm mt-1"></p>
                 </div>
                 <div class="w-1/2">
                     <label for="apellidos" class="block text-gray-700 dark:text-gray-300">Apellidos</label>
-                    <input type="text" id="apellidos" name="apellidos" value="{{ old('apellidos', $cliente->apellido) }}"
+                    <input type="text" id="apellidos" name="apellidos" @input="validarCampo('apellidos')" x-model="form.apellidos"
                            class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
                            required>
-                    @error('apellidos')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                    <p x-text="errors.apellidos" class="text-red-500 text-sm mt-1"></p>
                 </div>
             </div>
 
@@ -66,59 +58,49 @@
             <!-- Teléfono -->
             <div class="mb-4">
                 <label for="telefono" class="block text-gray-700 dark:text-gray-300">Teléfono</label>
-                <input type="text" id="telefono" name="telefono" value="{{ old('telefono', $cliente->telefono) }}"
+                <input type="text" id="telefono" name="telefono" @input="validarCampo('telefono')" x-model="form.telefono"
                        class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
                        required>
-                @error('telefono')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
+                <p x-text="errors.telefono" class="text-red-500 text-sm mt-1"></p>
             </div>
 
             <!-- Dirección -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="direccion_calle" class="block text-gray-700 dark:text-gray-300">Calle</label>
-                    <input type="text" id="direccion_calle" name="direccion[calle]" value="{{ old('direccion.calle', $cliente->direccion->calle ?? '') }}"
-                           class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
-                           required>
-                    @error('direccion.calle')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div>
-                    <label for="direccion_numero" class="block text-gray-700 dark:text-gray-300">Número</label>
-                    <input type="number" id="direccion_numero" name="direccion[numero]" value="{{ old('direccion.numero', $cliente->direccion->numero ?? '') }}"
-                           class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
-                           required>
-                    @error('direccion.numero')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+            <div class="grid grid-cols-1 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="direccion_calle" class="block text-gray-700 dark:text-gray-300">Calle</label>
+                        <input type="text" id="direccion_calle" name="direccion[calle]" @input="validarCampo('direccion.calle')" x-model="form.direccion.calle"
+                               class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
+                               required>
+                        <p x-text="errors['direccion.calle']" class="text-red-500 text-sm mt-1"></p>
+                    </div>
+                    <div>
+                        <label for="direccion_numero" class="block text-gray-700 dark:text-gray-300">Número</label>
+                        <input type="number" id="direccion_numero" name="direccion[numero]" @input="validarCampo('direccion.numero')" x-model="form.direccion.numero"
+                               class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
+                               required>
+                        <p x-text="errors['direccion.numero']" class="text-red-500 text-sm mt-1"></p>
+                    </div>
                 </div>
                 <div class="flex gap-4">
                     <div class="w-1/3">
                         <label for="direccion_piso" class="block text-gray-700 dark:text-gray-300">Piso</label>
-                        <input type="number" id="direccion_piso" name="direccion[piso]" value="{{ old('direccion.piso', $cliente->direccion->piso ?? '') }}"
+                        <input type="number" id="direccion_piso" name="direccion[piso]" @input="validarCampo('direccion.piso')" x-model="form.direccion.piso"
                                class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all">
-                        @error('direccion.piso')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <p x-text="errors['direccion.piso']" class="text-red-500 text-sm mt-1"></p>
                     </div>
                     <div class="w-1/3">
                         <label for="direccion_letra" class="block text-gray-700 dark:text-gray-300">Letra</label>
-                        <input type="text" id="direccion_letra" name="direccion[letra]" value="{{ old('direccion.letra', $cliente->direccion->letra ?? '') }}"
+                        <input type="text" id="direccion_letra" name="direccion[letra]" @input="validarCampo('direccion.letra')" x-model="form.direccion.letra"
                                class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all">
-                        @error('direccion.letra')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <p x-text="errors['direccion.letra']" class="text-red-500 text-sm mt-1"></p>
                     </div>
                     <div class="w-1/3">
                         <label for="direccion_codigoPostal" class="block text-gray-700 dark:text-gray-300">Código Postal</label>
-                        <input type="number" id="direccion_codigoPostal" name="direccion[codigoPostal]" value="{{ old('direccion.codigoPostal', $cliente->direccion->codigoPostal ?? '') }}"
+                        <input type="number" id="direccion_codigoPostal" name="direccion[codigoPostal]" @input="validarCampo('direccion.codigoPostal')" x-model="form.direccion.codigoPostal"
                                class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-[#BFF205] transition-all"
                                required>
-                        @error('direccion.codigoPostal')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <p x-text="errors['direccion.codigoPostal']" class="text-red-500 text-sm mt-1"></p>
                     </div>
                 </div>
 
@@ -129,7 +111,7 @@
                 <a href="{{ route('profile') }}" class="px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-700 dark:text-white hover:bg-gray-400 transition">
                     Volver atrás
                 </a>
-                <button type="button" onclick="confirmChanges()" class="px-4 py-2 rounded-lg bg-[#BFF205] hover:bg-[#A0D500] text-black transition">
+                <button type="button" onclick="confirmChanges()" :disabled="hasErrors" class="px-4 py-2 rounded-lg bg-[#BFF205] hover:bg-[#A0D500] text-black transition">
                     Guardar Cambios
                 </button>
             </div>
@@ -150,6 +132,102 @@
 
     <!-- Script para Mostrar el Toast de Confirmación -->
     <script>
+
+        function registro() {
+            return {
+                step: 1,
+                form: {
+                    telefono: '{{$cliente->telefono}}',
+                    nombre: '{{$cliente->nombre}}',
+                    apellidos: '{{ $cliente->apellido }}',
+                    direccion: {
+                        calle: '{{$cliente->direccion->calle ?? ''}}',
+                        numero: '{{$cliente->direccion->numero ?? '' }}',
+                        piso:'{{$cliente->direccion->piso ?? ''}}',
+                        letra: '{{$cliente->direccion->letra ?? ''}}',
+                        codigoPostal: '{{$cliente->direccion->codigoPostal ?? ''}}'
+                    }
+                },
+                errors: {},
+
+                validarCampo(campo) {
+                    if (this.errors[campo]) {
+                        delete this.errors[campo];
+                    }
+                    if (campo === 'telefono') {
+                        let telefono = this.form.telefono.trim();
+                        if (!telefono) {
+                            this.errors.telefono = "El teléfono es obligatorio.";
+                        } else {
+                            if (!/^[67]/.test(telefono)) {
+                                this.errors.telefono = "El teléfono debe empezar por 6 o 7.";
+                            }
+                            if (!/^\d{9}$/.test(telefono)) {
+                                this.errors.telefono = this.errors.telefono ? this.errors.telefono + " y tener 9 dígitos." : "El teléfono debe tener 9 dígitos.";
+                            }
+                        }
+                    } else if (campo === 'nombre') {
+                        if (!this.form.nombre.trim()) {
+                            this.errors.nombre = "El nombre es obligatorio.";
+                        } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.form.nombre.trim())) {
+                            this.errors.nombre = "El nombre solo puede contener letras.";
+                        }
+                    } else if (campo === 'apellidos') {
+                        if (!this.form.apellidos.trim()) {
+                            this.errors.apellidos = "Los apellidos son obligatorios.";
+                        } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.form.apellidos.trim())) {
+                            this.errors.apellidos = "Los apellidos solo pueden contener letras.";
+                        }
+                    } else if (campo === 'direccion.calle') {
+                        if (!this.form.direccion.calle.trim()) {
+                            this.errors["direccion.calle"] = "La calle es obligatoria.";
+                        }
+                    } else if (campo === 'direccion.numero') {
+                        if (!this.form.direccion.numero) {
+                            this.errors["direccion.numero"] = "El número es obligatorio.";
+                        } else if (isNaN(this.form.direccion.numero)) {
+                            this.errors["direccion.numero"] = "El número debe ser un número.";
+                        } else if (this.form.direccion.numero <= 0) {
+                            this.errors["direccion.numero"] = "El número no puede ser negativo.";
+                        }
+                    } else if (campo === 'direccion.piso') {
+                        if (this.form.direccion.piso && (isNaN(this.form.direccion.piso) || this.form.direccion.piso < 0)) {
+                            this.errors["direccion.piso"] = "El piso debe ser un número y no puede ser negativo.";
+                        }
+                    } else if (campo === 'direccion.letra') {
+                        if (this.form.direccion.letra.trim() && !/^[a-zA-Z]+$/.test(this.form.direccion.letra.trim())) {
+                            this.errors["direccion.letra"] = "La letra solo puede contener letras.";
+                        }
+                    } else if (campo === 'direccion.codigoPostal') {
+                        const postalCodeRegex = /^\d{5}$/;
+                        if (!postalCodeRegex.test(this.form.direccion.codigoPostal.trim())) {
+                            this.errors["direccion.codigoPostal"] = "El código postal es obligatorio y debe ser un código postal válido.";
+                        }
+                    }
+                },
+
+                validarFormulario() {
+                    this.errors = {};
+                    Object.keys(this.form).forEach(campo => {
+                        if (typeof this.form[campo] === 'object') {
+                            Object.keys(this.form[campo]).forEach(subCampo => {
+                                this.validarCampo(`direccion.${subCampo}`);
+                            });
+                        } else {
+                            this.validarCampo(campo);
+                        }
+                    });
+
+                    return Object.keys(this.errors).length === 0;
+                },
+
+                get hasErrors() {
+                    return Object.keys(this.errors).length > 0;
+                }
+            };
+        }
+
+
         function confirmChanges() {
             const toast = document.getElementById('toast-confirm');
             toast.classList.remove('hidden');

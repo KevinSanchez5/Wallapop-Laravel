@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Utils\GuidGenerator;
 
 class Producto extends Model
 {
@@ -14,6 +15,15 @@ class Producto extends Model
     protected $casts = [
         'imagenes' => 'array',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($producto) {
+            $producto->guid = GuidGenerator::generarId();
+        });
+    }
 
     // Relación N:1 con Cliente (Vendedor)
     public function vendedor()

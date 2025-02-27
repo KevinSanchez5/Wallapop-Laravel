@@ -3,9 +3,9 @@
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <div class="flex flex-col md:flex-row min-h-screen">
+    <div class="flex min-h-screen">
         <!-- Sección de imagen -->
-        <div class="w-full md:w-1/2 min-h-[300px] md:min-h-screen bg-cover bg-center flex items-center justify-center text-white"
+        <div class="w-full md:w-1/2 min-h-[300px] md:min-h-screen bg-cover bg-center flex items-center justify-center text-white hidden md:flex"
              style="background-image: url({{ asset('imgs/fondo_auth.jpg') }});">
             <div class="absolute inset-0 bg-black opacity-25"></div>
         </div>
