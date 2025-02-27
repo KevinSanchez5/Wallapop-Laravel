@@ -77,7 +77,6 @@ class ClienteController extends Controller
     {
         Log::info('Validando cliente');
         $validator = Validator::make($request->all(), [
-            'guid' => 'required|unique:clientes,guid',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'avatar' => 'nullable|string',
