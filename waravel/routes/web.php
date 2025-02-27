@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/producto/{guid}', [ProductoControllerView::class, 'update'])->name('producto.update');
     Route::post('/producto/{guid}/changestatus', [ProductoControllerView::class, 'changestatus'])->name('producto.changestatus');
     Route::delete('/producto/{guid}', [ProductoControllerView::class, 'destroy'])->name('producto.destroy');
+
+    Route::get('/pedido/overview', [CarritoControllerView::class, 'showOrder'])->name('carrito.checkout');
 });
 
 Route::get('/productos/search', [ProductoControllerView::class, 'search'])->name('productos.search');

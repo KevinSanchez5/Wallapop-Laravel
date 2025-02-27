@@ -9,7 +9,7 @@ class Venta extends Model
 {
 
     use HasFactory;
-    protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal'];
+    protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal', 'estado'];
 
     public function setCompradorAttribute($value)
     {
