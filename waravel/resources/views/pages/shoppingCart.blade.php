@@ -158,7 +158,7 @@
 
             totalPrice.innerHTML = (newTotal / 1.21).toFixed(2) + " €";
             finalTotal.innerHTML = newTotal + " €";
-            iva.innerHTML = (newTotal - (newTotal / 1.21)).toFixed(2) + "€";
+            iva.innerHTML = (newTotal - (newTotal / 1.21)).toFixed(2) + " €";
         }
 
         function updateCartLogo(amountOfItems) {
