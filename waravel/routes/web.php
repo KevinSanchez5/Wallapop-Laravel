@@ -61,8 +61,5 @@ Route::get('/pago/success', function () {
 Route::get('/pago/cancelled', function () {
     return view('payment.cancelled');
 })->name('payment.cancel');
-Route::get('/pago/checkout', function () {
-    return view('payment.checkout');
-});
 
 require __DIR__.'/auth.php';
