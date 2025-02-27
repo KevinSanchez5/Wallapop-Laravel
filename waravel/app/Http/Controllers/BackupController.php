@@ -2,167 +2,154 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Artisan;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\File;
 
-class BackupController extends Controller{
-    /**
-     * Genera un backup de la aplicación (archivos + base de datos)
-     */
+class BackupController extends Controller
+{
+    private $backupPath = 'backups/';
+
+    public function __construct()
+    {
+        Log::info('Comprobando existencia de directorio para backups');
+        $initialBackupPath = storage_path('app/backups');
+
+        if (!file_exists($initialBackupPath)) {
+            Log::info('Directorio de backups inexistente, creando directorio');
+            mkdir($initialBackupPath, 0777, true);
+        }
+    }
+
+    public function getAllBackups()
+    {
+        Log::info('Buscando todos los archivos de copia de seguridad');
+        $directory = storage_path("app/{$this->backupPath}");
+        $files = scandir($directory);
+        $backups = array_filter($files, fn($file) => !in_array($file, ['.', '..']) && is_file($directory . DIRECTORY_SEPARATOR . $file));
+        return response()->json(array_values($backups));
+    }
+
     public function createBackup()
     {
-        Artisan::call('backup:run');
+        Log::info('Creando copia de seguridad');
+        $filename = 'backup_' . date('Y-m-d_H-i-s') . '.sql';
+        $path = storage_path("app/{$this->backupPath}{$filename}");
 
-        $output = Artisan::output();
+        $command = sprintf(
+            'PGPASSWORD=%s pg_dump -U %s -h %s -p %s %s > %s',
+            env('DB_PASSWORD'),
+            env('DB_USERNAME'),
+            env('DB_HOST'),
+            env('DB_PORT'),
+            env('DB_DATABASE'),
+            $path
+        );
 
-        return response()->json([
-            'message' => 'Backup creado con éxito',
-            'output' => $output
-        ]);
+        $output = null;
+        $resultCode = null;
+        exec($command, $output, $resultCode);
+
+        return $resultCode === 0
+            ? response()->json(['message' => 'Backup creado', 'filename' => $filename])
+            : response()->json(['error' => 'Error al crear el backup'], 500);
     }
 
-    /**
-     * Genera solo un backup de la base de datos
-     */
-    public function backupDatabase()
+    public function deleteBackup($filename)
     {
-        Artisan::call('backup:run --only-db');
+        Log::info('Borrand copia de seguridad: ' . $filename);
+        $directory = storage_path("app/{$this->backupPath}");
+        $files = scandir($directory);
+        $backups = array_filter($files, fn($file) => !in_array($file, ['.', '..']) && is_file($directory . DIRECTORY_SEPARATOR . $file));
+        $backups = array_values($backups);
 
-        $output = Artisan::output();
-
-        return response()->json([
-            'message' => 'Backup de la base de datos creado con éxito',
-            'output' => $output
-        ]);
-    }
-
-    /**
-     * Lista los backups disponibles
-     */
-    public function listBackups()
-    {
-        Artisan::call('backup:list');
-        $output = Artisan::output();
-
-        // Mejoramos la legibilidad de la respuesta:
-
-        // Dividir la salida en líneas
-        $lines = explode("\n", trim($output));
-
-        // Filtrar la tabla de backups
-        $backups = [];
-        $parsingBackups = false;
-
-        foreach ($lines as $line) {
-            if (str_contains($line, 'Name') && str_contains($line, 'Disk')) {
-                // Iniciar el análisis de la tabla de backups
-                $parsingBackups = true;
-                continue;
-            }
-
-            if ($parsingBackups && str_contains($line, '|')) {
-                $columns = array_map('trim', explode('|', trim($line, '|')));
-                if (count($columns) >= 7) {
-                    $backups[] = [
-                        'name' => $columns[0],
-                        'disk' => $columns[1],
-                        'reachable' => $columns[2] === '✅',
-                        'healthy' => $columns[3] === '✅',
-                        'backup_count' => (int) $columns[4],
-                        'newest_backup' => $columns[5],
-                        'used_storage' => $columns[6]
-                    ];
+        foreach ($backups as $backup) {
+            if ($backup === $filename) {
+                $filePath = $directory . DIRECTORY_SEPARATOR . $backup;
+                if (unlink($filePath)) {
+                    return response()->json(['message' => 'Backup eliminado']);
+                } else {
+                    return response()->json(['error' => 'Error al eliminar el backup'], 500);
                 }
             }
         }
 
-        return response()->json([
-            'message' => 'Backup list retrieved successfully',
-            'backups' => $backups
-        ]);
+        return response()->json(['error' => 'Backup no encontrado'], 404);
     }
 
 
-
-    /**
-     * Elimina backups antiguos según la configuración
-     */
-    public function cleanBackups()
+    public function deleteAllBackups()
     {
-        Artisan::call('backup:clean');
-        $output = Artisan::output();
+        Log::info('Borrando todas las copias de seguridad');
+        $directory = storage_path("app/{$this->backupPath}");
+        $files = scandir($directory);
+        $backups = array_filter($files, fn($file) =>
+            !in_array($file, ['.', '..']) && is_file($directory . DIRECTORY_SEPARATOR . $file)
+        );
+        $backups = array_values($backups);
+        $errors = [];
 
-        // Dividir la salida en líneas
-        $lines = explode("\n", trim($output));
-
-        // Variables para extraer datos clave
-        $usedStorage = null;
-        $status = 'Cleanup completed successfully';
-        $cleaningMessage = null;
-
-        foreach ($lines as $line) {
-            if (str_contains($line, 'Used storage after cleanup:')) {
-                $usedStorage = trim(str_replace('Used storage after cleanup:', '', $line));
-            }
-
-            if (str_contains($line, 'Cleaning backups of')) {
-                $cleaningMessage = trim($line);
-            }
-
-            if (str_contains($line, 'Starting cleanup...')) {
-                $status = 'Cleanup started';
+        foreach ($backups as $backup) {
+            $filePath = $directory . DIRECTORY_SEPARATOR . $backup;
+            if (!unlink($filePath)) {
+                $errors[] = "Error al eliminar: {$backup}";
             }
         }
 
-        return response()->json([
-            'message' => $status,
-            'cleaning' => $cleaningMessage ?? 'No cleaning message found',
-            'used_storage' => $usedStorage ?? 'Unknown'
-        ]);
+        if (empty($errors)) {
+            return response()->json(['message' => 'Todos los backups han sido eliminados']);
+        }
+
+        return response()->json(['error' => 'Algunos backups no se pudieron eliminar', 'details' => $errors], 500);
     }
 
-
-    /**
-     * Restaura un backup de la base de datos desde un archivo
-     */
-    public function restoreDatabase($filename)
+    public function restoreBackup($filename)
     {
-        $path = storage_path("app/backup-temp/{$filename}");
+        Log::info('Restaurando copia de seguridad: '. $filename);
+        $directory = storage_path("app/{$this->backupPath}");
+        $files = scandir($directory);
+        $backups = array_filter($files, fn($file) => !in_array($file, ['.', '..']) && is_file($directory . DIRECTORY_SEPARATOR . $file));
+        $backups = array_values($backups);
 
-        if (!file_exists($path)) {
-            return response()->json([
-                'message' => 'El archivo de backup no existe.',
-                'filename' => $filename
-            ], 404);
+        foreach ($backups as $backup) {
+            if ($backup === $filename) {
+                $filePath = $directory . DIRECTORY_SEPARATOR . $backup;
+
+                // Vaciamos primero la base de datos para evitar problemas a la hora de restaurar los datos
+                $dropCommand = sprintf(
+                    'PGPASSWORD=%s psql -U %s -h %s -p %s -d %s -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"',
+                    escapeshellarg(env('DB_PASSWORD')),
+                    escapeshellarg(env('DB_USERNAME')),
+                    escapeshellarg(env('DB_HOST')),
+                    escapeshellarg(env('DB_PORT')),
+                    escapeshellarg(env('DB_DATABASE'))
+                );
+                exec($dropCommand, $outputDrop, $resultCodeDrop);
+
+                if ($resultCodeDrop !== 0) {
+                    return response()->json(['error' => 'Error al limpiar la base de datos', 'output' => $outputDrop], 500);
+                }
+
+                $restoreCommand = sprintf(
+                    'PGPASSWORD=%s psql -U %s -h %s -p %s -d %s < %s',
+                    escapeshellarg(env('DB_PASSWORD')),
+                    escapeshellarg(env('DB_USERNAME')),
+                    escapeshellarg(env('DB_HOST')),
+                    escapeshellarg(env('DB_PORT')),
+                    escapeshellarg(env('DB_DATABASE')),
+                    escapeshellarg($filePath)
+                );
+
+                exec($restoreCommand . ' 2>&1', $outputRestore, $resultCodeRestore);
+
+                return $resultCodeRestore === 0
+                    ? response()->json(['message' => 'Backup restaurado correctamente', 'output' => $outputRestore])
+                    : response()->json(['error' => 'Error al restaurar el backup', 'output' => $outputRestore], 500);
+            }
         }
 
-        $dbHost = env('DB_HOST', '127.0.0.1');
-        $dbPort = env('DB_PORT', '5432');
-        $dbName = env('DB_DATABASE');
-        $dbUser = env('DB_USERNAME');
-        $dbPass = env('DB_PASSWORD');
-
-        putenv("PGPASSWORD={$dbPass}");
-
-        $command = "PGPASSWORD={$dbPass} psql -h {$dbHost} -p {$dbPort} -U {$dbUser} -d {$dbName} -f {$path}";
-
-        $process = Process::fromShellCommandline($command);
-        $process->setTimeout(300); // Tiempo máximo de ejecución en segundos
-
-        try {
-            $process->mustRun();
-
-            return response()->json([
-                'message' => 'Base de datos restaurada con éxito.',
-                'filename' => $filename
-            ]);
-        } catch (ProcessFailedException $exception) {
-            return response()->json([
-                'message' => 'Error al restaurar la base de datos.',
-                'error' => $exception->getMessage()
-            ], 500);
-        }
+        return response()->json(['error' => 'Backup no encontrado'], 404);
     }
-
 }
