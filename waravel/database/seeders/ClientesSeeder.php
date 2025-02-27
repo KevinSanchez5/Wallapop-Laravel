@@ -23,7 +23,7 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28001
             ],
             'activo' => true,
-            'usuario_id' => 1,
+            'usuario_id' => 2,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -36,12 +36,12 @@ class ClientesSeeder extends Seeder
             'direccion' => [
                 'calle' => 'Calle de las Nubes',
                 'numero' => 123,
-                'piso' => 2,
+                'piso' => 3,
                 'letra' => 'C',
                 'codigoPostal' => 28971
             ],
             'activo' => true,
-            'usuario_id' => 2,
+            'usuario_id' => 3,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -59,7 +59,7 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28970
             ],
             'activo' => false,
-            'usuario_id' => 3,
+            'usuario_id' => 4,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
