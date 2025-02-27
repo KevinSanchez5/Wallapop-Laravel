@@ -52,9 +52,6 @@
 
                                 <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">{{ $linea->precioTotal }}</td>
                             </tr>
-                        @if(!$loop->last)
-                            <hr class="bottomLine my-12 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem); margin-top: 0"/>
-                        @endif
                         @empty
                             <p class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem">
                                 No hay productos en el pedido
