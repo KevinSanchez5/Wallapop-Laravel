@@ -17,8 +17,8 @@ class Valoracion extends Model
     {
         parent::boot();
 
-        static::creating(function ($cliente) {
-            $cliente->guid = GuidGenerator::generarId();
+        static::creating(function ($valoracion) {
+            $valoracion->guid = GuidGenerator::generarId();
         });
     }
 
