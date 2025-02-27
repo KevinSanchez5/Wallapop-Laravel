@@ -82,7 +82,6 @@ class VentaController extends Controller
         Log::info('Validando venta');
 
         $validator = Validator::make($request->all(), [
-            'guid' => 'required|string|max:255|unique:ventas',
             'comprador' => 'required|array',
             'lineaVentas' => 'required|array',
             'precioTotal' => 'required|numeric|min:0'
