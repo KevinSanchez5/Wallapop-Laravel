@@ -95,6 +95,11 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+
+            'dump' => [
+                'dump_binary_path' => env('PGDUMP_PATH', '/usr/bin/pg_dump'),
+                'use_compression' => true,
+            ],
         ],
 
         'sqlsrv' => [

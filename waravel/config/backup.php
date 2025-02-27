@@ -23,11 +23,7 @@ return [
             ],
 
             'databases' => [
-                'pgsql' => [
-                    'dump_command' => 'pg_dump',
-                    'dump_binary_path' => '/usr/bin/pg_dump',
-                    'use_compression' => true,
-                ],
+                'pgsql'
             ],
         ],
 
