@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Utils\GuidGenerator;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -37,6 +38,15 @@ class User extends Authenticatable
         'password_reset_token',
         'password_reset_expires_at',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($cliente) {
+            $cliente->guid = GuidGenerator::generarId();
+        });
+    }
 
     /**
      * Get the attributes that should be cast.
