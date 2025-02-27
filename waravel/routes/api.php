@@ -53,5 +53,8 @@ Route::middleware('api')->group(function () {
     Route::put('/ventas/{id}', [VentaController::class, 'update']);
     Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
 
-    Route::post('/crear-sesion-pago',[PagoController::class, 'crearSesionPago']);
+    Route::post('/stripe/crear-sesion-pago',[VentaController::class, 'crearSesionPago']);
+    Route::post('/stripe/producto', [VentaController::class, 'crearPrecioStripe']);
+    Route::post('/webhook/stripe', [VentaController::class, 'handleWebhook']);
+
 });

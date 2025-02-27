@@ -9,7 +9,7 @@ class Venta extends Model
 {
 
     use HasFactory;
-    protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal'];
+    protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal' /*, 'payment_intent_id*/];
 
     public function setCompradorAttribute($value)
     {
@@ -22,7 +22,7 @@ class Venta extends Model
             return $value;
         }
 
-        return json_decode($value);
+        return json_decode($value, true);
     }
 
     public function setLineaVentasAttribute($value)

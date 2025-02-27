@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('comprador');
             $table->json('lineaVentas');
             $table->double('precioTotal');
+            //$table->string('payment_intent_id')->nullable();
             $table->timestamps();
         });
     }
