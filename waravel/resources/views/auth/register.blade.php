@@ -197,7 +197,7 @@
                     if (!this.form.email) return;
 
                     try {
-                        let response = await fetch(`/api/verificar-email?email=${this.form.email}`);
+                        let response = await fetch(`api/users/verificar-correo/${this.form.email}`);
                         let data = await response.json();
 
                         if (data.exists) {
