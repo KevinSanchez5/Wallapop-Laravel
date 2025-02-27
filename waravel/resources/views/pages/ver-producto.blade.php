@@ -187,16 +187,8 @@
     }
 
     function updateStockDisplay() {
-        const stockInput = document.getElementById('stock');
+        const stockInput = document.getElementById('cantidad');
         stockInput.value = currentStock;
-    }
-
-    function raiseAmount() {
-        const cantidadInput = document.getElementById('cantidad');
-        const cantidad = parseInt(cantidadInput.value);
-        if (isNaN(cantidad) || cantidad < 1) {
-            cantidadInput.value = 1;
-        }
     }
 
     async function addToCart(productId) {
