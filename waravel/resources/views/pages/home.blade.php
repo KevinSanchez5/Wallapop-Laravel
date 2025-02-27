@@ -23,8 +23,8 @@
                         @foreach ($categories as $category)
                             <form method="GET" action="{{ route('productos.search') }}">
                                 <button type="submit" name="categoria" value="{{ $category }}"
-                                        class="dark:hover:bg-[#BFF205] px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300
-                                            {{ $selectedCategory == $category ? 'bg-[#BFF205] text-black' : 'bg-gray-200 dark:bg-gray-700 hover:bg-[#BFF205] dark:hover:text-black text-gray-700 dark:text-gray-200  hover:text-black' }}">
+                                        class=" px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300
+                                            {{ $selectedCategory == $category ? ' bg-[#BFF205] text-black' : 'bg-gray-200 dark:bg-gray-700 hover:bg-[#BFF205] dark:hover:bg-[#BFF205] dark:hover:text-black text-gray-700 dark:text-gray-200  hover:text-black' }}">
                                     {{ ucfirst($category) }}
                                 </button>
                             </form>
