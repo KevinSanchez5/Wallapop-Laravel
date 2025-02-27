@@ -10,7 +10,6 @@ class ClientesSeeder extends Seeder
     public function run(): void
     {
         Cliente::create([
-            'guid' => 'de6a7d01-af1d-44fb-a615-2583f52da3c4',
             'nombre' => 'Juan',
             'apellido' => 'Perez',
             'avatar' => 'clientes/avatar.png',
@@ -28,7 +27,6 @@ class ClientesSeeder extends Seeder
             'updated_at' => now(),
         ]);
         Cliente::create([
-            'guid' => '97b37979-552a-4916-989a-b96031348856',
             'nombre' => 'Maria',
             'apellido' => 'Garcia',
             'avatar' =>'clientes/avatar.png',
@@ -46,7 +44,6 @@ class ClientesSeeder extends Seeder
             'updated_at' => now(),
         ]);
         Cliente::create([
-            'guid' => '81f58779-2a53-4922-b628-16c330d4b28a',
             'nombre' => 'Pedro',
             'apellido' => 'Martinez',
             'avatar' => 'clientes/avatar.png',

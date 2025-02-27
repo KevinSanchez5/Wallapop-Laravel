@@ -68,7 +68,6 @@ class UserController extends Controller
     {
         Log::info("Intentando crear un nuevo usuario");
         $validator = Validator::make($request->all(), [
-            'guid' => 'required|unique:users,guid',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
@@ -172,21 +171,7 @@ class UserController extends Controller
         $email = $request->email;
         Log::info('Validación de email completada', ['email' => $email]);
         Log::info('Buscando usuario por email', ['email' => $email]);
-        try {
-            $user = User::where('email', $email)->first();
-            Log::info('Usuario encontrado', ['user_id' => optional($user)->id]);
-        } catch(\Exception $e) {
-            Log::error('Error al buscar el usuario por email', [
-                'email' => $email,
-                'exception' => $e->getMessage()
-            ]);
-            return response()->json(['error' => $e->getMessage()], 503);//fallo en la base de datos se podria eliminar
-        }
-
-        if (!$user) {
-            Log::warning('Usuario no encontrado', ['email' => $email]);
-            return response()->json(['message' => 'User not found'], 404);
-        }
+        $user = $this->findUserByEmail($email);
 
         $codigo = strtoupper(Str::random(10));
         $user->password_reset_token = Hash::make($codigo);
@@ -223,12 +208,7 @@ class UserController extends Controller
         $email = $request->email;
         $codigo = $request->codigo;
 
-        $user= User::where('email', $email)->first();
-
-        if (!$user) {
-            Log::warning('Usuario no encontrado', ['email' => $email]);
-            return response()->json(['success'=>false , 'message' => 'User not found'], 404);
-        }
+        $user = $this->findUserByEmail($email);
 
         if(!Hash::check($codigo, $user->password_reset_token)){
             Log::warning('Codigo incorrecto ingresado');
@@ -244,18 +224,25 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message'=>'Codigo verificado'], 200);
     }
 
-    public function showEmail($email)
+    public function validarEmail($request)
+    {
+        $user = $this->findUserByEmail($request);
+
+        return response()->json(['exists' => $user !== null]);
+    }
+
+    public function findUserByEmail($email)
     {
         Log::info("Buscando usuario por email", ['email' => $email]);
 
         $user = User::where('email', $email)->first();
 
-        if(!$user) {
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
             return response()->json(['message' => 'User not found'], 404);
         }
 
         Log::info("Usuario encontrado", ['email' => $email, 'user_id' => $user->id]);
-        return response()->json($user);
+        return $user;
     }
-
 }

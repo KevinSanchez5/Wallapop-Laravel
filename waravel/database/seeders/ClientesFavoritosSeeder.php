@@ -49,6 +49,5 @@ class ClientesFavoritosSeeder extends Seeder
             ],
         ];
 
-        DB::table('cliente_favoritos')->insert($clienteFavoritos);
     }
 }
