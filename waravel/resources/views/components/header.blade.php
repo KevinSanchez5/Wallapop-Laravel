@@ -29,9 +29,17 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</p>
                         </div>
                         <hr class="border-gray-300 dark:border-gray-600">
-                        <x-dropdown-link :href="route('profile')">
-                            {{ __('Perfil') }}
-                        </x-dropdown-link>
+
+                        @if (Auth::user()->role === 'admin')
+                            <x-dropdown-link :href="route('admin.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-dropdown-link>
+                        @else
+                            <x-dropdown-link :href="route('profile')">
+                                {{ __('Perfil') }}
+                            </x-dropdown-link>
+                        @endif
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
