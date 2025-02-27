@@ -22,45 +22,101 @@
 
 <div class="flex min-h-screen">
 
+    <!-- Modo oscuro -->
+    <button id="modoOscuroBtn" class=" fixed top-4 right-4 p-2 rounded-lg bg-white hover:text-white hover:bg-black  dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white transform" aria-label="Cambiar modo de tema">
+        <svg id="modoOscuroIconLuz" class="hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="modoOscuroIconNoche" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
     <!-- Barra Lateral -->
-    <div id="sidebar" class="w-64 bg-[#BFF205] text-black p-6 flex flex-col h-screen transform-translate-x-full transition-transform duration-300 z-20">
-        <h4 class="text-center text-xl font-bold mb-6">Administración</h4>
+    <div id="sidebar" class="w-64 bg-[#BFF205] text-black p-6 flex flex-col min-h-screen h-full fixed top-0 left-0 z-20">
+        <h2 class="text-center text-2xl font-extrabold mb-6">Administración</h2>
 
         <!-- Enlaces de Navegación -->
         <nav class="flex-1">
             <a href="{{ route('admin.dashboard') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
+                <i class="fas fa-tachometer-alt"></i> &nbsp; Dashboard
             </a>
-            <a href="{{ route('clients.list') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
-                <i class="fas fa-users"></i> Gestionar Usuarios
+            <a href="{{ route('admin.clients') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+                <i class="fas fa-users"></i> &nbsp; Gestionar Clientes
             </a>
-            <a href="{{ route('products.list') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
-                <i class="fas fa-box"></i> Gestionar Productos
+            <a href="{{ route('admin.products') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+                <i class="fas fa-box"></i> &nbsp; Gestionar Productos
             </a>
             <a href="#" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
-                <i class="fas fa-star"></i> Ver Valoraciones
+                <i class="fas fa-star"></i> &nbsp;Ver Valoraciones
             </a>
-            <a href="{{ route('admins.list') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
-                <i class="fas fa-user-plus"></i> Añadir Administradores
+            <a href="" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+                <i class="fas fa-shopping-cart"></i> &nbsp; Gestionar Ventas
+            </a>
+            <a href="{{ route('admins.add') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+                <i class="fas fa-user-plus"></i> &nbsp; Añadir Admin
             </a>
             <a href="{{ route('admin.backup') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
-                <i class="fas fa-database"></i> Copia de Seguridad
+                <i class="fas fa-database"></i> &nbsp; Copia de Seguridad
             </a>
         </nav>
 
         <!-- Botón Cerrar Sesión -->
         <form action="{{ route('logout') }}" method="POST" class="mt-auto">
             @csrf
-            <button type="submit" class="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 hover:text-white">
-                Cerrar Sesión
+            <button type="submit" class="w-full bg-black text-white py-2 rounded-lg hover:bg-white hover:text-black">
+                <b>Cerrar Sesión</b>
             </button>
         </form>
     </div>
+    <div class="w-64 h-full"></div>
 
     <!-- Contenido Principal -->
-    <main class="p-6 bg-gray-100 flex-1 min-h-screen">
+    <main class="p-6 bg-gray-100 dark:bg-gray-900 dark:text-white flex-1 min-h-screen">
         @yield('content')
     </main>
+
+    <!-- Scripts -->
+    <script>document
+            .addEventListener('DOMContentLoaded', function () {
+                const html = document.documentElement;
+                const botonModoOscuro = document.getElementById('modoOscuroBtn');
+                const iconoLuz = document.getElementById('modoOscuroIconLuz');
+                const iconoNoche = document.getElementById('modoOscuroIconNoche');
+
+                if (localStorage.getItem('modoOscuro') === 'true') {
+                    html.classList.add('dark');
+                    iconoLuz.classList.remove('hidden');
+                    iconoNoche.classList.add('hidden');
+                } else {
+                    html.classList.remove('dark');
+                    iconoLuz.classList.add('hidden');
+                    iconoNoche.classList.remove('hidden');
+                }
+
+                botonModoOscuro.addEventListener('click', function () {
+                    if (html.classList.contains('dark')) {
+                        html.classList.remove('dark');
+                        localStorage.setItem('modoOscuro', 'false');
+                        iconoLuz.classList.add('hidden');
+                        iconoNoche.classList.remove('hidden');
+                    } else {
+                        html.classList.add('dark');
+                        localStorage.setItem('modoOscuro', 'true');
+                        iconoLuz.classList.remove('hidden');
+                        iconoNoche.classList.add('hidden');
+                    }
+                });
+            });
+    </script>
 
 </div>
 </body>

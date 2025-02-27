@@ -33,12 +33,18 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
 
 Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/clients', [AdminController::class, 'listClients'])->name('clients.list');
-    Route::get('/admin/products', [AdminController::class, 'listProducts'])->name('products.list');
-    Route::get('/admin/admins', [AdminController::class, 'listAdmins'])->name('admins.list');
-    Route::post('/admin/admins/add', [AdminController::class, 'addAdmin'])->name('admins.add');
+    Route::get('/admin/clients', [AdminController::class, 'listClients'])->name('admin.clients');
+
+    Route::get('/admin/products', [AdminController::class, 'listProducts'])->name('admin.products');
+    Route::patch('/product/ban/{guid}', [AdminController::class, 'banProduct'])->name('admin.banProduct');
+
+    //Route::get('/admin/admins', [AdminController::class, 'listAdmins'])->name('admin.admins');
+    Route::post('/admin/add', [AdminController::class, 'addAdmin'])->name('admins.add');
+    Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
 });
+
 
 Route::get('/productos/search', [ProductoControllerView::class, 'search'])->name('productos.search');
 Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');
