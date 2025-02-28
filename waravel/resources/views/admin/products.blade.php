@@ -27,7 +27,7 @@
             @foreach($productos as $producto)
                 <tr class="hover:bg-gray-200 dark:hover:bg-gray-600">
                     <td class="py-2 px-4">{{ $producto->id }}</td>
-                    <td class="py-2 px-4">{{ $producto->nombre }}</td>
+                    <td class="py-2 px-4"><a href="{{ route('producto.show', $producto->guid) }}">{{ $producto->nombre }}</a></td>
                     <td class="py-2 px-4">{{ $producto->categoria }}</td>
                     <td class="py-2 px-4">{{ $producto->precio }}</td>
                     <td class="py-2 px-4">{{ $producto->estado }}</td>
