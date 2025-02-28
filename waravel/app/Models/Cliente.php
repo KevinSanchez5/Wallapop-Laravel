@@ -17,7 +17,9 @@ class Cliente extends Model
         parent::boot();
 
         static::creating(function ($cliente) {
-            $cliente->guid = GuidGenerator::generarId();
+            if (empty($cliente->guid)) {
+                $cliente->guid = GuidGenerator::generarId();
+            }
         });
     }
 

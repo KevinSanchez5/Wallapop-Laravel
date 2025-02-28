@@ -21,6 +21,7 @@ class VentaController extends Controller
             return [
                 'id' => $venta->id,
                 'guid' => $venta->guid,
+                'estado' => $venta->estado,
                 'comprador' => $venta->comprador,
                 'lineaVentas' => $venta->lineaVentas,
                 'precioTotal' => $venta->precioTotal,
@@ -64,6 +65,7 @@ class VentaController extends Controller
         $data = [
             'id' => $venta->id,
             'guid' => $venta->guid,
+            'estado' => $venta->estado,
             'comprador' => $venta->comprador,
             'lineaVentas' => $venta->lineaVentas,
             'precioTotal' => $venta->precioTotal,
@@ -84,6 +86,7 @@ class VentaController extends Controller
         Log::info('Validando venta');
 
         $validator = Validator::make($request->all(), [
+            'estado' =>'required|string|max:255',
             'comprador' => 'required|array',
             'lineaVentas' => 'required|array',
             'precioTotal' => 'required|numeric|min:0',

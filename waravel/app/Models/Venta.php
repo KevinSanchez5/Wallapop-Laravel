@@ -10,14 +10,16 @@ class Venta extends Model
 {
 
     use HasFactory;
-    protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal', 'estado'];
+    protected $fillable = ['guid','estado','comprador', 'lineaVentas', 'precioTotal'];
 
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($venta) {
-            $venta->guid = GuidGenerator::generarId();
+            if (empty($venta->guid)) {
+                $venta->guid = GuidGenerator::generarId();
+            }
         });
     }
 
