@@ -87,7 +87,7 @@ class VentaController extends Controller
             'estado' =>'required|string|max:255',
             'comprador' => 'required|array',
             'lineaVentas' => 'required|array',
-            'precioTotal' => 'required|numeric|min:0'
+            'precioTotal' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {

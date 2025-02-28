@@ -154,9 +154,11 @@
         function updateTotal(newTotal) {
             const totalPrice = document.getElementById('totalPrice');
             const finalTotal = document.getElementById('finalTotal');
+            const iva = document.getElementById('ivaAmount');
 
-            totalPrice.innerHTML = newTotal + " €";
+            totalPrice.innerHTML = (newTotal / 1.21).toFixed(2) + " €";
             finalTotal.innerHTML = newTotal + " €";
+            iva.innerHTML = (newTotal - (newTotal / 1.21)).toFixed(2) + " €";
         }
 
         function updateCartLogo(amountOfItems) {
@@ -262,8 +264,12 @@
                             <div class="space-y-4">
                                 <div class="space-y-2">
                                     <dl class="flex items-center justify-between gap-4">
-                                        <dt class="text-base font-normal text-gray-500 dark:text-gray-400">Precio</dt>
-                                        <dd id="totalPrice" class="text-base font-medium text-gray-500 dark:text-gray-400">{{ $cart->precioTotal }} €</dd>
+                                        <dt class="text-base font-normal text-gray-500 dark:text-gray-400">Precio sin IVA</dt>
+                                        <dd id="totalPrice" class="text-base font-medium text-gray-500 dark:text-gray-400">{{ number_format(($cart->precioTotal / 1.21), 2) }} €</dd>
+                                    </dl>
+                                    <dl class="flex items-center justify-between gap-4">
+                                        <dt class="text-base font-normal text-gray-500 dark:text-gray-400">IVA (21%)</dt>
+                                        <dd id="ivaAmount" class="text-base font-medium text-gray-500 dark:text-gray-400">{{ number_format($cart->precioTotal - ($cart->precioTotal / 1.21), 2) }} €</dd>
                                     </dl>
                                 </div>
 
