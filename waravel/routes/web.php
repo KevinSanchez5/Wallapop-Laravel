@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
@@ -47,6 +48,8 @@ Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
 
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
+    Route::get('/admin/backups', [BackupController::class, 'getAllBackups'])->name('admin.backups.list');
+    Route::post('/admin/backup/restore/{filename}', [BackupController::class, 'restoreBackup'])->name('admin.backup.restore');
 });
 
 

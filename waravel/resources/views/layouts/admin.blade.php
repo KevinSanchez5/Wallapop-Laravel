@@ -69,10 +69,10 @@
                     <i class="fas fa-database"></i> &nbsp; Copia de Seguridad
                 </a>
                 <div class="absolute right-0 hidden mt-2 space-y-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg w-48" id="backupMenu">
-                    <a href="" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <a href="{{ route('admin.backup') }}" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
                         <i class="fas fa-arrow-down"></i> &nbsp; Exportar
                     </a>
-                    <a href="" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <a href="" id="importBackupButton" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
                         <i class="fas fa-arrow-up"></i> &nbsp; Importar
                     </a>
                 </div>
@@ -86,6 +86,17 @@
                 <b>Cerrar Sesión</b>
             </button>
         </form>
+
+
+        <!-- Modal -->
+        <div id="backupModal" class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-lg w-1/3">
+                <h2 class="text-lg font-bold mb-4">Restaurar Backup</h2>
+                <ul id="backupList" class="space-y-2">
+                </ul>
+                <button id="closeModal" class="mt-4 px-4 py-2 bg-gray-500 text-white rounded">Cerrar</button>
+            </div>
+        </div>
     </div>
     <div class="w-64 h-full"></div>
 
@@ -139,6 +150,71 @@
                 menu.classList.add('hidden');
             }
         });
+
+        document.getElementById('importBackupButton').addEventListener('click', function (event) {
+            event.preventDefault(); // Evita cualquier comportamiento extraño
+            fetch('{{ route("admin.backups.list") }}')
+                .then(response => response.json())
+                .then(data => {
+                    let list = document.getElementById('backupList');
+                    list.innerHTML = ""; // Limpia la lista antes de agregar elementos nuevos
+
+                    if (!data || data.length === 0) {
+                        list.innerHTML = "<li class='p-2 text-gray-500'>No hay backups disponibles.</li>";
+                    } else {
+                        data.forEach(backup => {
+                            let li = document.createElement('li');
+                            li.classList.add("p-2", "bg-gray-200", "rounded", "cursor-pointer", "hover:bg-gray-300");
+                            li.textContent = backup;
+                            li.addEventListener('click', function () {
+                                restoreBackup(backup);
+                            });
+                            list.appendChild(li);
+                        });
+                    }
+
+                    document.getElementById('backupModal').classList.remove('hidden'); // Muestra la modal
+                });
+        });
+
+        document.getElementById('backupModal').addEventListener('click', function (event) {
+            let modalContent = document.querySelector('#backupModal > div');
+            if (!modalContent.contains(event.target)) {
+                document.getElementById('backupModal').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function () {
+            document.getElementById('backupModal').classList.add('hidden');
+        });
+
+        window.addEventListener('click', function (event) {
+            let modal = document.getElementById('backupModal');
+            if (!modal.classList.contains('hidden') && !modal.querySelector('.bg-white').contains(event.target)) {
+                modal.classList.add('hidden');
+            }
+        });
+
+        function restoreBackup(filename) {
+            if (confirm("¿Estás seguro de que deseas restaurar este backup? Se perderán los datos actuales.")) {
+                fetch(`{{ url('/admin/backup/restore') }}/${filename}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message || "Error al restaurar el backup");
+                        document.getElementById('backupModal').classList.add('hidden');
+                    })
+                    .catch(error => {
+                        console.error("Error al restaurar backup:", error);
+                        alert("Ocurrió un error al restaurar el backup.");
+                    });
+            }
+        }
     </script>
 
 </div>

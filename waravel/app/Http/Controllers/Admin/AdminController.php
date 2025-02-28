@@ -39,13 +39,121 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'admins', 'latestProducts', 'latestClients'));
     }
 
+    private $backupPath = 'backups/';
+
+    public function createBackup()
+    {
+        Log::info('Creando copia de seguridad');
+
+        $timestamp = date('Y-m-d_H-i-s');
+        $sqlFilename = "backup_{$timestamp}.sql";
+        $zipFilename = "backup_{$timestamp}.zip";
+
+        $sqlPath = storage_path("app/{$this->backupPath}{$sqlFilename}");
+        $zipPath = storage_path("app/{$this->backupPath}{$zipFilename}");
+        $storagePath = public_path('storage');
+
+        $command = sprintf(
+            'PGPASSWORD=%s pg_dump -U %s -h %s -p %s %s > %s',
+            env('DB_PASSWORD'),
+            env('DB_USERNAME'),
+            env('DB_HOST'),
+            env('DB_PORT'),
+            env('DB_DATABASE'),
+            $sqlPath
+        );
+
+        $output = null;
+        $resultCode = null;
+        exec($command, $output, $resultCode);
+
+        if ($resultCode !== 0) {
+            return response()->json(['error' => 'Error al crear el backup de la base de datos'], 500);
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
+            $zip->addFile($sqlPath, $sqlFilename);
+
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($storagePath),
+                \RecursiveIteratorIterator::LEAVES_ONLY
+            );
+
+            foreach ($files as $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $relativePath = 'storage/' . substr($filePath, strlen($storagePath) + 1);
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+
+            $zip->close();
+            unlink($sqlPath);
+        } else {
+            return response()->json(['error' => 'Error al crear el archivo ZIP'], 500);
+        }
+
+        return response()->json(['message' => 'Backup creado', 'filename' => $zipFilename]);
+    }
+
     /**
      * Realiza un respaldo de la base de datos y lo almacena en el servidor.
      */
-    public function backupDatabase() // TODO -> PENDIENTE DE QUE ESTÉ LA FUNCIÓN
+    public function backupDatabase()
     {
-        // Generar un archivo SQL con el respaldo de la base de datos
-        // Guardarlo en el almacenamiento de Laravel (storage/app/backups)
+        $response = $this->createBackup();
+
+        if ($response->status() !== 200) {
+            return redirect()->back()->with('error', 'Error al crear el backup.');
+        }
+
+        $data = $response->getData();
+        $filename = $data->filename;
+        $filePath = storage_path("app/{$this->backupPath}{$filename}");
+
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'El archivo de respaldo no se encontró.');
+        }
+
+        return response()->download($filePath);
+    }
+
+    public function listBackups()
+    {
+        $files = Storage::files($this->backupPath);
+        $backups = array_map(fn($file) => basename($file), $files);
+        return response()->json($backups);
+    }
+
+    public function restoreBackup($filename)
+    {
+        $backupFilePath = storage_path("app/{$this->backupPath}{$filename}");
+
+        if (!Storage::exists("{$this->backupPath}{$filename}")) {
+            return response()->json(['error' => 'El archivo de backup no existe'], 404);
+        }
+
+        // Comando para restaurar la base de datos
+        $command = sprintf(
+            'PGPASSWORD=%s psql -U %s -h %s -p %s -d %s -f %s',
+            env('DB_PASSWORD'),
+            env('DB_USERNAME'),
+            env('DB_HOST'),
+            env('DB_PORT'),
+            env('DB_DATABASE'),
+            $backupFilePath
+        );
+
+        $output = null;
+        $resultCode = null;
+        exec($command, $output, $resultCode);
+
+        if ($resultCode !== 0) {
+            return response()->json(['error' => 'Error al restaurar la base de datos'], 500);
+        }
+
+        return response()->json(['message' => 'Backup restaurado correctamente']);
     }
 
     /**
