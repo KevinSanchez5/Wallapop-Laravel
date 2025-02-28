@@ -19,20 +19,32 @@
                 </a>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-col justify-between h-[375px] transition">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-col h-[375px] transition">
                 <div>
-                    <h5 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                        <i class="fas fa-users text-[#BFF205]"></i> &nbsp; Últimos Clientes
+                    <h5 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                        <i class="fas fa-users text-[#BFF205] mr-2"></i> Últimos Clientes
                     </h5>
-                    <ul class="space-y-2 overflow-y-auto max-h-[300px] pr-2 pb-4">
-                        @foreach ($latestClients as $client)
-                            <li class="text-black dark:text-white">
-                                <a href="{{ route('cliente.ver', $client->guid) }}" class="hover:underline">
-                                    <b>{{ $client->name }} &nbsp; - </b>&nbsp;{{ $client->email }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+                    <div class="overflow-y-auto max-h-[290px] pr-2">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            @foreach ($latestClients as $index => $client)
+                                <li class="p-3 rounded-lg flex justify-between items-center
+                        {{ $index % 2 == 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gray-50 dark:bg-gray-800' }}">
+                                    <div>
+                                        <a href="{{ route('cliente.ver', $client->guid) }}" class="text-black dark:text-white hover:underline font-medium">
+                                            {{ $client->name }}
+                                        </a>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $client->email }}
+                                        </p>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300 flex items-center">
+                                        <i class="far fa-calendar-alt mr-1"></i>&nbsp;
+                                        {{ \Carbon\Carbon::parse($client->created_at)->format('d M Y') }}
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,24 +61,29 @@
                 </a>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-col justify-between h-[375px] transition">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-col h-[375px] transition">
                 <div>
-                    <h5 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                        <i class="fas fa-box text-[#BFF205]"></i> &nbsp; Últimos Productos
+                    <h5 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                        <i class="fas fa-box text-[#BFF205] mr-2"></i> Últimos Productos
                     </h5>
-                    <ul class="space-y-2 overflow-y-auto max-h-[300px] pr-2 pb-4">
-                        @foreach ($latestProducts as $product)
-                            <li class="text-black dark:text-white">
-                                <a href="{{ route('producto.show', $product->guid) }}" class="hover:underline font-bold">
-                                    {{ $product->nombre }}
-                                </a>
-                                - ${{ number_format($product->precio, 2) }} - Vendedor:
-                                <a href="{{ route('cliente.ver', $product->vendedor->guid) }}" class="hover:underline">
-                                    {{ $product->vendedor->nombre }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+                    <div class="overflow-y-auto max-h-[290px] pr-2">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            @foreach ($latestProducts as $index => $product)
+                                <li class="p-3 rounded-lg flex justify-between items-center
+                        {{ $index % 2 == 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gray-50 dark:bg-gray-800' }}">
+                                    <div>
+                                        <a href="{{ route('producto.show', $product->guid) }}" class="text-black dark:text-white hover:underline font-bold">
+                                            {{ $product->nombre }}
+                                        </a>
+                                        <span class="text-gray-600 dark:text-gray-400"> - ${{ number_format($product->precio, 2) }} - </span>
+                                        <a href="{{ route('cliente.ver', $product->vendedor->guid) }}" class="hover:underline text-blue-600 dark:text-blue-400 font-medium">
+                                            {{ $product->vendedor->nombre }}
+                                        </a>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,7 +155,7 @@
         <div class="w-full md:w-1/2 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 h-[375px] overflow-y-auto">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-200">
                 <i class="fas fa-money-bill text-[#BFF205]"></i> &nbsp;
-                Sección Ventas</h5>
+                Ultimas Ventas</h5>
             <p class="text-gray-700 dark:text-gray-300">
 
             </p>

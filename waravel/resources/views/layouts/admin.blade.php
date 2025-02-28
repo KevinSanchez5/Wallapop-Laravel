@@ -55,18 +55,28 @@
             <a href="{{ route('admin.products') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-box"></i> &nbsp; Gestionar Productos
             </a>
-            <a href="#" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+            <a href="{{ route('admin.reviews') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-star"></i> &nbsp;Ver Valoraciones
             </a>
             <a href="" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-shopping-cart"></i> &nbsp; Gestionar Ventas
             </a>
-            <a href="{{ route('admins.add') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+            <a href="{{ route('admins.add.form') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-user-plus"></i> &nbsp; Añadir Admin
             </a>
-            <a href="{{ route('admin.backup') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
-                <i class="fas fa-database"></i> &nbsp; Copia de Seguridad
-            </a>
+            <div class="relative">
+                <a href="#" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white" id="backupMenuButton">
+                    <i class="fas fa-database"></i> &nbsp; Copia de Seguridad
+                </a>
+                <div class="absolute right-0 hidden mt-2 space-y-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg w-48" id="backupMenu">
+                    <a href="" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-arrow-down"></i> &nbsp; Exportar
+                    </a>
+                    <a href="" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-arrow-up"></i> &nbsp; Importar
+                    </a>
+                </div>
+            </div>
         </nav>
 
         <!-- Botón Cerrar Sesión -->
@@ -86,36 +96,49 @@
 
     <!-- Scripts -->
     <script>document
-            .addEventListener('DOMContentLoaded', function () {
-                const html = document.documentElement;
-                const botonModoOscuro = document.getElementById('modoOscuroBtn');
-                const iconoLuz = document.getElementById('modoOscuroIconLuz');
-                const iconoNoche = document.getElementById('modoOscuroIconNoche');
+        .addEventListener('DOMContentLoaded', function () {
+            const html = document.documentElement;
+            const botonModoOscuro = document.getElementById('modoOscuroBtn');
+            const iconoLuz = document.getElementById('modoOscuroIconLuz');
+            const iconoNoche = document.getElementById('modoOscuroIconNoche');
 
-                if (localStorage.getItem('modoOscuro') === 'true') {
-                    html.classList.add('dark');
-                    iconoLuz.classList.remove('hidden');
-                    iconoNoche.classList.add('hidden');
-                } else {
+            if (localStorage.getItem('modoOscuro') === 'true') {
+                html.classList.add('dark');
+                iconoLuz.classList.remove('hidden');
+                iconoNoche.classList.add('hidden');
+            } else {
+                html.classList.remove('dark');
+                iconoLuz.classList.add('hidden');
+                iconoNoche.classList.remove('hidden');
+            }
+
+            botonModoOscuro.addEventListener('click', function () {
+                if (html.classList.contains('dark')) {
                     html.classList.remove('dark');
+                    localStorage.setItem('modoOscuro', 'false');
                     iconoLuz.classList.add('hidden');
                     iconoNoche.classList.remove('hidden');
+                } else {
+                    html.classList.add('dark');
+                    localStorage.setItem('modoOscuro', 'true');
+                    iconoLuz.classList.remove('hidden');
+                    iconoNoche.classList.add('hidden');
                 }
-
-                botonModoOscuro.addEventListener('click', function () {
-                    if (html.classList.contains('dark')) {
-                        html.classList.remove('dark');
-                        localStorage.setItem('modoOscuro', 'false');
-                        iconoLuz.classList.add('hidden');
-                        iconoNoche.classList.remove('hidden');
-                    } else {
-                        html.classList.add('dark');
-                        localStorage.setItem('modoOscuro', 'true');
-                        iconoLuz.classList.remove('hidden');
-                        iconoNoche.classList.add('hidden');
-                    }
-                });
             });
+        });
+
+        document.getElementById('backupMenuButton').addEventListener('click', function (e) {
+            e.preventDefault();
+            const menu = document.getElementById('backupMenu');
+            menu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function (e) {
+            const menu = document.getElementById('backupMenu');
+            if (!menu.contains(e.target) && e.target !== document.getElementById('backupMenuButton')) {
+                menu.classList.add('hidden');
+            }
+        });
     </script>
 
 </div>
