@@ -10,27 +10,33 @@ use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
 
     public function dashboard()
     {
-        $totalUsers = User::count();
+        $totalUsers = User::where('role', 'cliente')->count();
         $totalProducts = Producto::count();
-
+        $admins = User::where('role', 'admin')
+            ->where('id', '!=', auth()->id()) // Excluye al admin actual
+            ->get();
         $valoraciones = Valoracion::all();
         $puntuaciones = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+
         foreach ($valoraciones as $valoracion) {
             $puntuaciones[$valoracion->puntuacion]++;
         }
 
-        $latestProducts = Producto::orderBy('updated_at', 'desc')->limit(5)->get();
+        $latestProducts = Producto::orderBy('updated_at', 'desc')->limit(10)->get();
 
-        $latestClients = User::orderBy('updated_at', 'desc')->limit(5)->get();
+        $latestClients = User::where('role', 'cliente')
+            ->orderBy('updated_at', 'desc')
+            ->limit(8)
+            ->get();
 
-        return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'latestProducts', 'latestClients'));
+        return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'admins', 'latestProducts', 'latestClients'));
     }
 
     /**
@@ -49,11 +55,56 @@ class AdminController extends Controller
     {
         Log::info('Obteniendo clientes cuyo usuario tiene el rol de cliente');
 
-        $clientes = Cliente::whereHas('usuario', function ($query) {
-            $query->where('role', 'cliente'); // Filtra solo usuarios con rol "cliente"
-        })->with('usuario')->get();
+        // Crea la consulta sin obtener los resultados todavía y agrega el conteo de productos
+        $query = Cliente::orderBy('updated_at', 'desc')->withCount('productos');
 
-        return view('admin.clients', compact('clientes'));
+        // Obtén los usuarios con el rol de 'cliente'
+        $users = User::where('role', 'cliente')->get();
+
+        // Si hay búsqueda, aplica el filtro
+        if (request()->has('search') && request('search') !== '') {
+            $search = request('search');
+            Log::info('Búsqueda: ' . $search);
+
+            $query->whereHas('usuario', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Aplica paginación a la consulta antes de obtener los resultados
+        $clientes = $query->paginate(10);
+
+        return view('admin.clients', compact('clientes', 'users'));
+    }
+
+    public function listReviews()
+    {
+        Log::info('Obteniendo valoraciones');
+
+        $query = Valoracion::with(['clienteValorado', 'creador'])->orderBy('created_at', 'desc');
+
+        if (request()->has('search') && request('search') !== '') {
+            $search = request('search');
+            Log::info('Búsqueda: ' . $search);
+
+            $query->whereHas('clienteValorado', function ($q) use ($search) {
+                $q->whereRaw('LOWER(nombre) LIKE ?', ['%' . mb_strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(apellido) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+            })
+                ->orWhereRaw('LOWER(comentario) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+        }
+
+        $valoraciones = $query->paginate(9);
+
+        return view('admin.reviews', compact('valoraciones'));
+    }
+
+    public function deleteReview($id)
+    {
+        $valoracion = Valoracion::findOrFail($id);
+        $valoracion->delete();
+        return redirect()->route('admin.reviews')->with('success', 'Valoración eliminada correctamente.');
     }
 
     /**
@@ -61,64 +112,54 @@ class AdminController extends Controller
      */
     public function listAdmins()
     {
-        // Obtener todos los usuarios con rol de administrador
-        Log::info("Obteniendo todos los usuarios administradores");
-        $admins = User::where('role', "admin")->all();
+        /*Log::info("Obteniendo todos los usuarios administradores");
 
-        // Retornar una vista con la lista de administradores
-        Log::info("Redireccionando a la lista de .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return view('admin.clients', compact('admins')); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        Log::info("Redireccionando a la lista de administradores");
+        return view('admin.dashboard', compact('admins'));*/
     }
 
     /**
      * Añadir un nuevo administrador al sistema.
      */
-    public function addAdmin(Request $request)
+    public function addAdmin()
     {
-        // Validar los datos ingresados TODO -> No debería haber selección de rol en la vista, al crear el admin debe pasar nombre, email y pass
-        Log::info("Validando datos para crear el usuario administrador");
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
-        ]);
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
-        ]);
-        if ($validator->fails()) {
-            Log::warning("Error de validación al crear administrador", ['errors' => $validator->errors()]);
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // Crear un nuevo usuario con rol de administrador
-        Log::info("Creando usuario administrador");
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => 'admin',
-        ]);
-
-        // Redireccionar a la lista de administradores
-        Log::info("Redireccionando a la lista de administradores");
-        return redirect()->route('admin.admin')->with('success', 'Administrador añadido correctamente.');
     }
+    public function showAddForm()
+    {
+        return view('admin.add-admins');
+    }
+
 
     /**
      * Ver la lista de todos los productos en la plataforma vendidos, desactivados baneados....
      */
     public function listProducts()
     {
-        // Obtener todos los productos de la base de datos
         Log::info("Obteniendo todos los productos");
-        $productos = Producto::all();
 
-        // Retornar una vista con la lista de productos
-        Log::info("Redireccionando a la lista de .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return view('admin.clients', compact('productos')); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        $query = Producto::query();
+
+        // Filtro de búsqueda
+        if (request()->has('search') && request('search') !== '') {
+            $search = request('search');
+
+            $normalizedSearch = Str::lower(Str::replace(
+                ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'],
+                ['a', 'e', 'i', 'o', 'u', 'a', 'e', 'i', 'o', 'u'],
+                $search
+            ));
+
+            Log::info('Realizando búsqueda con término normalizado', ['search' => $normalizedSearch]);
+
+            $query->whereRaw("LOWER(REPLACE(nombre, 'á', 'a')) LIKE ?", ["%{$normalizedSearch}%"]);
+        }
+
+        // Ordenar por fecha de última modificación (updated_at)
+        $productos = $query->orderBy('updated_at', 'desc')->paginate(10);
+
+        Log::info("Redireccionando a la lista de productos");
+
+        return view('admin.products', compact('productos'));
     }
 
     /**
@@ -126,23 +167,23 @@ class AdminController extends Controller
      */
     public function banProduct($guid)
     {
-        // Buscar el producto por ID
+        // Buscar el producto por GUID
         Log::info("Obteniendo producto por GUID");
         $producto = Producto::where('guid', $guid)->first();
 
         if (!$producto) {
             Log::warning('Producto no encontrado', ['guid' => $guid]);
-            return redirect()->route('profile')->with('error', 'Producto no encontrado'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+            return redirect()->route('admin.products')->with('error', 'Producto no encontrado');
         }
 
-        // Cambiar su estado a "baneado"
-        Log::info("Baneando producto");
-        $producto->estado = "Baneado";
+        // Cambiar el estado entre "Baneado" y "Disponible"
+        Log::info("Cambiando el estado del producto");
+        $producto->estado = ($producto->estado === 'Baneado') ? 'Disponible' : 'Baneado';
         $producto->save();
 
-        // Retornar a la vista ...
-        Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('admin.products')->with('success', 'Producto baneado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        // Retornar a la vista de productos con un mensaje de éxito
+        Log::info("Redireccionando a la vista de productos");
+        return redirect()->route('admin.products')->with('success', 'Estado del producto actualizado correctamente.');
     }
 
     /**
