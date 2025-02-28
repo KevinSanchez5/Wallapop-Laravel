@@ -23,11 +23,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28001
             ],
             'activo' => true,
-            'usuario_id' => 2,
+            'usuario_id' => 3,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
-
+        ]);//id user 3
         Cliente::create([
             'guid'=> 'DU6jCZtareb',
             'nombre' => 'Maria',
@@ -42,11 +41,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28971
             ],
             'activo' => true,
-            'usuario_id' => 3,
+            'usuario_id' => 4,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 3
-
+        ]);//id user 4
         Cliente::create([
             'guid'=> 'yEC3KBt6CFY',
             'nombre' => 'Pedro',
@@ -61,12 +59,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28970
             ],
             'activo' => false,
-            'usuario_id' => 4,
+            'usuario_id' => 5,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 4
-
-
+        ]);//id user 5
         Cliente::create([
             'guid'=> 'X9vB7LpQ2ZM',
             'nombre' => 'Laura',
@@ -81,11 +77,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28003
             ],
             'activo' => true,
-            'usuario_id' => 5,
+            'usuario_id' => 6,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 5
-
+        ]);//id user 6
         Cliente::create([
             'guid'=> 'G5Yt9XqK8VL',
             'nombre' => 'Diego',
@@ -100,11 +95,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28004
             ],
             'activo' => true,
-            'usuario_id' => 6,
+            'usuario_id' => 7,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 6
-
+        ]);//id user 7
         Cliente::create([
             'guid'=> 'J2pM6ZcQ4BR',
             'nombre' => 'Sofía',
@@ -119,11 +113,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28005
             ],
             'activo' => true,
-            'usuario_id' => 7,
+            'usuario_id' => 8,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 7
-
+        ]);//id user 8
         Cliente::create([
             'guid'=> 'W7Xn3TfY9KD',
             'nombre' => 'Javier',
@@ -138,11 +131,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28006
             ],
             'activo' => true,
-            'usuario_id' => 8,
+            'usuario_id' => 9,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 8
-
+        ]);//id user 9
         Cliente::create([
             'guid'=> 'P8Lq5VZK2YM',
             'nombre' => 'Laura',
@@ -157,11 +149,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28007
             ],
             'activo' => true,
-            'usuario_id' => 9,
+            'usuario_id' => 10,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 9
-
+        ]);//id user 10
         Cliente::create([
             'guid'=> 'M4B9XQK7YtN',
             'nombre' => 'Ana',
@@ -176,11 +167,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28002
             ],
             'activo' => true,
-            'usuario_id' => 5,
+            'usuario_id' => 11,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 10
-
+        ]);//id user 11
         Cliente::create([
             'guid'=> 'Z6TQ8LpX5YV',
             'nombre' => 'Carlos',
@@ -195,11 +185,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28972
             ],
             'activo' => true,
-            'usuario_id' => 6,
+            'usuario_id' => 12,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 11
-
+        ]);//id user 12
         Cliente::create([
             'guid'=> 'X9KpL3YV7QT',
             'nombre' => 'Isabella',
@@ -214,11 +203,10 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28973
             ],
             'activo' => true,
-            'usuario_id' => 7,
+            'usuario_id' => 13,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 12
-
+        ]);//id user 13
         Cliente::create([
             'guid'=> 'B6YtQ8XZ5LM',
             'nombre' => 'Jose',
@@ -233,10 +221,9 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28974
             ],
             'activo' => true,
-            'usuario_id' => 8,
+            'usuario_id' => 14,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 13
-
+        ]);//id user 14
     }
 }
