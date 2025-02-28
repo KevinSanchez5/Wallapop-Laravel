@@ -28,6 +28,7 @@ class VentaSeeder extends Seeder
                     ],
                     'cantidad' => 2,
                     'producto' => [
+                        'guid'=> 3,
                         'id' => 1,
                         'nombre' => 'Portatil Gamer',
                         'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',

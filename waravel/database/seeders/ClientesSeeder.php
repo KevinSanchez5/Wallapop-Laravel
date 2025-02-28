@@ -10,6 +10,7 @@ class ClientesSeeder extends Seeder
     public function run(): void
     {
         Cliente::create([
+            'guid'=> '2G6HueqixE5',
             'nombre' => 'Juan',
             'apellido' => 'Perez',
             'avatar' => 'clientes/avatar.png',
@@ -28,6 +29,7 @@ class ClientesSeeder extends Seeder
         ]);
 
         Cliente::create([
+            'guid'=> 'DU6jCZtareb',
             'nombre' => 'Maria',
             'apellido' => 'Garcia',
             'avatar' => 'clientes/avatar.png',
@@ -46,6 +48,7 @@ class ClientesSeeder extends Seeder
         ]);//id user 3
 
         Cliente::create([
+            'guid'=> 'yEC3KBt6CFY',
             'nombre' => 'Pedro',
             'apellido' => 'Martinez',
             'avatar' => 'clientes/avatar.png',
@@ -63,8 +66,9 @@ class ClientesSeeder extends Seeder
             'updated_at' => now(),
         ]);//id user 4
 
-        // Más clientes
+
         Cliente::create([
+            'guid'=> 'X9vB7LpQ2ZM',
             'nombre' => 'Laura',
             'apellido' => 'Gómez',
             'avatar' => 'clientes/avatar.png',
@@ -83,6 +87,7 @@ class ClientesSeeder extends Seeder
         ]);//id user 5
 
         Cliente::create([
+            'guid'=> 'G5Yt9XqK8VL',
             'nombre' => 'Diego',
             'apellido' => 'Ruiz',
             'avatar' => 'clientes/avatar.png',
@@ -101,6 +106,7 @@ class ClientesSeeder extends Seeder
         ]);//id user 6
 
         Cliente::create([
+            'guid'=> 'J2pM6ZcQ4BR',
             'nombre' => 'Sofía',
             'apellido' => 'López',
             'avatar' => 'clientes/avatar.png',
@@ -119,6 +125,7 @@ class ClientesSeeder extends Seeder
         ]);//id user 7
 
         Cliente::create([
+            'guid'=> 'W7Xn3TfY9KD',
             'nombre' => 'Javier',
             'apellido' => 'Torres',
             'avatar' => 'clientes/avatar.png',
@@ -137,7 +144,8 @@ class ClientesSeeder extends Seeder
         ]);//id user 8
 
         Cliente::create([
-            'nombre' => 'Elena',
+            'guid'=> 'P8Lq5VZK2YM',
+            'nombre' => 'Laura',
             'apellido' => 'Castro',
             'avatar' => 'clientes/avatar.png',
             'telefono' => '655667788',
@@ -149,12 +157,13 @@ class ClientesSeeder extends Seeder
                 'codigoPostal' => 28007
             ],
             'activo' => true,
-            'usuario_id' => 9, // ID del nuevo usuario Elena Castro
+            'usuario_id' => 9,
             'created_at' => now(),
             'updated_at' => now(),
         ]);//id user 9
 
         Cliente::create([
+            'guid'=> 'M4B9XQK7YtN',
             'nombre' => 'Ana',
             'apellido' => 'Lopez',
             'avatar' => 'clientes/avatar.png',
@@ -173,6 +182,7 @@ class ClientesSeeder extends Seeder
         ]);//id user 10
 
         Cliente::create([
+            'guid'=> 'Z6TQ8LpX5YV',
             'nombre' => 'Carlos',
             'apellido' => 'Fernandez',
             'avatar' => 'clientes/avatar.png',
@@ -191,6 +201,7 @@ class ClientesSeeder extends Seeder
         ]);//id user 11
 
         Cliente::create([
+            'guid'=> 'X9KpL3YV7QT',
             'nombre' => 'Isabella',
             'apellido' => 'Rodriguez',
             'avatar' => 'clientes/avatar.png',
@@ -209,6 +220,7 @@ class ClientesSeeder extends Seeder
         ]);//id user 12
 
         Cliente::create([
+            'guid'=> 'B6YtQ8XZ5LM',
             'nombre' => 'Jose',
             'apellido' => 'Luis',
             'avatar' => 'clientes/avatar.png',

@@ -17,7 +17,9 @@ class Venta extends Model
         parent::boot();
 
         static::creating(function ($venta) {
-            $venta->guid = GuidGenerator::generarId();
+            if (empty($venta->guid)) {
+                $venta->guid = GuidGenerator::generarId();
+            }
         });
     }
 
