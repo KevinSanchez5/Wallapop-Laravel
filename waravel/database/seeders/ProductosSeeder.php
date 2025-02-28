@@ -235,6 +235,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
 
         ]);
+        /*
         Producto::create([
             'guid' => 'YQ7LXK9V53T',
             'vendedor_id' => 9,
@@ -308,6 +309,6 @@ class ProductosSeeder extends Seeder
             'imagenes' => ['productos/mesa1.webp', 'productos/mesa2.webp'],
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ]);*/
     }
 }

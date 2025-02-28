@@ -222,20 +222,7 @@ class UsersSeeder extends Seeder
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
         ]);
-        User::create([
-            'guid' =>'PUY346GPD1M',
 
-            'name' => 'Mario de Domingo',
-            'email' => 'wolverine.mda.307@gmail.com',
-            'password' => '30072004',
-            'role' => 'admin',
-            'email_verified_at' => now(),
-            'remember_token' => '',
-            'created_at' => now(),
-            'updated_at' => now(),
-            'password_reset_token' => null,
-            'password_reset_expires_at' => null,
-        ]);
 
     }
 }
