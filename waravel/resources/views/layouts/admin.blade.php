@@ -23,7 +23,7 @@
 <div class="flex min-h-screen">
 
     <!-- Modo oscuro -->
-    <button id="modoOscuroBtn" class=" fixed top-4 right-4 p-2 rounded-lg bg-white hover:text-white hover:bg-black  dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white transform" aria-label="Cambiar modo de tema">
+    <button id="modoOscuroBtn" class="z-40 fixed top-4 right-4 p-2 rounded-lg bg-white border border-gray-700 hover:text-white hover:bg-black dark:bg-black dark:text-white dark:border-gray-500 dark:hover:text-black dark:hover:bg-white transform" aria-label="Cambiar modo de tema">
         <svg id="modoOscuroIconLuz" class="hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>

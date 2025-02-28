@@ -1,4 +1,4 @@
-﻿@php use App\Models\Carrito; @endphp
+@php use App\Models\Carrito; @endphp
 @extends('layouts.app')
 
 @section('title', 'Detalles del Producto')
@@ -135,33 +135,50 @@
             @endif
 
             <!-- Botones -->
-            <div class="mt-6 flex flex-col sm:flex-row items-center sm:justify-center md:justify-start gap-4">
-                <!-- Botón Agregar a Cesta con el color personalizado -->
-                <a id="addLink" href="#" onclick="addToCart('{{ $producto->guid }}'); return false" class="bg-[#BFF205] text-gray-800 font-semibold py-2 px-6 rounded-md
-   hover:bg-[#A8D403] transition duration-300 transform hover:scale-105">
-                    Agregar a Cesta
-                </a>
-                <!-- Spinner -->
-                <div id="spinner" class="hidden inset-0 flex items-center justify-center"
-                     style="width:8.85rem; margin-left: 0.75rem; margin-right: 0.75rem">
-                    <svg class="h-4 w-4 animate-spin text-gray-500" viewBox="0 0 24 24" fill="none"
+            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+                <!-- Botón Agregar a Cesta (Solo para invitados o clientes) -->
+                @if(auth()->guest() || auth()->user()->role === 'cliente')
+                    <a id="addLink" href="#" onclick="addToCart('{{ $producto->guid }}'); return false"
+                       class="bg-[#BFF205] text-gray-800 font-semibold py-3 px-6 rounded-md hover:bg-[#A8D403]
+                  transition duration-300 transform hover:scale-105 w-full sm:w-auto text-center flex items-center justify-center gap-2">
+                        <i class="fa fa-shopping-cart"></i> Agregar a Cesta
+                    </a>
+                @endif
+
+                <!-- Spinner de carga -->
+                <div id="spinner" class="hidden flex items-center justify-center w-full sm:w-auto">
+                    <svg class="h-5 w-5 animate-spin text-gray-500" viewBox="0 0 24 24" fill="none"
                          xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="10" stroke="#111827" stroke-width="4"></circle>
                         <path d="M2 12a10 10 0 0110-10" stroke="#BFF205" stroke-width="4"></path>
                     </svg>
                 </div>
 
-                <!-- Botón Añadir a Favoritos con icono de corazón -->
-                <a href="#" class="bg-white text-gray-800 font-semibold py-2 px-6 rounded-md
-   hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800 transition duration-300 transform hover:scale-105 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         class="w-5 h-5">
-                        <path
-                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Añadir a Favoritos
-                </a>
+                <!-- Botón Añadir a Favoritos (Solo para clientes) -->
+                @if(auth()->check() && auth()->user()->role === 'cliente')
+                    <a href="#" class="bg-white text-gray-800 font-semibold py-3 px-6 rounded-md
+                          hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800
+                          border-2 border-black dark:border-gray-600 transition duration-300
+                          transform hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto text-center">
+                        <i class="fa fa-heart"></i> Añadir a Favoritos
+                    </a>
+                @endif
+
+                <!-- Botón Banear/Rehabilitar (Solo para administradores) -->
+                @if(auth()->check() && auth()->user()->role === 'admin')
+                    <form action="{{ route('admin.banProduct', $producto->guid) }}" method="POST" class="w-full sm:w-auto">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="p-3 text-black rounded-md bg-[#BFF205] hover:bg-[#96bf03]
+                                       font-semibold w-full sm:w-auto text-center flex items-center justify-center gap-2">
+                            @if($producto->estado === 'Baneado')
+                                REHABILITAR
+                            @else
+                                <i class="fa fa-ban"></i> BANNEAR <i class="fa fa-ban"></i>
+                            @endif
+                        </button>
+                    </form>
+                @endif
             </div>
 
         </div>
