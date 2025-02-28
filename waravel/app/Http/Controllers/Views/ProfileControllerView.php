@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\Valoracion;
+use App\Models\Venta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,9 @@ use function Laravel\Prompts\error;
 
 class ProfileControllerView extends Controller
 {
+
+    // Perfil por defecto con productos
+
     public function show()
     {
         Log::info('Accediendo a la página de perfil');
@@ -33,14 +37,96 @@ class ProfileControllerView extends Controller
         if (!$cliente) {
             return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
-        Log::info('Perfil del cliente encontrado, obteniendo productos y valoraciones asociados');
-        $productos = Producto::where('vendedor_id', $cliente->id)->get();
+        Log::info('Perfil del cliente encontrado, obteniendo productos');
+        $query = Producto::where('vendedor_id', $cliente->id);
 
-        $valoraciones = Valoracion::where('clienteValorado_id', $cliente->id)->get();
+        $productos = $query->orderBy('created_at', 'desc')->paginate(6);
 
-        Log::info('Productos y valoraciones obtenidos correctamente, mostrando la vista del perfil');
+        Log::info('Productos obtenidos correctamente, mostrando la vista del perfil');
 
-        return view('profile.profile', compact('cliente', 'productos', 'valoraciones'));
+        return view('profile.partials.mis-productos', compact('cliente', 'productos'));
+    }
+
+    // Valoraciones
+
+    public function showReviews(){
+        Log::info('Accediendo a la página de valoraciones');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus valoraciones.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo valoraciones');
+        $query = Valoracion::where('clienteValorado_id', $cliente->id);
+
+        $valoraciones = $query->orderBy('created_at', 'desc')->paginate(6);
+
+        Log::info('Valoraciones obtenidas correctamente, mostrando la vista de valoraciones');
+        return view('profile.partials.valoraciones', compact('cliente', 'valoraciones'));
+    }
+
+    // Mis Pedidos
+
+    public function showOrders(){
+        Log::info('Accediendo a la página de pedidos');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus pedidos.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo pedidos');
+        $query = Venta::where('comprador->id',  $cliente->id);
+
+        $pedidos = $query->orderBy('created_at', 'desc')->paginate(6);
+
+        Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
+        return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
+    }
+
+    public function filterByEstado(){
+        Log::info('Accediendo a la página de pedidos');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus pedidos.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo pedidos');
+        $query = Venta::where('comprador->id',  $cliente->id);
+
+        $pedidos = $query->orderBy('created_at', 'desc')->paginate(6);
+
+        Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
+        return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
     }
 
     public function edit(Request $request)
