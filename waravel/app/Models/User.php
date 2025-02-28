@@ -44,7 +44,9 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($user) {
-            $user->guid = GuidGenerator::generarId();
+            if (empty($user->guid)) {
+                $user->guid = GuidGenerator::generarId();
+            }
         });
     }
 
