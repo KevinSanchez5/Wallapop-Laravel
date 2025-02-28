@@ -37,7 +37,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/97b37979-552a-4916-989a-b96031348856",
+							"raw": "http://127.0.0.1/api/clientes/iaDXvz15LNy",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -48,7 +48,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"97b37979-552a-4916-989a-b96031348856"
+								"iaDXvz15LNy"
 							]
 						}
 					},
@@ -61,7 +61,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"guid\": \"123e4567-e89b-12d3-a456-426614174000\",\r\n    \"nombre\": \"Pepe\",\r\n    \"apellido\": \"Sanchez\",\r\n    \"avatar\": \"\",\r\n    \"telefono\": \"653456789\",\r\n    \"direccion\": {\r\n        \"calle\": \"Calle Falsa\",\r\n        \"numero\": 123,\r\n        \"ciudad\": \"Madrid\"\r\n    },\r\n    \"activo\": true,\r\n    \"usuario_id\": 1\r\n}",
+							"raw": "{\r\n   \r\n    \"nombre\": \"Pepe\",\r\n    \"apellido\": \"Sanchez\",\r\n    \"avatar\": \"\",\r\n    \"telefono\": \"653456789\",\r\n    \"direccion\": {\r\n        \"calle\": \"Calle Falsa\",\r\n        \"numero\": 123,\r\n        \"ciudad\": \"Madrid\"\r\n    },\r\n    \"activo\": true,\r\n    \"usuario_id\": 1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -100,7 +100,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/de6a7d01-af1d-44fb-a615-2583f52da3c4",
+							"raw": "http://127.0.0.1/api/clientes/5q0feoGtw3H",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -111,7 +111,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"de6a7d01-af1d-44fb-a615-2583f52da3c4"
+								"5q0feoGtw3H"
 							]
 						}
 					},
@@ -123,7 +123,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/de6a7d01-af1d-44fb-a615-2583f52da3c4",
+							"raw": "http://127.0.0.1/api/clientes/5q0feoGtw3H",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -134,7 +134,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"de6a7d01-af1d-44fb-a615-2583f52da3c4"
+								"5q0feoGtw3H"
 							]
 						}
 					},
@@ -149,7 +149,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/97b37979-552a-4916-989a-b96031348856/favoritos",
+							"raw": "http://127.0.0.1/api/clientes/iaDXvz15LNy",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -160,8 +160,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"97b37979-552a-4916-989a-b96031348856",
-								"favoritos"
+								"iaDXvz15LNy"
 							]
 						}
 					},
@@ -200,7 +199,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/users/2491f841-0993-4096-82b9-6884a887f683",
+							"raw": "http://127.0.0.1/api/users/sLYLxmYBvdq",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -211,7 +210,7 @@
 							"path": [
 								"api",
 								"users",
-								"2491f841-0993-4096-82b9-6884a887f683"
+								"sLYLxmYBvdq"
 							]
 						}
 					},
@@ -224,7 +223,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"guid\": \"550e8400-e29b-41d4-a716-446655440000\",\r\n    \"name\": \"María López\",\r\n    \"email\": \"maria.lopez@example.com\",\r\n    \"password\": \"Secure@123\",\r\n    \"role\": \"cliente\",\r\n    \"telefono\": \"612345678\",\r\n    \"direccion\": {\r\n        \"calle\": \"Av. Siempre Viva\",\r\n        \"numero\": \"742\",\r\n        \"ciudad\": \"Springfield\",\r\n        \"codigo_postal\": \"12345\",\r\n        \"pais\": \"USA\"\r\n    },\r\n    \"activo\": true\r\n}",
+							"raw": "{\r\n    \"name\": \"María López\",\r\n    \"email\": \"maria.lopez@example.com\",\r\n    \"password\": \"Secure@123\",\r\n    \"role\": \"cliente\",\r\n    \"telefono\": \"612345678\",\r\n    \"direccion\": {\r\n        \"calle\": \"Av. Siempre Viva\",\r\n        \"numero\": \"742\",\r\n        \"ciudad\": \"Springfield\",\r\n        \"codigo_postal\": \"12345\",\r\n        \"pais\": \"USA\"\r\n    },\r\n    \"activo\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -263,7 +262,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1/api/users/789a7609-624a-49b2-bcf9-a9ea1d034f5e",
+							"raw": "http://127.0.0.1/api/users/JPASFdOlnLS",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -274,7 +273,7 @@
 							"path": [
 								"api",
 								"users",
-								"789a7609-624a-49b2-bcf9-a9ea1d034f5e"
+								"JPASFdOlnLS"
 							]
 						}
 					},
@@ -286,7 +285,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/users/789a7609-624a-49b2-bcf9-a9ea1d034f5e",
+							"raw": "http://127.0.0.1/api/users/JPASFdOlnLS",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -297,7 +296,7 @@
 							"path": [
 								"api",
 								"users",
-								"789a7609-624a-49b2-bcf9-a9ea1d034f5e"
+								"JPASFdOlnLS"
 							]
 						}
 					},
@@ -336,7 +335,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/productos/b4cb952d-1568-4763-901a-dfb9e05a4992",
+							"raw": "http://127.0.0.1/api/productos/OKr6Xs46nea",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -347,7 +346,7 @@
 							"path": [
 								"api",
 								"productos",
-								"b4cb952d-1568-4763-901a-dfb9e05a4992"
+								"OKr6Xs46nea"
 							]
 						}
 					},
@@ -360,7 +359,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"guid\": \"550e8400-e29b-41d4-a716-446655440000\",\r\n    \"vendedor_id\": \"2\",\r\n    \"nombre\": \"Producto Ejemplo\",\r\n    \"descripcion\": \"Descripción detallada del producto.\",\r\n    \"estadoFisico\": \"Nuevo\",\r\n    \"precio\": 199.99,\r\n    \"stock\": 50,\r\n    \"categoria\": \"Cocina\",\r\n    \"estado\": \"Disponible\",\r\n    \"imagenes\": [\r\n        \"http://miapi.com/imagenes/producto1.jpg\",\r\n        \"http://miapi.com/imagenes/producto2.jpg\"\r\n    ]\r\n}\r\n",
+							"raw": "{\r\n    \"vendedor_id\": \"2\",\r\n    \"nombre\": \"Producto Ejemplo\",\r\n    \"descripcion\": \"Descripción detallada del producto.\",\r\n    \"estadoFisico\": \"Nuevo\",\r\n    \"precio\": 199.99,\r\n    \"stock\": 50,\r\n    \"categoria\": \"Cocina\",\r\n    \"estado\": \"Disponible\",\r\n    \"imagenes\": [\r\n        \"http://miapi.com/imagenes/producto1.jpg\",\r\n        \"http://miapi.com/imagenes/producto2.jpg\"\r\n    ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -399,7 +398,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1/api/productos/8b09d444-554b-4b95-9962-d6d64d46719c",
+							"raw": "http://127.0.0.1/api/productos/Ve8wAnPo71B",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -410,7 +409,7 @@
 							"path": [
 								"api",
 								"productos",
-								"8b09d444-554b-4b95-9962-d6d64d46719c"
+								"Ve8wAnPo71B"
 							]
 						}
 					},
@@ -422,7 +421,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/productos/b4cb952d-1568-4763-901a-dfb9e05a4992",
+							"raw": "http://127.0.0.1/api/productos/Ve8wAnPo71B",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -433,7 +432,7 @@
 							"path": [
 								"api",
 								"productos",
-								"b4cb952d-1568-4763-901a-dfb9e05a4992"
+								"Ve8wAnPo71B"
 							]
 						}
 					},
@@ -472,7 +471,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones/5e6f7g8h-5678-9abc-def0-456789012345",
+							"raw": "http://127.0.0.1/api/valoraciones/D6UlbesjFes",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -483,7 +482,7 @@
 							"path": [
 								"api",
 								"valoraciones",
-								"5e6f7g8h-5678-9abc-def0-456789012345"
+								"D6UlbesjFes"
 							]
 						}
 					},
@@ -496,7 +495,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"guid\": \"valoracion-123456\",\r\n  \"comentario\": \"Este es un comentario de prueba sobre el producto.\",\r\n  \"puntuacion\": 4,\r\n  \"clienteValorado_id\": 3,\r\n  \"autor_id\": 2\r\n}\r\n",
+							"raw": "{\r\n\r\n  \"comentario\": \"Este es un comentario de prueba sobre el producto.\",\r\n  \"puntuacion\": 4,\r\n  \"clienteValorado_id\": 3,\r\n  \"autor_id\": 2\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -526,7 +525,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones/5e6f7g8h-5678-9abc-def0-456789012345",
+							"raw": "http://127.0.0.1/api/valoraciones/3J97GU9UB1y",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -537,7 +536,7 @@
 							"path": [
 								"api",
 								"valoraciones",
-								"5e6f7g8h-5678-9abc-def0-456789012345"
+								"3J97GU9UB1y"
 							]
 						}
 					},
@@ -653,22 +652,39 @@
 			"name": "Backup",
 			"item": [
 				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/backups/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"backups",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/backup/create",
+							"raw": "http://localhost/api/backups/create",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"localhost"
 							],
 							"path": [
 								"api",
-								"backup",
+								"backups",
 								"create"
 							]
 						}
@@ -676,46 +692,41 @@
 					"response": []
 				},
 				{
-					"name": "Database",
+					"name": "Delete",
 					"request": {
-						"method": "POST",
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/backup/database",
+							"raw": "http://localhost/api/backups/delete/backup_2025-02-27_15-18-03.sql",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"localhost"
 							],
 							"path": [
 								"api",
-								"backup",
-								"database"
+								"backups",
+								"delete",
+								"backup_2025-02-27_15-18-03.sql"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Clean",
+					"name": "Delete All",
 					"request": {
-						"method": "POST",
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/backup/clean",
+							"raw": "http://localhost/api/backups/delete-all",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"localhost"
 							],
 							"path": [
 								"api",
-								"backup",
-								"clean"
+								"backups",
+								"delete-all"
 							]
 						}
 					},
@@ -727,42 +738,16 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/backup/restore/",
+							"raw": "http://localhost/api/backups/restore/backup_2025-02-27_15-23-08.sql",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"localhost"
 							],
 							"path": [
 								"api",
-								"backup",
+								"backups",
 								"restore",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1/api/backup/list",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"path": [
-								"api",
-								"backup",
-								"list"
+								"backup_2025-02-27_15-23-08.sql"
 							]
 						}
 					},

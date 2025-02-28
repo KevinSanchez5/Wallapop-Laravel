@@ -74,7 +74,6 @@ class ValoracionController extends Controller
     {
         Log::info('Intentando crear una nueva valoración', ['request' => $request->all()]);
         $validator = Validator::make($request->all(), [
-            'guid' => 'required|unique:valoraciones,guid',
             'comentario' => 'required|string|max:1000',
             'puntuacion' => 'required|integer|min:1|max:5',
             'clienteValorado_id' => 'required|exists:clientes,id',

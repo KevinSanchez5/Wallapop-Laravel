@@ -30,7 +30,6 @@ class ProfileControllerView extends Controller
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
-
         Log::info('Buscando el perfil del cliente en la base de datos');
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 

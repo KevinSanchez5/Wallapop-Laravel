@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Utils\GuidGenerator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +13,14 @@ class Valoracion extends Model
     protected $table = 'valoraciones';
 
     protected $fillable = ['guid', 'comentario', 'puntuacion', 'clienteValorado_id', 'autor_id'];
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($valoracion) {
+            $valoracion->guid = GuidGenerator::generarId();
+        });
+    }
 
     /**
      * Relación con el cliente valorado (cliente que recibe la valoración).

@@ -1,3 +1,24 @@
+<style>
+    @media (max-width: 768px) { /* Para dispositivos móviles */
+        .btn-mobile {
+            justify-content: center; /* Centrar contenido */
+            width: 40px; /* Ajustar ancho para que solo ocupe lo necesario */
+            height: 40px; /* Hacerlo cuadrado */
+            padding: 0; /* Quitar padding extra */
+        }
+
+        .btn-mobile span,
+        .btn-mobile svg {
+            display: none;
+        }
+
+        .btn-mobile img {
+            margin: 0; /* Eliminar márgenes */
+        }
+    }
+</style>
+
+
 <header class="bg-[#BFF205] py-4 shadow-md">
     <div class="container mx-auto flex justify-between items-center px-6">
 
@@ -12,7 +33,7 @@
                 <!-- Dropdown de usuario -->
                 <x-dropdown align="right" width="56" class="dropdown-menu">
                     <x-slot name="trigger">
-                        <button class="h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md  transition-all duration-300 ease-in-out bg-white hover:text-white hover:bg-black  dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white">
+                        <button class="btn-mobile h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-all duration-300 ease-in-out bg-white hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white">
                             <img src="{{ asset('storage/' . (Auth::user()->avatar ?? 'clientes/avatar.png')) }}"
                                  alt="Avatar de {{ Auth::user()->name }}"
                                  class="w-8 h-8 rounded-full object-cover mr-2">
@@ -29,9 +50,17 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</p>
                         </div>
                         <hr class="border-gray-300 dark:border-gray-600">
-                        <x-dropdown-link :href="route('profile')">
-                            {{ __('Perfil') }}
-                        </x-dropdown-link>
+
+                        @if (Auth::user()->role === 'admin')
+                            <x-dropdown-link :href="route('admin.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-dropdown-link>
+                        @else
+                            <x-dropdown-link :href="route('profile')">
+                                {{ __('Perfil') }}
+                            </x-dropdown-link>
+                        @endif
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
@@ -42,10 +71,10 @@
                     </x-slot>
                 </x-dropdown>
             @else
-                <a href="{{ route('login') }}" style="width: 50px"
-                   class="h-10 flex items-center justify-center text-base font-extrabold tracking-wide bg-white text-black hover:text-white hover:bg-black dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black rounded-lg transition-all border-2 border-transparent shadow-md px-6 sm:px-3 sm:w-10">
+                <a href="{{ route('login') }}"
+                   class="h-10 flex items-center justify-center text-base font-extrabold tracking-wide bg-white text-black hover:text-white hover:bg-black dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black rounded-lg transition-all border-2 border-transparent shadow-md px-6 sm:px-3">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                         class="w-6 h-6 transition-colors duration-300">
+                         class="w-8 h-8 transition-colors duration-300">
                         <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
                         <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
                     </svg>
