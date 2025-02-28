@@ -25,7 +25,6 @@ class VentaController extends Controller
                 'comprador' => $venta->comprador,
                 'lineaVentas' => $venta->lineaVentas,
                 'precioTotal' => $venta->precioTotal,
-                'estado' => $venta->estado,
                 'created_at' => $venta->created_at->toDateTimeString(),
                 'updated_at' => $venta->updated_at->toDateTimeString(),
             ];
@@ -69,7 +68,6 @@ class VentaController extends Controller
             'comprador' => $venta->comprador,
             'lineaVentas' => $venta->lineaVentas,
             'precioTotal' => $venta->precioTotal,
-            'estado' => $venta->estado,
             'created_at' => $venta->created_at->toDateTimeString(),
             'updated_at' => $venta->updated_at->toDateTimeString(),
         ];
@@ -90,7 +88,6 @@ class VentaController extends Controller
             'comprador' => 'required|array',
             'lineaVentas' => 'required|array',
             'precioTotal' => 'required|numeric|min:0',
-            'estado' => 'required|string|max:255'
         ]);
 
         if ($validator->fails()) {

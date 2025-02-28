@@ -18,14 +18,6 @@ return new class extends Migration
             $table->json('comprador');
             $table->json('lineaVentas');
             $table->double('precioTotal');
-            $table->enum('estado', [
-                'Pendiente',
-                'Procesando',
-                'Enviado',
-                'Entregado',
-                'Cancelado',
-                'Devuelto'
-            ]);
             $table->timestamps();
         });
     }
