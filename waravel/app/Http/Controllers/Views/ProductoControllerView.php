@@ -127,7 +127,6 @@ class ProductoControllerView extends Controller
         $clienteId = $this->getClienteId();
 
         $producto = Producto::create([
-            'guid' => Str::uuid()->toString(),
             'vendedor_id' => $clienteId,
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,

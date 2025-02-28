@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
 use App\Models\Carrito;
+use App\Models\Cliente;
 use App\Models\LineaCarrito;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -181,6 +183,10 @@ class CarritoControllerView extends Controller
             if ($linea->producto->guid == $productId) {
                 Log::info("Producto encontrado en el carrito, aumentando la cantidad");
                 $cart->precioTotal += $linea->producto->precio;
+                if ($linea->cantidad + 1 > $linea->producto->stock){
+                    Log::warning("El producto no tiene stock suficiente para agregar más");
+                    return response()->json("No hay stock suficiente para agregar más productos", 400);
+                }
                 $linea->cantidad += 1;
                 $linea->precioTotal += $linea->producto->precio;
                 $lineaPrice = $linea->precioTotal;
@@ -243,6 +249,10 @@ class CarritoControllerView extends Controller
             if ($linea->producto->id == $producto->id) {
                 Log::info("Producto encontrado en el carrito, editándolo");
                 $cart->precioTotal -= $linea->precioTotal;
+                if ($linea->cantidad + $amount > $linea->producto->stock){
+                    Log::warning("El producto no tiene stock suficiente para agregar más");
+                    return response()->json("No hay stock suficiente para agregar más productos", 400);
+                }
                 $linea->cantidad += $amount;
                 $linea->precioTotal = $linea->cantidad * $producto->precio;
                 $lineaPrice = $linea->precioTotal;
@@ -274,5 +284,25 @@ class CarritoControllerView extends Controller
             "lineaPrice" => $lineaPrice,
             "status" => 200
         ]);
+    }
+
+    public function showOrder()
+    {
+        Log::info('Buscando el carrito en la sesión');
+        $cart = session()->get('carrito', new Carrito([
+            'lineasCarrito' => [],
+            'precioTotal' => 0
+        ]));
+
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        Log::info('Devolviendo la vista con el carrito');
+        return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));
     }
 }
