@@ -14,13 +14,13 @@ class VentaSeeder extends Seeder
     {
         Venta::create([
             'guid'=>'kY8XqT5L9v3',
+            'estado' =>'procesado',
             'comprador' => [
                 'guid'=>'DU6jCZtareb',
                 'id' => 2,
                 'nombre' => 'Maria',
                 'apellido' => 'Garcia'
             ],
-            'estado' =>'',
             'lineaVentas' => [
                 [
                     'vendedor' => [
@@ -47,13 +47,13 @@ class VentaSeeder extends Seeder
         ]);
         Venta::create([
             'guid'=>'Z4mT7pQX2Vy',
+            'estado' =>'procesado',
             'comprador' => [
                 'guid'=>'yEC3KBt6CFY',
                 'id' => 3,
                 'nombre' => 'Pedro',
                 'apellido' => 'Martinez'
             ],
-            'estado' =>'',
             'lineaVentas' => [
                 [
                     'vendedor' => [

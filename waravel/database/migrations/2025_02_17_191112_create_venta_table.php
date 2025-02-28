@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ventas', function (Blueprint $table) {
-            $table->string('guid', 11)->unique();
             $table->id();
-            $table->json('comprador');
+            $table->string('guid', 11)->unique();
             $table->string('estado');
+            $table->json('comprador');
             $table->json('lineaVentas');
             $table->double('precioTotal');
             $table->timestamps();
