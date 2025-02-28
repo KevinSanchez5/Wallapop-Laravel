@@ -38,7 +38,17 @@ class VentasControllerTest extends TestCase
             'nombre' => 'Producto',
             'vendedor_id' => $this->vendedor->id,
             'precio' => 970.03,
+            'stock' => 100,
+            'estado' => 'Disponible',
         ]);
+        parent::setUp();
+        Redis::flushAll();
+    }
+
+    protected function tearDown(): void
+    {
+        Redis::flushAll();
+        parent::tearDown();
     }
 
     public function testIndex()
@@ -49,6 +59,7 @@ class VentasControllerTest extends TestCase
                 'cantidad' => 5,
                 'producto' => $this->producto->toArray(),
                 'precioTotal' => $this->producto->precio * 5,
+                'estado' => 'Disponible',
             ],
         ];
 
@@ -59,6 +70,7 @@ class VentasControllerTest extends TestCase
             'comprador' => $this->comprador->toArray(),
             'lineaVentas' => json_encode($lineaVentas),
             'precioTotal' => $precioTotalVenta,
+            'estado' => 'Enviado',
         ]);
 
         $response = $this->get('/api/ventas?per_page=15');
@@ -73,18 +85,29 @@ class VentasControllerTest extends TestCase
 
     public function testShowVentaFromDatabaseAndStoreInRedis()
     {
-        $venta = Venta::factory()->create();
+        $venta = Venta::factory()->create([
+            'guid' => 'venta-guid',
+            'comprador' => $this->comprador->toArray(),
+            'lineaVentas' => json_encode([
+                'vendedor' => $this->vendedor->toArray(),
+                'cantidad' => 1,
+                'producto' => $this->producto->toArray(),
+                'precioTotal' => $this->producto->precio,
+            ]),
+            'precioTotal' => $this->producto->precio,
+            'estado' => 'Enviado',
+        ]);
 
         Redis::shouldReceive('get')
             ->once()
-            ->with('venta_'.$venta->id)
+            ->with('venta_'.$venta->guid)
             ->andReturn(null);
 
         Redis::shouldReceive('set')
             ->once()
-            ->with('venta_'.$venta->id, \Mockery::type('string'), 'EX', 1800);
+            ->with('venta_'.$venta->guid, \Mockery::type('string'), 'EX', 1800);
 
-        $response = $this->getJson('/api/ventas/' . $venta->id);
+        $response = $this->getJson('/api/ventas/' . $venta->guid);
 
         $response->assertOk()
             ->assertJson([
@@ -93,6 +116,7 @@ class VentasControllerTest extends TestCase
                 'comprador' => $venta->comprador,
                 'lineaVentas' => $venta->lineaVentas,
                 'precioTotal' => round($venta->precioTotal, 2),
+                'estado' => $venta->estado,
             ]);
     }
 
@@ -105,16 +129,17 @@ class VentasControllerTest extends TestCase
             'comprador' => ['nombre' => 'Juan Pérez', 'email' => 'juan@example.com'],
             'lineaVentas' => [['producto' => 'Laptop', 'cantidad' => 1, 'precio' => 1000.00]],
             'precioTotal' => 1000.00,
+            'estado' => 'Entregado',
             'created_at' => now()->toDateTimeString(),
             'updated_at' => now()->toDateTimeString(),
         ];
 
         Redis::shouldReceive('get')
             ->once()
-            ->with('venta_1')
+            ->with('venta_venta-test-guid')
             ->andReturn(json_encode($ventaData));
 
-        $response = $this->getJson('/api/ventas/1');
+        $response = $this->getJson('/api/ventas/venta-test-guid');
 
         $response->assertOk()
             ->assertJson($ventaData);
@@ -124,8 +149,7 @@ class VentasControllerTest extends TestCase
 
     public function testShowNotFound()
     {
-
-        $response = $this->get("/api/ventas/999");
+        $response = $this->get("/api/ventas/guid-invalido");
 
         $response->assertStatus(404);
 
@@ -141,6 +165,7 @@ class VentasControllerTest extends TestCase
             'comprador' => ['nombre' => 'Juan Pérez', 'email' => 'juan@example.com'],
             'lineaVentas' => [['producto' => 'Laptop', 'cantidad' => 1, 'precio' => 1000.00]],
             'precioTotal' => 1000.00,
+            'estado' => 'Entregado',
         ];
 
         $response = $this->post('/api/ventas', $data);
@@ -156,21 +181,21 @@ class VentasControllerTest extends TestCase
     public function testStoreValidationError()
     {
         $data = [
-            'guid' => '',
             'comprador' => [],
             'lineaVentas' => [],
             'precioTotal' => -10,
+            'estado'=> 'no valido'
         ];
 
         $response = $this->post('/api/ventas', $data);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['guid', 'comprador', 'lineaVentas', 'precioTotal']);
+        $response->assertJsonValidationErrors(['comprador', 'lineaVentas', 'precioTotal', 'estado']);
     }
 
     public function testDestroySuccess()
     {
-        $venta = Venta::factory()->create();
+        $venta = Venta::factory()->create([]);
 
         $this->assertDatabaseHas('ventas', ['id' => $venta->id]);
 
@@ -185,7 +210,7 @@ class VentasControllerTest extends TestCase
     public function testDestroyNotFound()
     {
 
-        $response = $this->delete("/api/ventas/999");
+        $response = $this->delete("/api/ventas/guid-invalido");
 
         $response->assertStatus(404);
         $response->assertJson(['message' => 'Venta no encontrada']);

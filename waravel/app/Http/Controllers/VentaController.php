@@ -64,7 +64,7 @@ class VentaController extends Controller
         }
 
         Log::info('Buscando venta de la base de datos');
-        $venta = Venta::where('guid',$guid)->firstOrFail();
+        $venta = Venta::where('guid',$guid)->first();
 
         if (!$venta) {
             return response()->json(['message' => 'Venta no encontrada'], 404);
@@ -114,18 +114,19 @@ class VentaController extends Controller
     public function destroy($guid)
     {
         Log::info('Intentando eliminar venta');
-        $venta = Redis::get('venta_' . $guid);
-        if(!$venta) {
-            $venta = Venta::where('guid',$guid)->firstOrFail();
-        }
+        $venta = Venta::where('guid',$guid)->first();
 
         if(!$venta) {
+            Log::warning('Venta no encontrada: ' . $guid);
             return response()->json(['message' => 'Venta no encontrada'], 404);
+        }
+        if(Redis::exists('venta_' . $guid)){
+            Log::info('Eliminando venta de la cache');
+            Redis::del('venta_'. $guid);
         }
         Log::info('Eliminando venta de la base de datos');
         $venta->delete();
-        Log::info('Eliminando venta de la cache');
-        Redis::del('venta_'. $guid);
+
         Log::info('Venta eliminada correctamente');
 
         return response()->json(['message' => 'Venta eliminada correctamente']);
@@ -341,5 +342,4 @@ class VentaController extends Controller
             return response()-> json(['error' => $e->getMessage()]);
         }
     }
-
 }
