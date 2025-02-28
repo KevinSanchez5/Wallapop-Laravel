@@ -25,7 +25,7 @@ class ClientesSeeder extends Seeder
             'usuario_id' => 2,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);//id user 2
+        ]);
 
         Cliente::create([
             'nombre' => 'Maria',
