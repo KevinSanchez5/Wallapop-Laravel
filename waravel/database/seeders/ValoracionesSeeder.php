@@ -120,7 +120,7 @@ class ValoracionesSeeder extends Seeder
         ]);
 
         Valoracion::create([
-            'guid' => 'L2XqT8mY7pV5',
+            'guid' => 'L2XqT8mY7pV',
             'comentario' => 'La calidad es buena, pero me hubiera gustado más variedad.',
             'puntuacion' => 4,
             'clienteValorado_id' => 2,
@@ -130,7 +130,7 @@ class ValoracionesSeeder extends Seeder
         ]);
 
         Valoracion::create([
-            'guid' => 'X7T9L3pY5mV8',
+            'guid' => 'X7T9L3pY5mV',
             'comentario' => 'Recibí el producto con un pequeño defecto, pero me lo solucionaron rápido.',
             'puntuacion' => 4,
             'clienteValorado_id' => 3,
@@ -140,7 +140,7 @@ class ValoracionesSeeder extends Seeder
         ]);
 
         Valoracion::create([
-            'guid' => 'Y5qT2X9L8mV7',
+            'guid' => 'Y5qT2X9L8mV',
             'comentario' => 'Producto excelente, aunque no es lo que esperaba.',
             'puntuacion' => 1,
             'clienteValorado_id' => 1,
@@ -150,7 +150,7 @@ class ValoracionesSeeder extends Seeder
         ]);
 
         Valoracion::create([
-            'guid' => 'L8mT5X7pY9qV',
+            'guid' => 'L8mT5X7pY9q',
             'comentario' => 'Todo llegó a tiempo y en perfectas condiciones.',
             'puntuacion' => 1,
             'clienteValorado_id' => 2,

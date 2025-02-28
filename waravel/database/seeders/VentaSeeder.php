@@ -20,6 +20,7 @@ class VentaSeeder extends Seeder
                 'nombre' => 'Maria',
                 'apellido' => 'Garcia'
             ],
+            'estado' =>'',
             'lineaVentas' => [
                 [
                     'vendedor' => [
@@ -52,6 +53,7 @@ class VentaSeeder extends Seeder
                 'nombre' => 'Pedro',
                 'apellido' => 'Martinez'
             ],
+            'estado' =>'',
             'lineaVentas' => [
                 [
                     'vendedor' => [

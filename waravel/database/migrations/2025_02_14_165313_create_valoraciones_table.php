@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('valoraciones', function (Blueprint $table) {
             $table->id();
-            $table->string('guid', 11)->unique();
+            $table->string('guid', 11);
             $table->string('comentario');
             $table->integer('puntuacion');
             $table->foreignId('clienteValorado_id')->constrained('clientes')->onDelete('cascade');

@@ -11,6 +11,7 @@ class ProductosSeeder extends Seeder
     {
 
         Producto::create([
+                'id'=>1,
                 'guid' => 'G4YXT9K5QLV',
                 'vendedor_id' => 1,
                 'nombre' => 'Portátil Gamer',
@@ -25,6 +26,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>2,
                 'guid' => 'Z8K3VLYTQ72',
                 'vendedor_id' => 2,
                 'nombre' => 'Chaqueta de Cuero',
@@ -39,6 +41,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>3,
                 'guid' => 'QX9T7LK5VY3',
                 'vendedor_id' =>3,
                 'nombre' => 'Guitarra Eléctrica',
@@ -53,7 +56,8 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
-            'guid' => 'VYQ8XK4T9L5',
+                'id'=>4,
+                'guid' => 'VYQ8XK4T9L5',
                 'vendedor_id' => 1,
                 'nombre' => 'Pantalones Vaqueros',
                 'descripcion' => 'Pantalones vaqueros de alta calidad, confeccionados con tela resistente y un ajuste cómodo. Ideales para el día a día o para combinarlos con distintos estilos. Su diseño clásico nunca pasa de moda y su durabilidad los hace una opción excelente para cualquier guardarropa.',
@@ -67,6 +71,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>5,
                 'guid' => 'T3K9QLYV7X5',
                 'vendedor_id' => 2,
                 'nombre' => 'Mario Party 8',
@@ -81,6 +86,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>6,
                 'guid' => 'L5X7YQT9VK3',
                 'vendedor_id' => 3,
                 'nombre' => 'Consola Xbox Series X',
@@ -95,6 +101,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>7,
                 'guid' => 'X8KQ5T9YLV7',
                 'vendedor_id' => 2,
                 'nombre' => 'Set de Púas para Guitarra',
@@ -109,6 +116,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>8,
                 'guid' => 'Y9VQXK37TL5',
                 'vendedor_id' => 2,
                 'nombre' => 'Amplificador Fender 40W',
@@ -123,6 +131,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>9,
                 'guid' => 'K7YLTQ9X5V3',
                 'vendedor_id' => 1,
                 'nombre' => 'Batería Electrónica Roland',
@@ -137,6 +146,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>10,
                 'guid' => 'QX5V9KY3TL7',
                 'vendedor_id' => 3,
                 'nombre' => 'Smartwatch Xiaomi Mi Band 7',
@@ -151,6 +161,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>11,
                 'guid' => 'X9YT7KQLV53',
                 'vendedor_id' => 3,
                 'nombre' => 'Zapatillas Adidas Running',
@@ -165,6 +176,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>12,
                 'guid' => '7K5TQL9XYV3',
                 'vendedor_id' => 2,
                 'nombre' => 'Lámpara LED Inteligente',
@@ -179,6 +191,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>13,
                 'guid' => 'TQ9K7XY5LV3',
                 'vendedor_id' => 1,
                 'nombre' => 'The Legend of Zelda: Breath of the Wild',
@@ -193,6 +206,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>14,
                 'guid' => 'V3XKYQ9T57L',
                 'vendedor_id' => 1,
                 'nombre' => 'Colección de Blu-ray Star Wars',
@@ -207,6 +221,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>15,
                 'guid' => '5KQYT79XLV3',
                 'vendedor_id' => 3,
                 'nombre' => 'Cafetera Espresso Automática',
@@ -221,6 +236,7 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         Producto::create([
+                'id'=>16,
                 'guid' => 'XK5VQT9Y3L7',
                 'vendedor_id' => 1,
                 'nombre' => 'Figura de Acción Spider-Man',
@@ -235,9 +251,8 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
 
         ]);
-
-
         Producto::create([
+            'id'=>17,
             'guid' => 'YQ7LXK9V53T',
             'vendedor_id' => 9,
             'nombre' => 'Monitor Gaming 27"',
@@ -253,6 +268,7 @@ class ProductosSeeder extends Seeder
         ]);
 
         Producto::create([
+            'id'=>18,
             'guid' => 'K9QXT7VYL53',
             'vendedor_id' => 8,
             'nombre' => 'Teclado Mecánico RGB',
@@ -268,6 +284,7 @@ class ProductosSeeder extends Seeder
         ]);
 
         Producto::create([
+            'id'=>19,
             'guid' => 'T5YXQK9L73V',
             'vendedor_id' => 7,
             'nombre' => 'Silla Gaming Ergonómica',
@@ -283,6 +300,7 @@ class ProductosSeeder extends Seeder
         ]);
 
         Producto::create([
+            'id'=>20,
             'guid' => '9X7TQY5KVL3',
             'vendedor_id' => 6,
             'nombre' => 'Auriculares Inalámbricos',
@@ -298,6 +316,7 @@ class ProductosSeeder extends Seeder
         ]);
 
         Producto::create([
+            'id'=>21,
             'guid' => 'QKYX9T753LV',
             'vendedor_id' => 5,
             'nombre' => 'Mesa de Oficina',

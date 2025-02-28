@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-            $table->string('guid', 11)->unique();
+            $table->string('guid', 11);
             $table->foreignId('vendedor_id')->constrained('clientes')->onDelete('cascade');
             $table->string('nombre');
             $table->text('descripcion');
