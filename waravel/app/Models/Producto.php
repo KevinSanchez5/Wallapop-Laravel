@@ -21,7 +21,9 @@ class Producto extends Model
         parent::boot();
 
         static::creating(function ($producto) {
-            $producto->guid = GuidGenerator::generarId();
+            if (empty($producto->guid)) {
+                $producto->guid = GuidGenerator::generarId();
+            }
         });
     }
 
