@@ -23,7 +23,6 @@ class ProductosSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
         Producto::create([
                 'vendedor_id' => 2,
                 'nombre' => 'Chaqueta de Cuero',
@@ -37,7 +36,6 @@ class ProductosSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
         Producto::create([
                 'vendedor_id' =>3,
                 'nombre' => 'Guitarra Eléctrica',
@@ -90,7 +88,6 @@ class ProductosSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
         Producto::create([
                 'vendedor_id' => 2,
                 'nombre' => 'Set de Púas para Guitarra',
@@ -223,5 +220,80 @@ class ProductosSeeder extends Seeder
 
         ]);
 
+
+        Producto::create([
+            'guid' => 'P008',
+            'vendedor_id' => 9,
+            'nombre' => 'Monitor Gaming 27"',
+            'descripcion' => 'Monitor de 27 pulgadas con tasa de refresco de 144Hz y resolución QHD. Ideal para gaming y diseño gráfico.',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 300.00,
+            'stock' => 10,
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible',
+            'imagenes' => json_encode(['productos/monitor1.webp', 'productos/monitor2.webp']),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Producto::create([
+            'guid' => 'P009',
+            'vendedor_id' => 8,
+            'nombre' => 'Teclado Mecánico RGB',
+            'descripcion' => 'Teclado mecánico con retroiluminación RGB y switches Cherry MX. Perfecto para gamers y programadores.',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 120.00,
+            'stock' => 15,
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible',
+            'imagenes' => json_encode(['productos/teclado1.webp', 'productos/teclado2.webp']),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Producto::create([
+            'guid' => 'P010',
+            'vendedor_id' => 7,
+            'nombre' => 'Silla Gaming Ergonómica',
+            'descripcion' => 'Silla ergonómica con soporte lumbar y reposacabezas ajustable. Ideal para largas sesiones de gaming o trabajo.',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 200.00,
+            'stock' => 5,
+            'categoria' => 'Hogar',
+            'estado' => 'Disponible',
+            'imagenes' => json_encode(['productos/silla1.webp', 'productos/silla2.webp']),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Producto::create([
+            'guid' => 'P011',
+            'vendedor_id' => 6,
+            'nombre' => 'Auriculares Inalámbricos',
+            'descripcion' => 'Auriculares con cancelación de ruido y sonido envolvente. Perfectos para música y llamadas.',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 150.00,
+            'stock' => 20,
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible',
+            'imagenes' => json_encode(['productos/auriculares1.webp', 'productos/auriculares2.webp']),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Producto::create([
+            'guid' => 'P012',
+            'vendedor_id' => 5,
+            'nombre' => 'Mesa de Oficina',
+            'descripcion' => 'Mesa de oficina con diseño moderno y espacio amplio. Ideal para trabajar desde casa.',
+            'estadoFisico' => 'Nuevo',
+            'precio' => 180.00,
+            'stock' => 8,
+            'categoria' => 'Hogar',
+            'estado' => 'Disponible',
+            'imagenes' => json_encode(['productos/mesa1.webp', 'productos/mesa2.webp']),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
