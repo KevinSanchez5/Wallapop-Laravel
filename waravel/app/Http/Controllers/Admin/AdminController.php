@@ -78,6 +78,35 @@ class AdminController extends Controller
         return view('admin.clients', compact('clientes', 'users'));
     }
 
+    public function listReviews()
+    {
+        Log::info('Obteniendo valoraciones');
+
+        $query = Valoracion::with(['clienteValorado', 'creador'])->orderBy('created_at', 'desc');
+
+        if (request()->has('search') && request('search') !== '') {
+            $search = request('search');
+            Log::info('Búsqueda: ' . $search);
+
+            $query->whereHas('clienteValorado', function ($q) use ($search) {
+                $q->whereRaw('LOWER(nombre) LIKE ?', ['%' . mb_strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(apellido) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+            })
+                ->orWhereRaw('LOWER(comentario) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+        }
+
+        $valoraciones = $query->paginate(9);
+
+        return view('admin.reviews', compact('valoraciones'));
+    }
+
+    public function deleteReview($id)
+    {
+        $valoracion = Valoracion::findOrFail($id);
+        $valoracion->delete();
+        return redirect()->route('admin.reviews')->with('success', 'Valoración eliminada correctamente.');
+    }
+
     /**
      * Muestra la lista de todos los administradores registrados.
      */
@@ -92,41 +121,14 @@ class AdminController extends Controller
     /**
      * Añadir un nuevo administrador al sistema.
      */
-    public function addAdmin(Request $request)
+    public function addAdmin()
     {
-
-        return view('admin.add-admins');
-        /*// Validar los datos ingresados TODO -> No debería haber selección de rol en la vista, al crear el admin debe pasar nombre, email y pass
-        Log::info("Validando datos para crear el usuario administrador");
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
-        ]);
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
-        ]);
-        if ($validator->fails()) {
-            Log::warning("Error de validación al crear administrador", ['errors' => $validator->errors()]);
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // Crear un nuevo usuario con rol de administrador
-        Log::info("Creando usuario administrador");
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => 'admin',
-        ]);
-
-        // Redireccionar a la lista de administradores
-        Log::info("Redireccionando a la lista de administradores");
-        return redirect()->route('admin.admin')->with('success', 'Administrador añadido correctamente.');*/
     }
+    public function showAddForm()
+    {
+        return view('admin.add-admins');
+    }
+
 
     /**
      * Ver la lista de todos los productos en la plataforma vendidos, desactivados baneados....
