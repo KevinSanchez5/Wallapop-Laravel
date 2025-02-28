@@ -20,7 +20,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Tecnologia',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/portatil1.webp', 'productos/portatil2.webp']),
+                'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -34,7 +34,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Ropa',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/chaqueta1.webp']),
+                'imagenes' => ['productos/chaqueta1.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -48,7 +48,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Musica',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/guitarra1.webp', 'productos/guitarra2.webp']),
+                'imagenes' => ['productos/guitarra1.webp', 'productos/guitarra2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -62,7 +62,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Ropa',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/pantalones1.webp', 'productos/pantalones2.webp']),
+                'imagenes' => ['productos/pantalones1.webp', 'productos/pantalones2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -76,7 +76,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Videojuegos',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/mario1.webp','productos/mario2.webp']),
+                'imagenes' => ['productos/mario1.webp','productos/mario2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -90,7 +90,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Videojuegos',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/xbox1.webp', 'productos/xbox2.webp']),
+                'imagenes' => ['productos/xbox1.webp', 'productos/xbox2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -104,7 +104,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Musica',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/puas1.webp', 'productos/puas2.webp']),
+                'imagenes' => ['productos/puas1.webp', 'productos/puas2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -118,7 +118,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Musica',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/ampli1.webp', 'productos/ampli2.webp']),
+                'imagenes' => ['productos/ampli1.webp', 'productos/ampli2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -132,7 +132,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Musica',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/bateria1.webp', 'productos/bateria2.webp']),
+                'imagenes' => ['productos/bateria1.webp', 'productos/bateria2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -146,7 +146,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Tecnologia',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/smartwatch1.webp']),
+                'imagenes' => ['productos/smartwatch1.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -160,7 +160,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Ropa',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/zapatillas1.webp', 'productos/zapatillas2.webp']),
+                'imagenes' => ['productos/zapatillas1.webp', 'productos/zapatillas2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -174,7 +174,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Hogar',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/lampara1.webp']),
+                'imagenes' => ['productos/lampara1.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -188,7 +188,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Videojuegos',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/zelda1.webp', 'productos/zelda2.webp']),
+                'imagenes' => ['productos/zelda1.webp', 'productos/zelda2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -202,7 +202,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Cine',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/starwars1.webp', 'productos/starwars2.webp']),
+                'imagenes' => ['productos/starwars1.webp', 'productos/starwars2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -216,7 +216,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Cocina',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/cafetera1.webp', 'productos/cafetera2.webp']),
+                'imagenes' => ['productos/cafetera1.webp', 'productos/cafetera2.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -230,7 +230,7 @@ class ProductosSeeder extends Seeder
                 'stock' => 100,
                 'categoria' => 'Coleccionismo',
                 'estado' => 'Disponible',
-                'imagenes' => json_encode(['productos/spiderman1.webp']),
+                'imagenes' => ['productos/spiderman1.webp'],
                 'created_at' => now(),
                 'updated_at' => now(),
 
@@ -245,7 +245,7 @@ class ProductosSeeder extends Seeder
             'stock' => 10,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
-            'imagenes' => json_encode(['productos/monitor1.webp', 'productos/monitor2.webp']),
+            'imagenes' => ['productos/monitor1.webp', 'productos/monitor2.webp'],
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -260,7 +260,7 @@ class ProductosSeeder extends Seeder
             'stock' => 15,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
-            'imagenes' => json_encode(['productos/teclado1.webp', 'productos/teclado2.webp']),
+            'imagenes' => ['productos/teclado1.webp', 'productos/teclado2.webp'],
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -275,7 +275,7 @@ class ProductosSeeder extends Seeder
             'stock' => 5,
             'categoria' => 'Hogar',
             'estado' => 'Disponible',
-            'imagenes' => json_encode(['productos/silla1.webp', 'productos/silla2.webp']),
+            'imagenes' => ['productos/silla1.webp', 'productos/silla2.webp'],
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -290,7 +290,7 @@ class ProductosSeeder extends Seeder
             'stock' => 20,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
-            'imagenes' => json_encode(['productos/auriculares1.webp', 'productos/auriculares2.webp']),
+            'imagenes' => ['productos/auriculares1.webp', 'productos/auriculares2.webp'],
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -305,7 +305,7 @@ class ProductosSeeder extends Seeder
             'stock' => 8,
             'categoria' => 'Hogar',
             'estado' => 'Disponible',
-            'imagenes' => json_encode(['productos/mesa1.webp', 'productos/mesa2.webp']),
+            'imagenes' => ['productos/mesa1.webp', 'productos/mesa2.webp'],
             'created_at' => now(),
             'updated_at' => now(),
         ]);
