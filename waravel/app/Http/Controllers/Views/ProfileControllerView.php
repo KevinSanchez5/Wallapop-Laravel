@@ -102,7 +102,7 @@ class ProfileControllerView extends Controller
         return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
     }
 
-    public function filterByEstado(){
+    public function showFilteredOrders(){
         Log::info('Accediendo a la página de pedidos');
 
         if (!Auth::check()) {
@@ -121,6 +121,11 @@ class ProfileControllerView extends Controller
 
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
         $query = Venta::where('comprador->id',  $cliente->id);
+
+        if (request()->has('estado') && request('estado') !== 'todos') {
+            $query->where('estado', request('estado'));
+            Log::info('Filtro por estado aplicado', ['estado' => request('estado')]);
+        }
 
         $pedidos = $query->orderBy('created_at', 'desc')->paginate(6);
 

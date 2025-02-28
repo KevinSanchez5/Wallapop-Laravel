@@ -1,21 +1,25 @@
 @extends('layouts.profile')
 
-@section('title', 'Mis Productos')
+@section('title', 'Mis Pedidos')
 
 @section('section')
     <section>
-        <div class="flex justify-center mb-4">
+        <div class="flex flex-wrap justify-center gap-4 mb-4">
             <button onclick="window.location.href='{{ route('profile.products') }}'"
-                    class="px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
                 <b>Productos</b>
             </button>
             <button onclick="window.location.href='{{ route('profile.reviews') }}'"
-                    class="ml-2 px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
                 <b>Valoraciones</b>
             </button>
             <button onclick="window.location.href='{{ route('profile.orders') }}'"
-                    class="ml-2 px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                    class="px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
                 <b>Mis pedidos</b>
+            </button>
+            <button onclick="window.location.href='{{ route('profile.sales') }}'"
+                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
+                <b>Mis ventas</b>
             </button>
         </div>
         <div id="pedidos" class="seccion">
@@ -26,24 +30,42 @@
 
                         <div class="mt-6 gap-4 space-y-4 sm:mt-0 sm:flex sm:items-center sm:justify-end sm:space-y-0">
                             <div>
-                                <label for="order-type" class="sr-only mb-2 block text-sm font-medium text-gray-900 dark:text-white">Select order type</label>
-                                <select id="order-type" class="block w-full min-w-[8rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500">
-                                    <option selected>Todos</option>
-                                    <option value="pending">Pendiente</option>
-                                    <option value="processed">Procesado</option>
-                                    <option value="inTransit">En reparto</option>
-                                    <option value="received">Entregado</option>
-                                    <option value="returned">Devuelto</option>
-                                    <option value="cancelled">Cancelado</option>
-                                </select>
+                                <label for="estado" class="sr-only mb-2 block text-sm font-medium text-gray-900 dark:text-white">Select order type</label>
+                                @php
+                                    $orderStatuses = [
+                                        'todos' => 'Todos',
+                                        'pendiente' => 'Pendiente',
+                                        'procesado' => 'Procesado',
+                                        'enReparto' => 'En reparto',
+                                        'entregado' => 'Entregado',
+                                        'devuelto' => 'Devuelto',
+                                        'cancelado' => 'Cancelado'
+                                    ];
+                                    $selectedStatus = request('estado', 'todos');
+                                @endphp
+
+                                <form method="GET" action="{{ route('profile.orders.search') }}">
+                                    <select name="estado" id="estado" onchange="this.form.submit()"
+                                            class="block w-full min-w-[8rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500">
+                                        @foreach ($orderStatuses as $value => $label)
+                                            <option value="{{ $value }}" {{ $selectedStatus == $value ? 'selected' : '' }}>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </form>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-6 flow-root sm:mt-8">
+                    <div class="mt-2 flow-root sm:mt-2">
                         <div class="divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse($pedidos as $pedido)
-                            <div class="flex flex-wrap items-center gap-y-4 py-6">
+                            @if(!$loop->last)
+                                <div class="flex flex-wrap items-center border-b border-gray-300 dark:border-gray-700 gap-y-6 py-4">
+                            @else
+                                <div class="flex flex-wrap items-center gap-y-6 py-4">
+                            @endif
                                 <dl class="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
                                     <dt class="text-base font-medium text-gray-500 dark:text-gray-400">Número:</dt>
                                     <dd class="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
@@ -111,14 +133,13 @@
                                     @endif
                                 </dl>
 
-                                <div class="flex-1 text-right">
-                                    <a href="" class="w-full inline-flex justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 lg:w-auto">View details</a>
+                                <div class="flex-1 text-right py-2">
+                                    <a href="" class="w-full inline-flex justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 lg:w-auto">Ver detalles</a>
                                 </div>
                             </div>
                                 @empty
                                 <div class="flex justify-center items-center h-screen">
-                                    <img class="w-24 h-24 object-contain" src="{{ asset('img/empty-cart.svg') }}" alt="Empty cart">
-                                    <p class="mt-4 text-xl text-gray-900 dark:text-white">No tienes pedidos</p>
+                                    <p class="mt-4 text-xl text-gray-900 dark:text-gray-400">No tienes pedidos</p>
                                 </div>
                             @endforelse
                         </div>

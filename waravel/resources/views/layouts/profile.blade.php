@@ -66,7 +66,7 @@
                 @endif
 
                     <!-- Botón de Editar Perfil -->
-                    <div class="mt-6 text-center">
+                    <div class="mt-8 mb-2 text-center">
                         <a href="{{ route('profile.edit') }}" class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
                             <b>Editar perfil</b>
                         </a>
