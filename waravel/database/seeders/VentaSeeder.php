@@ -13,8 +13,9 @@ class VentaSeeder extends Seeder
     public function run(): void
     {
         Venta::create([
-
+            'guid'=>'kY8XqT5L9v3',
             'comprador' => [
+                'guid'=>'DU6jCZtareb',
                 'id' => 2,
                 'nombre' => 'Maria',
                 'apellido' => 'Garcia'
@@ -22,13 +23,14 @@ class VentaSeeder extends Seeder
             'lineaVentas' => [
                 [
                     'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
                         'id' => 1,
                         'nombre' => 'Juan',
                         'apellido' => 'Perez'
                     ],
                     'cantidad' => 2,
                     'producto' => [
-                        'guid'=> 3,
+                        'guid'=>'G4YXT9K5QLV',
                         'id' => 1,
                         'nombre' => 'Portatil Gamer',
                         'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
@@ -43,7 +45,9 @@ class VentaSeeder extends Seeder
             'created_at' => now()
         ]);
         Venta::create([
+            'guid'=>'Z4mT7pQX2Vy',
             'comprador' => [
+                'guid'=>'yEC3KBt6CFY',
                 'id' => 3,
                 'nombre' => 'Pedro',
                 'apellido' => 'Martinez'
@@ -51,15 +55,17 @@ class VentaSeeder extends Seeder
             'lineaVentas' => [
                 [
                     'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
                         'id' => 1,
                         'nombre' => 'Juan',
                         'apellido' => 'Perez'
                     ],
                     'cantidad' => 1,
                     'producto' => [
+                        'guid'=>'VYQ8XK4T9L5',
                         'id' => 4,
-                        'nombre' => 'Pantalones de lana',
-                        'descripcion' => 'Pantalones de lana de manga corta y cómodos.',
+                        'nombre' => 'Pantalones Vaqueros',
+                        'descripcion' => 'Pantalones Vaqueros cómodos.',
                         'estadoFisico' => 'Nuevo',
                         'precio' => 10.00,
                         'categoria' => 'Ropa',
@@ -68,12 +74,14 @@ class VentaSeeder extends Seeder
                 ],
                 [
                     'vendedor' => [
+                        'guid'=>'DU6jCZtareb',
                         'id' => 2,
                         'nombre' => 'Maria',
                         'apellido' => 'Garcia'
                     ],
                     'cantidad' => 2,
                     'producto' => [
+                        'guid'=>'T3K9QLYV7X5',
                         'id' => 5,
                         'nombre' => 'Mario Party 8',
                         'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
