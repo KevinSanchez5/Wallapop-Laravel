@@ -15,6 +15,10 @@ Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'p
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileControllerView::class, 'show'])->name('profile');
+    Route::get('/profile/myProducts', [ProfileControllerView::class, 'show'])->name('profile.products');
+    Route::get('/profile/myReviews', [ProfileControllerView::class,'showReviews'])->name('profile.reviews');
+    Route::get('/profile/myOrders', [ProfileControllerView::class, 'showOrders'])->name('profile.orders');
+    Route::get('/profile/mySales', [ProfileControllerView::class, 'showSales'])->name('profile.sales');
     Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileControllerView::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
