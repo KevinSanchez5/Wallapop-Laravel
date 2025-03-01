@@ -43,16 +43,16 @@ Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::get('/admin/clients', [AdminController::class, 'listClients'])->name('admin.clients');
 
     Route::get('/admin/products', [AdminController::class, 'listProducts'])->name('admin.products');
-    Route::patch('/product/ban/{guid}', [AdminController::class, 'banProduct'])->name('admin.banProduct');
 
 
     Route::get('/admin/reviews', [AdminController::class, 'listReviews'])->name('admin.reviews');
-    Route::delete('/admin/reviews/{id}', [AdminController::class, 'deleteReview'])->name('admin.reviews.destroy');
 
-    Route::get('/admin/add', [AdminController::class, 'showAddForm'])->name('admins.add.form');
-    Route::post('/admin/add', [AdminController::class, 'addAdmin'])->name('admins.add');
+    Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
 
-    Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+    Route::delete('/admin/admin/delete/{guid}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+    Route::delete('/admin/client/delete/{guid}', [AdminController::class, 'deleteClient'])->name('admin.delete.client');
+    Route::delete('/admin/reviews/delete/{guid}', [AdminController::class, 'deleteReview'])->name('admin.delete.review');
+    Route::patch('/admin/product/ban/{guid}', [AdminController::class, 'banProduct'])->name('admin.ban.product');
 
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
     Route::get('/admin/backups', [BackupController::class, 'getAllBackups'])->name('admin.backups.list');
