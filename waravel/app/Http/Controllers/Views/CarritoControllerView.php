@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Views;
 use App\Http\Controllers\Controller;
 use App\Models\Carrito;
 use App\Models\Cliente;
+use App\Models\User;
 use App\Models\LineaCarrito;
 use App\Models\Producto;
 use Illuminate\Http\Request;
@@ -294,13 +295,13 @@ class CarritoControllerView extends Controller
             'precioTotal' => 0
         ]));
 
-
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
 
         Log::info('Buscando el perfil del cliente en la base de datos');
-        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+        $cliente = $usuario->cliente;
+
 
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));
