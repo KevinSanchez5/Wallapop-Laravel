@@ -27,7 +27,11 @@
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Valoraciones</h2>
             <ul>
                 @foreach ($valoraciones as $valoracion)
-                    <li class="p-4 border-b border-gray-300 dark:border-gray-700">
+                    @if($loop->last)
+                        <li class="p-4">
+                    @else
+                        <li class="p-4 border-b border-gray-300 dark:border-gray-700">
+                    @endif
                         <div class="flex items-center gap-3">
                             <a href="{{ route('cliente.ver', $valoracion->creador->guid) }}"
                                class="text-blue-500 dark:text-blue-400 font-semibold hover:underline">
@@ -43,6 +47,12 @@
                     </li>
                 @endforeach
             </ul>
+            <!-- Paginación -->
+            @if ($valoraciones->hasPages())
+                <div class="mt-4 mx-auto text-center">
+                    {{ $valoraciones->links('pagination::tailwind') }}
+                </div>
+            @endif
         </div>
     </section>
 @endsection

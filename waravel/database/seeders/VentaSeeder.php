@@ -14,7 +14,7 @@ class VentaSeeder extends Seeder
     {
         Venta::create([
             'guid'=>'kY8XqT5L9v3',
-            'estado' =>'procesado',
+            'estado' =>'Procesando',
             'comprador' => [
                 'guid'=>'DU6jCZtareb',
                 'id' => 2,
@@ -48,7 +48,7 @@ class VentaSeeder extends Seeder
         ]);
         Venta::create([
             'guid'=>'Z4mT745g2Vy',
-            'estado' =>'procesado',
+            'estado' =>'Procesando',
             'comprador' => [
                 'guid'=>'yEC3KBt6CFY',
                 'id' => 3,
@@ -102,7 +102,7 @@ class VentaSeeder extends Seeder
         ]);
         Venta::create([
             'guid'=>'Z4mT7p972Vy',
-            'estado' =>'cancelado',
+            'estado' =>'Cancelado',
             'comprador' => [
                 'guid'=>'yEC3KBt6CFY',
                 'id' => 2,
@@ -156,7 +156,7 @@ class VentaSeeder extends Seeder
         ]);
         Venta::create([
             'guid'=>'Z4mT67QX2Vy',
-            'estado' =>'enReparto',
+            'estado' =>'Enviado',
             'comprador' => [
                 'guid'=>'yEC3KBt6CFY',
                 'id' => 2,

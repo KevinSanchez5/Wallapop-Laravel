@@ -52,7 +52,7 @@
                         <dd id="finalTotal" class="text-xl font-bold text-gray-900 dark:text-white">{{ number_format($pedido->precioTotal, 2) }} €</dd>
                     </dl>
 
-                    @if($pedido->estado == 'pendiente')
+                    @if($pedido->estado == 'Pendiente')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             <a href="#" class="bg-black text-white text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                                 Cancelar
@@ -61,7 +61,7 @@
                                 Ver Factura
                             </a>
                         </div>
-                    @else
+                    @elseif(!($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto'))
                         <a href="#" class="mt-4 block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Ver factura</a>
                     @endif
                 </div>
@@ -70,7 +70,7 @@
             <div class="w-full md:w-[55%]">
                 <h2 class="mb-2 text-xl font-semibold text-gray-900 transition-all duration-300 sm:text-2xl dark:text-white">Detalles del pedido</h2>
                 <div class="w-full rounded-lg bg-white shadow-lg transition-all duration-300 dark:bg-gray-800">
-                    @if(!($pedido->estado == 'cancelado' || $pedido->estado == 'devuelto'))
+                    @if(!($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto'))
                     <div class="p-6">
                         <div class="w-full max-w-3xl px-4">
                             <div class="flex items-center justify-between">
@@ -86,7 +86,7 @@
                                             <span class="text-sm mt-2 text-gray-500 dark:text-gray-400">Pendiente</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            @if($pedido->estado == 'entregado' || $pedido->estado == 'enReparto' || $pedido->estado == 'procesado')
+                                            @if($pedido->estado == 'Entregado' || $pedido->estado == 'Enviado' || $pedido->estado == 'Procesando')
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#BFF205] dark:text-black text-white z-20">
                                             @else
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 dark:text-gray-500 text-white z-20">
@@ -99,10 +99,10 @@
                                                 </svg>
 
                                             </div>
-                                            <span class="text-sm mt-2 text-gray-500 dark:text-gray-400">Procesado</span>
+                                            <span class="text-sm mt-2 text-gray-500 dark:text-gray-400">Procesando</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            @if($pedido->estado == 'entregado' || $pedido->estado == 'enReparto')
+                                            @if($pedido->estado == 'Entregado' || $pedido->estado == 'Enviado')
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#BFF205] dark:text-black text-white z-20">
                                             @else
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 dark:text-gray-500 text-white z-20">
@@ -114,8 +114,11 @@
                                             <span class="text-sm mt-2 text-gray-500 dark:text-gray-400">En reparto</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 dark:text-gray-500 text-white z-20">
-
+                                            @if($pedido->estado == 'Entregado')
+                                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#BFF205] dark:text-black text-white z-20">
+                                            @else
+                                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 dark:text-gray-500 text-white z-20">
+                                            @endif
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                 </svg>
@@ -125,13 +128,13 @@
                                     </div>
                                     <!-- Progress Bar -->
                                     <div class="absolute top-5 left-0 right-0 h-1 bg-gray-300 w-full z-0"></div>
-                                    @if($pedido->estado == 'pendiente')
+                                    @if($pedido->estado == 'Pendiente')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-1/4 z-10"></div>
-                                    @elseif($pedido->estado == 'procesado')
+                                    @elseif($pedido->estado == 'Procesando')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-2/4 z-10"></div>
-                                    @elseif($pedido->estado == 'enReparto')
+                                    @elseif($pedido->estado == 'Enviado')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-3/4 z-10"></div>
-                                    @elseif($pedido->estado == 'entregado')
+                                    @elseif($pedido->estado == 'Entregado')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-1 z-10"></div>
                                     @endif
                                 </div>
@@ -141,7 +144,7 @@
                     @endif
                     <div class="row p-6">
                         <div class="grid grid-flow-col gap-4">
-                            @if($pedido->estado == 'cancelado' || $pedido->estado == 'devuelto')
+                            @if($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto')
                                 <div class="min-w-1/3">
                             @else
                                 <div class="min-w-1/2">
@@ -149,7 +152,7 @@
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400">Nº pedido</p>
                                 <h3 class="text-xl font-normal break-all text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ $pedido->guid }}</h3>
                             </div>
-                            @if($pedido->estado == 'cancelado' || $pedido->estado == 'devuelto')
+                            @if($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto')
                                 <div class="min-w-1/3">
                             @else
                                 <div class="min-w-1/2">
@@ -157,7 +160,7 @@
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400">Fecha</p>
                                 <h3 class="text-xl font-normal text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ \Carbon\Carbon::parse($pedido->created_at)->format('d-m-y') }}</h3>
                             </div>
-                            @if($pedido->estado == 'cancelado' || $pedido->estado == 'devuelto')
+                            @if($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto')
                             <div class="min-w-1/3">
                                 <dd class="text-primary-800 dark:text-primary-300 flex-1 items-center rounded bg-blue-200 px-3 py-1 text-sm font-medium break-all dark:bg-blue-600">
                                     <svg class="me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

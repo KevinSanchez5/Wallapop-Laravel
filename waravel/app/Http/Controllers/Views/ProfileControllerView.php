@@ -124,7 +124,7 @@ class ProfileControllerView extends Controller
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
         $query = Venta::where('comprador->id',  $cliente->id);
 
-        if (request()->has('estado') && request('estado') !== 'todos') {
+        if (request()->has('estado') && request('estado') !== 'Todos') {
             $query->where('estado', request('estado'));
             Log::info('Filtro por estado aplicado', ['estado' => request('estado')]);
         }
