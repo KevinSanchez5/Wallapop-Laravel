@@ -56,7 +56,6 @@ Route::middleware('api')->group(function () {
     Route::put('/ventas/{id}', [VentaController::class, 'update']);
     Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
 
-    Route::post('/crear-sesion-pago',[PagoController::class, 'crearSesionPago']);
 
     Route::get('/backups', [BackupController::class, 'getAllBackups']);
     Route::post('/backups/create', [BackupController::class, 'createBackup']);

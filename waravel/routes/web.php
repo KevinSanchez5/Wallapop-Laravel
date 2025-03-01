@@ -6,6 +6,7 @@ use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
 use App\Http\Controllers\Views\ProfileControllerView;
+use App\Http\Controllers\VentaController;
 use App\Http\Controllers\Views\ValoracionesControllerView;
 use App\Http\Middleware\AdminRoleAuth;
 use App\Http\Middleware\UserRoleAuth;
@@ -69,19 +70,15 @@ Route::post('/carrito/addToCart', [CarritoControllerView::class, 'addToCartOrEdi
 Route::put('/carrito/removeOne', [CarritoControllerView::class, 'deleteOneFromCart'])->name('carrito.removeOne');
 Route::put('/carrito/addOne', [CarritoControllerView::class, 'addOneToCart'])->name('carrito.addOne');
 Route::delete('/carrito/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
+Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])
+    ->name('pagarcarrito');
 
 Route::get('/passchange', function () {
     return view('auth.passchange');
 })->name('passchange');
 
-Route::get('/pago/success', function () {
-    return view('payment.success');
-})->name('pago.success');
-Route::get('/pago/cancelled', function () {
-    return view('payment.cancelled');
-})->name('payment.cancel');
-Route::get('/pago/checkout', function () {
-    return view('payment.checkout');
-});
+Route::get('/pago/success', [VentaController::class, 'pagoSuccess'])->name('pago.success');
+Route::get('/pago/error', function () {return view('payment.error');})->name('payment.error');
+Route::get('/pago/cancelled', function () {return view('payment.cancelled');})->name('payment.cancel');
 
 require __DIR__.'/auth.php';
