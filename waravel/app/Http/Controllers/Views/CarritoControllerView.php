@@ -183,11 +183,11 @@ class CarritoControllerView extends Controller
         foreach ($lineas as &$linea) {
             if ($linea->producto->guid == $productId) {
                 Log::info("Producto encontrado en el carrito, aumentando la cantidad");
-                $cart->precioTotal += $linea->producto->precio;
                 if ($linea->cantidad + 1 > $linea->producto->stock){
                     Log::warning("El producto no tiene stock suficiente para agregar más");
                     return response()->json("No hay stock suficiente para agregar más productos", 400);
                 }
+                $cart->precioTotal += $linea->producto->precio;
                 $linea->cantidad += 1;
                 $linea->precioTotal += $linea->producto->precio;
                 $lineaPrice = $linea->precioTotal;
@@ -249,11 +249,11 @@ class CarritoControllerView extends Controller
         foreach ($lineas as &$linea) {
             if ($linea->producto->id == $producto->id) {
                 Log::info("Producto encontrado en el carrito, editándolo");
-                $cart->precioTotal -= $linea->precioTotal;
                 if ($linea->cantidad + $amount > $linea->producto->stock){
                     Log::warning("El producto no tiene stock suficiente para agregar más");
                     return response()->json("No hay stock suficiente para agregar más productos", 400);
                 }
+                $cart->precioTotal -= $linea->precioTotal;
                 $linea->cantidad += $amount;
                 $linea->precioTotal = $linea->cantidad * $producto->precio;
                 $lineaPrice = $linea->precioTotal;

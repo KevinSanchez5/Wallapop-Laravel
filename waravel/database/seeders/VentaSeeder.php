@@ -14,7 +14,7 @@ class VentaSeeder extends Seeder
     {
         Venta::create([
             'guid'=>'kY8XqT5L9v3',
-            'estado' =>'Enviado',
+            'estado' =>'Procesando',
             'comprador' => [
                 'guid'=>'DU6jCZtareb',
                 'id' => 2,
@@ -33,6 +33,7 @@ class VentaSeeder extends Seeder
                     'producto' => [
                         'guid'=>'G4YXT9K5QLV',
                         'id' => 1,
+                        'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
                         'nombre' => 'Portatil Gamer',
                         'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
                         'estadoFisico' => 'Nuevo',
@@ -46,8 +47,8 @@ class VentaSeeder extends Seeder
             'created_at' => now()
         ]);
         Venta::create([
-            'guid'=>'Z4mT7pQX2Vy',
-            'estado' =>'Entregado',
+            'guid'=>'Z4mT745g2Vy',
+            'estado' =>'Procesando',
             'comprador' => [
                 'guid'=>'yEC3KBt6CFY',
                 'id' => 3,
@@ -66,6 +67,7 @@ class VentaSeeder extends Seeder
                     'producto' => [
                         'guid'=>'VYQ8XK4T9L5',
                         'id' => 4,
+                        'imagenes' => ['productos/pantalones1.webp', 'productos/pantalones2.webp'],
                         'nombre' => 'Pantalones Vaqueros',
                         'descripcion' => 'Pantalones Vaqueros cómodos.',
                         'estadoFisico' => 'Nuevo',
@@ -86,6 +88,277 @@ class VentaSeeder extends Seeder
                         'guid'=>'T3K9QLYV7X5',
                         'id' => 5,
                         'nombre' => 'Mario Party 8',
+                        'imagenes' => ['productos/mario1.webp','productos/mario2.webp'],
+                        'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 50.00,
+                        'categoria' => 'Videojuegos',
+                    ],
+                    'precioTotal' => 2 * 50.00
+                ]
+            ],
+            'precioTotal' => 110.00,
+            'created_at' => now()
+        ]);
+        Venta::create([
+            'guid'=>'Z4mT7p972Vy',
+            'estado' =>'Cancelado',
+            'comprador' => [
+                'guid'=>'yEC3KBt6CFY',
+                'id' => 2,
+                'nombre' => 'Pedro',
+                'apellido' => 'Martinez'
+            ],
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => 1,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 1,
+                    'producto' => [
+                        'guid'=>'VYQ8XK4T9L5',
+                        'id' => 4,
+                        'imagenes' => ['productos/pantalones1.webp', 'productos/pantalones2.webp'],
+                        'nombre' => 'Pantalones Vaqueros',
+                        'descripcion' => 'Pantalones Vaqueros cómodos.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 10.00,
+                        'categoria' => 'Ropa',
+                    ],
+                    'precioTotal' => 1 * 10.00
+                ],
+                [
+                    'vendedor' => [
+                        'guid'=>'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'T3K9QLYV7X5',
+                        'id' => 5,
+                        'nombre' => 'Mario Party 8',
+                        'imagenes' => ['productos/mario1.webp','productos/mario2.webp'],
+                        'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 50.00,
+                        'categoria' => 'Videojuegos',
+                    ],
+                    'precioTotal' => 2 * 50.00
+                ]
+            ],
+            'precioTotal' => 110.00,
+            'created_at' => now()
+        ]);
+        Venta::create([
+            'guid'=>'Z4mT67QX2Vy',
+            'estado' =>'Enviado',
+            'comprador' => [
+                'guid'=>'yEC3KBt6CFY',
+                'id' => 2,
+                'nombre' => 'Pedro',
+                'apellido' => 'Martinez'
+            ],
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => 1,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 1,
+                    'producto' => [
+                        'guid'=>'VYQ8XK4T9L5',
+                        'id' => 4,
+                        'imagenes' => ['productos/pantalones1.webp', 'productos/pantalones2.webp'],
+                        'nombre' => 'Pantalones Vaqueros',
+                        'descripcion' => 'Pantalones Vaqueros cómodos.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 10.00,
+                        'categoria' => 'Ropa',
+                    ],
+                    'precioTotal' => 1 * 10.00
+                ],
+                [
+                    'vendedor' => [
+                        'guid'=>'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'T3K9QLYV7X5',
+                        'id' => 5,
+                        'nombre' => 'Mario Party 8',
+                        'imagenes' => ['productos/mario1.webp','productos/mario2.webp'],
+                        'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 50.00,
+                        'categoria' => 'Videojuegos',
+                    ],
+                    'precioTotal' => 2 * 50.00
+                ]
+            ],
+            'precioTotal' => 110.00,
+            'created_at' => now()
+        ]);
+        Venta::create([
+            'guid'=>'Z4m4e7QX2Vy',
+            'estado' =>'Entregado',
+            'comprador' => [
+                'guid'=>'yEC3KBt6CFY',
+                'id' => 2,
+                'nombre' => 'Pedro',
+                'apellido' => 'Martinez'
+            ],
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => 1,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 1,
+                    'producto' => [
+                        'guid'=>'VYQ8XK4T9L5',
+                        'id' => 4,
+                        'imagenes' => ['productos/pantalones1.webp', 'productos/pantalones2.webp'],
+                        'nombre' => 'Pantalones Vaqueros',
+                        'descripcion' => 'Pantalones Vaqueros cómodos.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 10.00,
+                        'categoria' => 'Ropa',
+                    ],
+                    'precioTotal' => 1 * 10.00
+                ],
+                [
+                    'vendedor' => [
+                        'guid'=>'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'T3K9QLYV7X5',
+                        'id' => 5,
+                        'nombre' => 'Mario Party 8',
+                        'imagenes' => ['productos/mario1.webp','productos/mario2.webp'],
+                        'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 50.00,
+                        'categoria' => 'Videojuegos',
+                    ],
+                    'precioTotal' => 2 * 50.00
+                ]
+            ],
+            'precioTotal' => 110.00,
+            'created_at' => now()
+        ]);
+        Venta::create([
+            'guid'=>'Z4507QX2Vy',
+            'estado' =>'Pendiente',
+            'comprador' => [
+                'guid'=>'yEC3KBt6CFY',
+                'id' => 2,
+                'nombre' => 'Pedro',
+                'apellido' => 'Martinez'
+            ],
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => 1,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 1,
+                    'producto' => [
+                        'guid'=>'VYQ8XK4T9L5',
+                        'id' => 4,
+                        'imagenes' => ['productos/pantalones1.webp', 'productos/pantalones2.webp'],
+                        'nombre' => 'Pantalones Vaqueros',
+                        'descripcion' => 'Pantalones Vaqueros cómodos.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 10.00,
+                        'categoria' => 'Ropa',
+                    ],
+                    'precioTotal' => 1 * 10.00
+                ],
+                [
+                    'vendedor' => [
+                        'guid'=>'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'T3K9QLYV7X5',
+                        'id' => 5,
+                        'nombre' => 'Mario Party 8',
+                        'imagenes' => ['productos/mario1.webp','productos/mario2.webp'],
+                        'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 50.00,
+                        'categoria' => 'Videojuegos',
+                    ],
+                    'precioTotal' => 2 * 50.00
+                ]
+            ],
+            'precioTotal' => 110.00,
+            'created_at' => now()
+        ]);
+        Venta::create([
+            'guid'=>'Z4mT59QX2Vy',
+            'estado' =>'Devuelto',
+            'comprador' => [
+                'guid'=>'yEC3KBt6CFY',
+                'id' => 2,
+                'nombre' => 'Pedro',
+                'apellido' => 'Martinez'
+            ],
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => 1,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 1,
+                    'producto' => [
+                        'guid'=>'VYQ8XK4T9L5',
+                        'id' => 4,
+                        'imagenes' => ['productos/pantalones1.webp', 'productos/pantalones2.webp'],
+                        'nombre' => 'Pantalones Vaqueros',
+                        'descripcion' => 'Pantalones Vaqueros cómodos.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 10.00,
+                        'categoria' => 'Ropa',
+                    ],
+                    'precioTotal' => 1 * 10.00
+                ],
+                [
+                    'vendedor' => [
+                        'guid'=>'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'T3K9QLYV7X5',
+                        'id' => 5,
+                        'nombre' => 'Mario Party 8',
+                        'imagenes' => ['productos/mario1.webp','productos/mario2.webp'],
                         'descripcion' => 'Juego de plataformas y acción, muy popular en Nintendo.',
                         'estadoFisico' => 'Nuevo',
                         'precio' => 50.00,

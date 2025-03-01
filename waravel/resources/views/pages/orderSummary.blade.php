@@ -34,28 +34,34 @@
 
             <div class="w-full md:w-[55%]">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl transition-all duration-300">Detalles de la compra</h2>
-                <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 mt-4 p-6">
+                <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 mt-4 px-6 py-2">
                     <table class="w-full text-left font-medium text-gray-900 dark:text-white md:table-fixed">
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                        <tbody>
                         @forelse($cart->lineasCarrito as $linea)
-                            <tr>
-                                <td class="whitespace-nowrap py-4" style="width: 60%">
+                            @if($loop->last)
+                                <tr class="mb-2">
+                            @else
+                                <tr class="border-b border-gray-300 dark:border-gray-700">
+                            @endif
+                                <td class="py-4" style="width: 60%;">
                                     <div class="flex items-center gap-4">
-                                        <div class="flex items-center aspect-square w-10 h-10 shrink-0">
-                                            <img class="h-auto w-full max-h-full" src=" {{ asset( 'storage/' . $linea->producto->imagenes[0]) }}" alt="imac image" />
+                                        <div class="shrink-0">
+                                            <img class="h-20 w-20 object-cover rounded-md" src="{{ asset('storage/' . $linea->producto->imagenes[0]) }}" alt="imagen de {{ $linea->producto->nombre }}" />
                                         </div>
-                                        <span>{{ $linea->producto->nombre }}</span>
+                                        <span class="text-base font-medium text-gray-900 dark:text-white">{{ $linea->producto->nombre }}</span>
                                     </div>
                                 </td>
 
                                 <td class="p-4 text-base font-normal text-gray-900 dark:text-white">x{{ $linea->cantidad }}</td>
 
-                                <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">{{ $linea->precioTotal }}</td>
+                                <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">{{ $linea->precioTotal }} €</td>
                             </tr>
                         @empty
-                            <p class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem">
-                                No hay productos en el pedido
-                            </p>
+                            <tr>
+                                <td colspan="3" class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem;">
+                                    No hay productos en el pedido
+                                </td>
+                            </tr>
                         @endforelse
                         </tbody>
                     </table>

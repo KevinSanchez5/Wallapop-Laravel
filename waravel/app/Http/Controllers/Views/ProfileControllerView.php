@@ -94,7 +94,7 @@ class ProfileControllerView extends Controller
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
-        $query = Venta::where('comprador->id',  $cliente->id);
+        $query = Venta::where('comprador->id',$cliente->id);
 
         $pedidos = $query->orderBy('created_at', 'desc')->paginate(6);
 
@@ -122,7 +122,7 @@ class ProfileControllerView extends Controller
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
         $query = Venta::where('comprador->id',  $cliente->id);
 
-        if (request()->has('estado') && request('estado') !== 'todos') {
+        if (request()->has('estado') && request('estado') !== 'Todos') {
             $query->where('estado', request('estado'));
             Log::info('Filtro por estado aplicado', ['estado' => request('estado')]);
         }
@@ -131,6 +131,44 @@ class ProfileControllerView extends Controller
 
         Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
         return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
+    }
+
+    // Temporal
+    public function showOrder($guid) {
+        Log::info('Accediendo a la página de detalle del pedido');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus pedidos.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo pedidos');
+
+        $pedido = Venta::where('guid',  $guid)->first();
+
+        if (!$pedido) {
+            return redirect()->route('profile')->with('error', 'No se ha encontrado el pedido.');
+        }
+
+        Log::info('Pedido encontrado, verificando que le pertenece al cliente');
+
+        if ($cliente->id !== $pedido->comprador->id) {
+            Log::error('El pedido no le pertenece al cliente.');
+            return redirect()->route('profile')->with('error', 'No tienes permisos para ver este pedido.');
+        }
+
+        Log::info('Pedido válido y pertenece al cliente, mostrando la vista de detalle del pedido');
+
+        return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario'));
     }
 
     public function edit(Request $request)
