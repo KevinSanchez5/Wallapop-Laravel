@@ -135,7 +135,7 @@
                                     @elseif($pedido->estado == 'Enviado')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-3/4 z-10"></div>
                                     @elseif($pedido->estado == 'Entregado')
-                                        <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-1 z-10"></div>
+                                        <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-full z-10"></div>
                                     @endif
                                 </div>
                             </div>
