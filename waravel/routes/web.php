@@ -24,6 +24,7 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile/myOrders', [ProfileControllerView::class, 'showOrders'])->name('profile.orders');
     Route::get('/profile/mySales', [ProfileControllerView::class, 'showOrders'])->name('profile.sales');
     Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
+    Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('profile.orders.detail');
     Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileControllerView::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
