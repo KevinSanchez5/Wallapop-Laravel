@@ -306,10 +306,6 @@ class CarritoControllerView extends Controller
         Log::info('Buscando el perfil del cliente en la base de datos');
         $cliente = $usuario->cliente;
 
-        if (!$cliente) {
-            Log::warning("El usuario {$usuario->id} no tiene un perfil de cliente asociado.");
-            return redirect()->route('home')->with('error', 'No tienes un perfil de cliente asociado.');
-        }
 
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));

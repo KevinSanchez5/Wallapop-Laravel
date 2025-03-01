@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\Producto;
 use App\Models\Venta;
+use App\Utils\GuidGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -132,7 +134,6 @@ class VentaController extends Controller
         return response()->json(['message' => 'Venta eliminada correctamente']);
     }
 
-    //TODO generar guid mejor
     public function validandoVentaAPartirDeCarrito()
     {
         Log::info('Creando venta a partir de carrito');
@@ -141,7 +142,6 @@ class VentaController extends Controller
         if (!$carrito || empty($carrito) || empty($carrito->lineasCarrito)) {
             return redirect()->back()->with('error', 'No hay productos en el carrito');
         }
-        $guid = uniqid();
         $usuario=Auth::user();
 
         if (!$usuario){
@@ -152,8 +152,16 @@ class VentaController extends Controller
             return redirect()->back()->with('error', 'No se encontro cliente registrado');
         }
 
+        Log::info('Creando lineas de venta a partir de lineas de carrito');
         $lineasVenta = [];
+        $precioDeTodo = 0;
         foreach($carrito->lineasCarrito as $linea){
+            Log::info('Validando disponibilidad de productos y precios en base de datos');
+            $producto = Producto::find($linea->producto->id);
+            if(!$producto || $producto->stock < $linea->cantidad ||$producto->estado !== 'Disponible') {
+                Log::warning('Producto no disponible: ' . $linea->producto->nombre);
+                return response()->json(['message' => 'Producto no disponible: ' . $linea->producto->nombre], 400);
+            }
             $lineasVenta[] = [
                 'vendedor' => [
                     'id' => $linea->producto->vendedor->id,
@@ -163,28 +171,30 @@ class VentaController extends Controller
                     ],
                 'cantidad' => $linea->cantidad,
                 'producto' => [
-                    'id' => $linea->producto['id'],
-                    'guid' => $linea->producto['guid'],
-                    'nombre' => $linea->producto['nombre'],
-                    'descripcion' => $linea->producto['descripcion'],
-                    'estadoFisico' => $linea->producto['estadoFisico'],
-                    'precio' => $linea->producto['precio'],
-                    'categoria' => $linea->producto['categoria'],
+                    'id' => $linea->producto->id,
+                    'guid' => $linea->producto->guid,
+                    'nombre' => $linea->producto->nombre,
+                    'descripcion' => $linea->producto->descripcion,
+                    'estadoFisico' => $linea->producto->estadoFisico,
+                    'precio' => $linea->producto->precio,
+                    'categoria' => $linea->producto->categoria,
                 ],
                 'precioTotal' => $linea->precioTotal,
             ];
+            $precioDeTodo+= $linea->precioTotal;
         }
 
+
         $venta = [
-            'guid' => $guid,
+            'guid' => GuidGenerator::generarId(),
             'comprador' => [
                 'id' => $usuario->id,
                 'guid' => $usuario->guid,
-                'nombre' => $usuario->name,
+                'nombre' => $cliente->nombre,
                 'cliente' =>$cliente->apellido,
             ],
-            'lineaVenta' => $lineasVenta,
-            'precioTotal' => $carrito->precioTotal,
+            'lineaVentas' => $lineasVenta,
+            'precioTotal' => $precioDeTodo,
             'estado' => 'Pendiente',
             'created_at' => now(),
         ];
@@ -192,20 +202,15 @@ class VentaController extends Controller
         $validator = Validator::make($venta, [
             'guid' => 'required|string|max:255|unique:ventas',
             'comprador' => 'required|array',
-            'lineaVenta' => 'required|array',
-            'precioTotal' => 'required|numeric|min:0'
+            'lineaVentas' => 'required|array',
+            'precioTotal' => 'required|numeric|min:0',
+            'estado' => 'required|string|max:25',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        Log::info('Validando disponibilidad de productos y precios en base de datos');
-        foreach ($venta['lineaVenta'] as $linea){
-            $producto = Product::find($linea['producto']['id']);
-            if(!$producto || $producto->stock < $linea['cantidad'] ||$producto->estado !== 'disponible') {
-                return response()->json(['message' => 'Producto no disponible: ' . $linea['producto']['nombre']], 400);
-            }
-        }
+
         Log::info('Carrito validado, se procede al pago de este');
         return $venta;
     }
@@ -216,7 +221,7 @@ class VentaController extends Controller
         $venta= $this->validandoVentaAPartirDeCarrito();
 
         if($venta instanceof JsonResponse){
-            return $venta;
+            return $venta;// Retorna si hay errores al crear la venta
         }
 
         $precioStripe = $this->crearPrecioStripe($venta['guid'], $venta['precioTotal']);
@@ -296,7 +301,7 @@ class VentaController extends Controller
                 'cancel_url' => $OUR_DOMAIN . '/pago/cancelled',
             ]);
 
-            return redirect()->away($checkoutSession->url);
+            return $checkoutSession;
 
         } catch (\Exception $e){
             return response()-> json(['error' => $e->getMessage()]);
