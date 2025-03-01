@@ -45,7 +45,7 @@
                     </div>
 
                     <!-- Botón de eliminar -->
-                    <form action="{{ route('admin.reviews.destroy', $valoracion->id) }}" method="POST" class="mt-4">
+                    <form action="{{ route('admin.delete.review', $valoracion->id) }}" method="POST" class="mt-4">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
