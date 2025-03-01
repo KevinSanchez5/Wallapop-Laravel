@@ -14,10 +14,18 @@ return new class extends Migration
         Schema::create('ventas', function (Blueprint $table) {
             $table->id();
             $table->string('guid', 11)->unique();
-            $table->string('estado');
             $table->json('comprador');
             $table->json('lineaVentas');
             $table->double('precioTotal');
+            //$table->string('payment_intent_id')->nullable();
+            $table->enum('estado', [
+                'Pendiente',
+                'Procesando',
+                'Enviado',
+                'Entregado',
+                'Cancelado',
+                'Devuelto'
+            ]);
             $table->timestamps();
         });
     }

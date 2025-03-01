@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -20,6 +21,7 @@ Route::middleware('guest')->group(function () {
 
     Route::post('passchange', [PasswordResetController::class, 'store'])
         ->name('passchange.store');
+
 });
 
 Route::middleware('auth')->group(function () {
@@ -49,6 +51,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('misventas', [ClienteController::class, 'misVentas'])
             ->name('cliente.misventas');
+
     });
 
     /*
