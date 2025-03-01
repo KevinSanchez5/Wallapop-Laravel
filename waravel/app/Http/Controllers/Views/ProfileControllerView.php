@@ -157,7 +157,18 @@ class ProfileControllerView extends Controller
 
         $pedido = Venta::where('guid',  $guid)->first();
 
-        Log::info($pedido);
+        if (!$pedido) {
+            return redirect()->route('profile')->with('error', 'No se ha encontrado el pedido.');
+        }
+
+        Log::info('Pedido encontrado, verificando que le pertenece al cliente');
+
+        if ($cliente->id !== $pedido->comprador->id) {
+            Log::error('El pedido no le pertenece al cliente.');
+            return redirect()->route('profile')->with('error', 'No tienes permisos para ver este pedido.');
+        }
+
+        Log::info('Pedido válido y pertenece al cliente, mostrando la vista de detalle del pedido');
 
         return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario'));
     }
