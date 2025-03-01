@@ -2,7 +2,7 @@
 
 @section('content')
     <h1 class="text-3xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">
-        Dashboard de Administración
+        Panel de Administración de {{ Auth::user()->name }}
     </h1>
 
     <!-- Contenedor Flex de 3 Columnas -->
@@ -120,13 +120,8 @@
             <div class="flex justify-between items-center mb-4">
                 <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-200 flex items-center gap-2">
                     <i class=" text-[#BFF205] fas fa-user-plus"></i> &nbsp;
-                    Sección Administradores
+                    Administradores
                 </h5>
-                <a href="{{ route('admins.add') }}" class="bg-[#BFF205] hover:bg-[#96bf03] text-black px-4 py-2 rounded-lg transition flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                </a>
             </div>
 
             <ul class="space-y-3 overflow-y-auto pr-2" style="max-height: 290px;">
@@ -137,15 +132,17 @@
                             <span class="text-gray-600 dark:text-gray-400 text-sm">{{ $admin->email }}</span>
                             <span class="text-gray-500 dark:text-gray-400 text-xs">Creado: {{ $admin->created_at->format('d/m/Y H:i') }}</span>
                         </div>
-                        <form action="{{ route('admin.delete', $admin->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este administrador?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 transition flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </form>
+                        @if ($admin->email != 'admin@example.com')
+                            <form action="{{ route('admin.delete', $admin->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este administrador?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 transition flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        @endif
                     </li>
                 @endforeach
             </ul>
