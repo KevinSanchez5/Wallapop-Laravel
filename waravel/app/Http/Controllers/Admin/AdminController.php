@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
-use App\Models\Valoracion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Valoracion;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -156,9 +157,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Backup restaurado correctamente']);
     }
 
-    /**
-     * Muestra la lista de todos los clientes registrados en el sistema.
-     */
     public function listClients()
     {
         Log::info('Obteniendo clientes cuyo usuario tiene el rol de cliente');
@@ -208,39 +206,6 @@ class AdminController extends Controller
         return view('admin.reviews', compact('valoraciones'));
     }
 
-    public function deleteReview($id)
-    {
-        $valoracion = Valoracion::findOrFail($id);
-        $valoracion->delete();
-        return redirect()->route('admin.reviews')->with('success', 'Valoración eliminada correctamente.');
-    }
-
-    /**
-     * Muestra la lista de todos los administradores registrados.
-     */
-    public function listAdmins()
-    {
-        /*Log::info("Obteniendo todos los usuarios administradores");
-
-        Log::info("Redireccionando a la lista de administradores");
-        return view('admin.dashboard', compact('admins'));*/
-    }
-
-    /**
-     * Añadir un nuevo administrador al sistema.
-     */
-    public function addAdmin()
-    {
-    }
-    public function showAddForm()
-    {
-        return view('admin.add-admins');
-    }
-
-
-    /**
-     * Ver la lista de todos los productos en la plataforma vendidos, desactivados baneados....
-     */
     public function listProducts()
     {
         Log::info("Obteniendo todos los productos");
@@ -270,9 +235,34 @@ class AdminController extends Controller
         return view('admin.products', compact('productos'));
     }
 
-    /**
-     * Banear un producto específico.
-     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $adminCount = User::where('role', 'admin')->count();
+        Log::info("Intentando añadir un nuevo administrador. Total actuales: {$adminCount}");
+
+        if ($adminCount >= 10) {
+            Log::warning("Se intentó añadir un administrador, pero ya hay 10 registrados.");
+            return response()->json(['message' => 'Demasiados administradores. No se pueden agregar más.'], 400);
+        }
+
+        $admin = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'admin',
+        ]);
+
+        Log::info("Administrador añadido correctamente: {$admin->email}");
+
+        return response()->json(['message' => 'Administrador agregado con éxito.', 'admin' => $admin], 201);
+    }
+
     public function banProduct($guid)
     {
         // Buscar el producto por GUID
@@ -294,90 +284,48 @@ class AdminController extends Controller
         return redirect()->route('admin.products')->with('success', 'Estado del producto actualizado correctamente.');
     }
 
-    /**
-     * Eliminar un producto de forma permanente.
-     */
-    public function deleteProduct($guid)
+    public function deleteReview($guid)
     {
-        // Buscar y eliminar el producto de la base de datos
-        Log::info("Obteniendo producto por GUID");
-        $producto = Producto::where('guid', $guid)->first();
-
-        if (!$producto) {
-            Log::warning('Producto no encontrado', ['guid' => $guid]);
-            return redirect()->route('profile')->with('error', 'Producto no encontrado'); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        }
-
-        // Eliminar imágenes asociadas si existen // TOOD -> REVISAR QUE SE BORRAN LAS IMÁGENES
-        Log::info("Eliminando imágenes asociadas al producto");
-        $imagenes = $producto->imagenes;
-        foreach ($imagenes as $imagen) {
-            $filePath = $imagen->input('image');
-
-            $key = array_search($filePath, $imagenes);
-            if ($key === false) {
-                return response()->json(['message' => 'Foto no encontrada en el producto'], 404);
-            }
-
-            Storage::disk('public')->delete($filePath);
-            unset($imagenes[$key]);
-        }
-
-        // Eliminar producto
-        $producto->delete();
-
-        // Retornar a la vista ...
-        Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('admin.products')->with('success', 'Producto borrado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        $valoracion = Valoracion::findOrFail($guid);
+        //logers
+        Log::info("Eliminando valoración");
+        // Eliminar la valoración y retornar a la lista de valoraciones con un mensaje de éxito
+        $valoracion->delete();
+        Log::info("Valoración eliminada, Redireccionando a la lista de valoraciones");
+        return redirect()->route('admin.reviews')->with('success', 'Valoración eliminada correctamente.');
     }
 
-    /**
-     * Eliminar un cliente de forma permanente.
-     */
     public function deleteClient($guid)
     {
-        // Buscar al cliente
         Log::info("Obteniendo cliente por GUID");
         $cliente = Cliente::where('guid', $guid)->first();
 
         if (!$cliente) {
             Log::warning('Cliente no encontrado', ['guid' => $guid]);
-            return redirect()->route('profile')->with('error', 'Cliente no encontrado'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+            return redirect()->route('profile')->with('error', 'Cliente no encontrado');
         }
 
-        // Eliminar su cuenta
         Log::info("Eliminando cuenta del cliente");
 
-        // Eliminar cliente
         $cliente->delete();
 
-        // Retornar a la vista ...
-        Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('admin.clients')->with('success', 'Cliente borrado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
-
+        Log::info("Redireccionando a ..........");
+        return redirect()->route('admin.clients')->with('success', 'Cliente borrado correctamente.');
     }
 
-    /**
-     * Restaurar un producto baneado (volverlo a activar).
-     */
-    public function restoreProduct($guid)
+    public function deleteAdmin($guid)
     {
-        // Buscar el producto por ID
-        Log::info("Obteniendo producto por GUID");
-        $producto = Producto::where('guid', $guid);
+        $admin = User::find($guid);
 
-        if (!$producto) {
-            Log::warning('Producto no encontrado', ['guid' => $guid]);
-            return redirect()->route('profile')->with('error', 'Producto no encontrado'); // TODO -> CAMBIAR POR LA VISTA DESEADA
+        if ($admin) {
+            Log::info('Administrador eliminado: ' . $admin->name . ' (ID: ' . $admin->id . ')');
+
+            $admin->delete();
+            return redirect()->route('admin.dashboard')->with('success', 'Administrador eliminado.');
+        } else {
+            Log::warning('Intento de eliminar un administrador que no existe. GUID: ' . $guid);
+
+            return redirect()->route('admin.dashboard')->with('error', 'Administrador no encontrado.');
         }
-
-        // Cambiar su estado a "disponible"
-        Log::info("Desbaneando producto");
-        $producto->estado = "Desactivado";
-        $producto->save();
-
-        // Retornar a la vista ...
-        Log::info("Redireccionando a .........."); // TODO -> CAMBIAR POR LA VISTA DESEADA
-        return redirect()->route('admin.products')->with('success', 'Producto baneado correctamente.'); // TODO -> CAMBIAR POR LA VISTA DESEADA
     }
 }

@@ -31,7 +31,7 @@ class ProductoControllerView extends Controller
             $query->where('vendedor_id', '!=', $clienteId);
         }
 
-        $productos = $query->orderBy('created_at', 'desc')->paginate(15);
+        $productos = $query->orderBy('updated_at', 'desc')->paginate(15);
 
         Log::info('Productos cargados', ['total_productos' => $productos->count()]);
 
@@ -69,7 +69,7 @@ class ProductoControllerView extends Controller
             Log::info('Filtro por categoría aplicado', ['categoria' => request('categoria')]);
         }
 
-        $productos = $query->orderBy('created_at', 'desc')->paginate(15);
+        $productos = $query->orderBy('updated_at', 'desc')->paginate(15);
 
         Log::info('Productos cargados después de la búsqueda', ['total_productos' => $productos->count()]);
 
@@ -100,7 +100,6 @@ class ProductoControllerView extends Controller
 
         return view('pages.ver-producto', compact('producto'));
     }
-
 
     public function store(Request $request)
     {

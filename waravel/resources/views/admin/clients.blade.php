@@ -27,12 +27,12 @@
             @foreach($clientes as $cliente)
                 <tr class="hover:bg-gray-200 dark:hover:bg-gray-600">
                     <td class="py-2 px-4">{{ $cliente->id }}</td>
-                    <td class="py-2 px-4">{{ $cliente->nombre }} {{ $cliente->apellido }}</td>
+                    <td class="py-2 px-4"><a href="{{route("cliente.ver", $cliente->guid)}}"><b>{{ $cliente->nombre }} {{ $cliente->apellido }}</b></a></td>
                     <td class="py-2 px-4">{{ $cliente->usuario->email }}</td>
                     <td class="py-2 px-4 capitalize">{{ $cliente->usuario->role }}</td>
                     <td class="py-2 px-4">{{ $cliente->productos_count }}</td>
                     <td class="py-2 px-4">
-                        <form action="" method="POST">
+                        <form action="{{route('admin.delete.client', $cliente->guid)}}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300">

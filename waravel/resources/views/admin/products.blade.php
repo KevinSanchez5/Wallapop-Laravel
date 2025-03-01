@@ -33,11 +33,12 @@
                     <td class="py-2 px-4">{{ $producto->estado }}</td>
                     <td class="py-2 px-4">
                         <!-- Botón para cambiar el estado del producto -->
-                        <form action="{{ route('admin.banProduct', $producto->guid) }}" method="POST">
+                        <form action="{{ route('admin.ban.product', $producto->guid) }}" method="POST">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="p-2 text-black rounded-md bg-[#BFF205] hover:bg-[#96bf03] ">
-                                {{ $producto->estado === 'Baneado' ? 'Rehabilitar' : 'Bannear' }}
+                            <button type="submit" class="p-2 text-white rounded-md transition duration-300
+                                {{ $producto->estado === 'Baneado' ? 'bg-blue-500 hover:bg-blue-700' : 'bg-red-500 hover:bg-red-700' }}">
+                                {{ $producto->estado === 'Baneado' ? 'Rehabilitar' : 'Banear' }}
                             </button>
                         </form>
                     </td>
