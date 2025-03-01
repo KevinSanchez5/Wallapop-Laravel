@@ -76,11 +76,8 @@ Route::get('/passchange', function () {
     return view('auth.passchange');
 })->name('passchange');
 
-Route::get('/pago/success', function () {
-    return view('payment.success');
-})->name('pago.success');
-Route::get('/pago/cancelled', function () {
-    return view('payment.cancelled');
-})->name('payment.cancel');
+Route::get('/pago/success', [VentaController::class, 'pagoSuccess'])->name('pago.success');
+Route::get('/pago/error', function () {return view('payment.error');})->name('payment.error');
+Route::get('/pago/cancelled', function () {return view('payment.cancelled');})->name('payment.cancel');
 
 require __DIR__.'/auth.php';

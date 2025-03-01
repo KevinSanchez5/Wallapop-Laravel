@@ -140,16 +140,16 @@ class VentaController extends Controller
 
         $carrito = session()->get('carrito');
         if (!$carrito || empty($carrito) || empty($carrito->lineasCarrito)) {
-            return redirect()->back()->with('error', 'No hay productos en el carrito');
+            return redirect()->route('payment.error')->with('error', 'No hay productos en el carrito');
         }
         $usuario=Auth::user();
 
         if (!$usuario){
-            return redirect()->back()->with('error', 'No hay usuario registrado');
+            return redirect()->route('payment.error')->with('error', 'No hay usuario registrado');
         }
         $cliente= Cliente::where('usuario_id', $usuario->id)->first();
         if(!$cliente){
-            return redirect()->back()->with('error', 'No se encontro cliente registrado');
+            return redirect()->route('payment.error')->with('error', 'No se encontro cliente registrado');
         }
 
         Log::info('Creando lineas de venta a partir de lineas de carrito');
@@ -159,9 +159,11 @@ class VentaController extends Controller
             Log::info('Validando disponibilidad de productos y precios en base de datos');
             $producto = Producto::find($linea->producto->id);
             if(!$producto || $producto->stock < $linea->cantidad ||$producto->estado !== 'Disponible') {
-                Log::warning('Producto no disponible: ' . $linea->producto->nombre);
-                return response()->json(['message' => 'Producto no disponible: ' . $linea->producto->nombre], 400);
+                Log::warning('Producto no disponible: ' . ($producto ? $producto->nombre : 'Producto desconocido'));
+                return redirect()->route('payment.error')->with('message', 'Producto no disponible: '.  ($producto ? $producto->nombre : 'Producto desconocido'));
             }
+            $precioLinea = $producto->precio * $linea->cantidad;
+
             $lineasVenta[] = [
                 'vendedor' => [
                     'id' => $linea->producto->vendedor->id,
@@ -179,9 +181,9 @@ class VentaController extends Controller
                     'precio' => $linea->producto->precio,
                     'categoria' => $linea->producto->categoria,
                 ],
-                'precioTotal' => $linea->precioTotal,
+                'precioTotal' => $precioLinea,
             ];
-            $precioDeTodo+= $linea->precioTotal;
+            $precioDeTodo+= $precioLinea;
         }
 
 
@@ -191,7 +193,7 @@ class VentaController extends Controller
                 'id' => $usuario->id,
                 'guid' => $usuario->guid,
                 'nombre' => $cliente->nombre,
-                'cliente' =>$cliente->apellido,
+                'apellido' =>$cliente->apellido,
             ],
             'lineaVentas' => $lineasVenta,
             'precioTotal' => $precioDeTodo,
@@ -207,7 +209,7 @@ class VentaController extends Controller
             'estado' => 'required|string|max:25',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return redirect()->route('payment.error')->with('error', 'Hubo un error en los datos de la venta.');
         }
 
 
@@ -223,7 +225,7 @@ class VentaController extends Controller
         if($venta instanceof JsonResponse){
             return $venta;// Retorna si hay errores al crear la venta
         }
-
+        session(['venta' => $venta]);
         $precioStripe = $this->crearPrecioStripe($venta['guid'], $venta['precioTotal']);
 
         if ($precioStripe instanceof JsonResponse) {
@@ -234,9 +236,6 @@ class VentaController extends Controller
         if ($checkoutSession instanceof JsonResponse) {
             return $checkoutSession;
         }
-        //TODO nuevo campo en caso de reembolso
-        //$venta['payment_intent_id'] = $checkoutSession->payment_intent;
-        $this->guardarVenta($venta);
 
         return redirect()->away($checkoutSession->url);
     }
@@ -247,6 +246,43 @@ class VentaController extends Controller
         $ventaModel = new Venta($venta);
         $ventaModel->save();
         Log::info('Venta guardada correctamente');
+    }
+
+    public function pagoSuccess(Request $request)
+    {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        try {
+            $sessionId = $request->query('session_id');
+            $checkoutSession = Session::retrieve($sessionId);
+
+            // Verificar el estado del pago (payment_intent)
+            $paymentIntent = PaymentIntent::retrieve($checkoutSession->payment_intent);
+
+            if ($paymentIntent->status == 'succeeded') {
+                $venta = session('venta');
+                if(!$venta){
+                    return redirect()-> route('pago.error')->with('error', 'Venta no encontrada');
+                }
+                //TODO nuevo campo en caso de reembolso
+                //$venta['payment_intent_id'] = $checkoutSession->payment_intent;
+                $venta['payment_intent_id'] = $checkoutSession->payment_intent; // Asignar el payment_intent
+
+                $this->guardarVenta($venta);
+
+                session()->forget('carrito'); // Eliminar el carrito de la sesión
+                session()->forget('venta');   // Eliminar la venta de la sesión
+
+
+                return redirect()->route('payment.success'); // Ruta donde el usuario ve el mensaje de éxito
+
+            } else {
+
+                return redirect()->route('payment.error'); // Ruta para error de pago
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
 
@@ -306,24 +342,6 @@ class VentaController extends Controller
         } catch (\Exception $e){
             return response()-> json(['error' => $e->getMessage()]);
         }
-    }
-
-    public function handleWebhook(Request $request)
-    {
-        $payload = $request->getContent();
-        $event = json_decode($payload);
-
-        if ($event->type === 'checkout.session.completed') {
-            $paymentIntentId = $event->data->object->payment_intent;
-            $venta = Venta::where('payment_intent_id', $paymentIntentId)->first();
-
-            if ($venta) {
-                $venta->estado = 'Pagado';
-                $venta->save();
-                Log::info('Venta actualizada como pagada. ID: ' . $venta->id);
-            }
-        }
-        return response()->json(['status' => 'success']);
     }
 
 

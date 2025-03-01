@@ -298,10 +298,6 @@ class CarritoControllerView extends Controller
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
-        if (!$usuario) {
-            Log::warning('Usuario no autenticado intentó acceder al resumen de pedido');
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tu pedido.');
-        }
 
         Log::info('Buscando el perfil del cliente en la base de datos');
         $cliente = $usuario->cliente;
