@@ -30,10 +30,10 @@ class VentaController extends Controller
             return [
                 'id' => $venta->id,
                 'guid' => $venta->guid,
+                'estado' => $venta->estado,
                 'comprador' => $venta->comprador,
                 'lineaVentas' => $venta->lineaVentas,
                 'precioTotal' => $venta->precioTotal,
-                'estado' => $venta->estado,
                 'created_at' => $venta->created_at->toDateTimeString(),
                 'updated_at' => $venta->updated_at->toDateTimeString(),
             ];
@@ -73,10 +73,10 @@ class VentaController extends Controller
         $data = [
             'id' => $venta->id,
             'guid' => $venta->guid,
+            'estado' => $venta->estado,
             'comprador' => $venta->comprador,
             'lineaVentas' => $venta->lineaVentas,
             'precioTotal' => $venta->precioTotal,
-            'estado' => $venta->estado,
             'created_at' => $venta->created_at->toDateTimeString(),
             'updated_at' => $venta->updated_at->toDateTimeString(),
         ];
@@ -93,10 +93,10 @@ class VentaController extends Controller
         Log::info('Validando venta');
 
         $validator = Validator::make($request->all(), [
+            'estado' =>'required|string|max:255',
             'comprador' => 'required|array',
             'lineaVentas' => 'required|array',
             'precioTotal' => 'required|numeric|min:0',
-            'estado' => 'required|string|max:255'
         ]);
 
         if ($validator->fails()) {

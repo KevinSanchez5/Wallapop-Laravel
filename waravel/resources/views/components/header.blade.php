@@ -50,9 +50,17 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</p>
                         </div>
                         <hr class="border-gray-300 dark:border-gray-600">
-                        <x-dropdown-link :href="route('profile')">
-                            {{ __('Perfil') }}
-                        </x-dropdown-link>
+
+                        @if (Auth::user()->role === 'admin')
+                            <x-dropdown-link :href="route('admin.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-dropdown-link>
+                        @else
+                            <x-dropdown-link :href="route('profile')">
+                                {{ __('Perfil') }}
+                            </x-dropdown-link>
+                        @endif
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
@@ -65,8 +73,8 @@
             @else
                 <a href="{{ route('login') }}"
                    class="h-10 flex items-center justify-center text-base font-extrabold tracking-wide bg-white text-black hover:text-white hover:bg-black dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black rounded-lg transition-all border-2 border-transparent shadow-md px-6 sm:px-3">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                         class="w-8 h-8 transition-colors duration-300">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                         class="w-6 h-6 transition-colors duration-300">
                         <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
                         <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
                     </svg>

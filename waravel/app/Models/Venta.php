@@ -17,7 +17,9 @@ class Venta extends Model
         parent::boot();
 
         static::creating(function ($venta) {
-            $venta->guid = GuidGenerator::generarId();
+            if (empty($venta->guid)) {
+                $venta->guid = GuidGenerator::generarId();
+            }
         });
     }
 
@@ -32,7 +34,7 @@ class Venta extends Model
             return $value;
         }
 
-        return json_decode($value, true);
+        return json_decode($value);
     }
 
     public function setLineaVentasAttribute($value)

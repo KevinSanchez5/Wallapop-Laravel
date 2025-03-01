@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
@@ -18,12 +19,16 @@ Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'p
 
 Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile', [ProfileControllerView::class, 'show'])->name('profile');
+    Route::get('/profile/myProducts', [ProfileControllerView::class, 'show'])->name('profile.products');
+    Route::get('/profile/myReviews', [ProfileControllerView::class,'showReviews'])->name('profile.reviews');
+    Route::get('/profile/myOrders', [ProfileControllerView::class, 'showOrders'])->name('profile.orders');
+    Route::get('/profile/mySales', [ProfileControllerView::class, 'showOrders'])->name('profile.sales');
+    Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
     Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileControllerView::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
-
     Route::get('/producto/add', [ProductoControllerView::class, 'showAddForm'])->name('producto.add');
     Route::get('/producto/{guid}/edit', [ProductoControllerView::class, 'edit'])->name('producto.edit');
     Route::put('/producto/{guid}', [ProductoControllerView::class, 'update'])->name('producto.update');
@@ -35,12 +40,25 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
 
 Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/clients', [AdminController::class, 'listClients'])->name('clients.list');
-    Route::get('/admin/products', [AdminController::class, 'listProducts'])->name('products.list');
-    Route::get('/admin/admins', [AdminController::class, 'listAdmins'])->name('admins.list');
-    Route::post('/admin/admins/add', [AdminController::class, 'addAdmin'])->name('admins.add');
+    Route::get('/admin/clients', [AdminController::class, 'listClients'])->name('admin.clients');
+
+    Route::get('/admin/products', [AdminController::class, 'listProducts'])->name('admin.products');
+    Route::patch('/product/ban/{guid}', [AdminController::class, 'banProduct'])->name('admin.banProduct');
+
+
+    Route::get('/admin/reviews', [AdminController::class, 'listReviews'])->name('admin.reviews');
+    Route::delete('/admin/reviews/{id}', [AdminController::class, 'deleteReview'])->name('admin.reviews.destroy');
+
+    Route::get('/admin/add', [AdminController::class, 'showAddForm'])->name('admins.add.form');
+    Route::post('/admin/add', [AdminController::class, 'addAdmin'])->name('admins.add');
+
+    Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
+    Route::get('/admin/backups', [BackupController::class, 'getAllBackups'])->name('admin.backups.list');
+    Route::post('/admin/backup/restore/{filename}', [BackupController::class, 'restoreBackup'])->name('admin.backup.restore');
 });
+
 
 Route::get('/productos/search', [ProductoControllerView::class, 'search'])->name('productos.search');
 Route::get('/producto/{guid}', [ProductoControllerView::class, 'showVista'])->name('producto.show');

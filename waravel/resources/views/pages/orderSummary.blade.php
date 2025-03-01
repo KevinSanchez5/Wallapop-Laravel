@@ -82,7 +82,7 @@
                     <hr class="bottomLine border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem)"/>
 
                     <dl class="flex items-center justify-between gap-4 mt-4 mb-4">
-                        <dt class="text-xl font-bold text-gray-900 text-gray-500 dark:text-gray-400">Total</dt>
+                        <dt class="text-xl font-bold text-gray-900 dark:text-gray-400">Total</dt>
                         <dd id="finalTotal" class="text-xl font-bold text-gray-900 dark:text-white">
                             {{ number_format($cart->precioTotal, 2) }} €
                         </dd>

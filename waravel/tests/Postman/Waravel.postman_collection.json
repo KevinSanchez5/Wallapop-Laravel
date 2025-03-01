@@ -37,7 +37,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/iaDXvz15LNy",
+							"raw": "http://127.0.0.1/api/clientes/2G6HueqixE5",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -48,7 +48,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"iaDXvz15LNy"
+								"2G6HueqixE5"
 							]
 						}
 					},
@@ -100,7 +100,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/5q0feoGtw3H",
+							"raw": "http://127.0.0.1/api/clientes/ySNCEKxmWyv",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -111,7 +111,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"5q0feoGtw3H"
+								"ySNCEKxmWyv"
 							]
 						}
 					},
@@ -123,7 +123,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/5q0feoGtw3H",
+							"raw": "http://127.0.0.1/api/clientes/ySNCEKxmWyv",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -134,7 +134,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"5q0feoGtw3H"
+								"ySNCEKxmWyv"
 							]
 						}
 					},
@@ -149,7 +149,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/clientes/iaDXvz15LNy",
+							"raw": "http://127.0.0.1/api/clientes/2G6HueqixE5",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -160,7 +160,7 @@
 							"path": [
 								"api",
 								"clientes",
-								"iaDXvz15LNy"
+								"2G6HueqixE5"
 							]
 						}
 					},
@@ -199,7 +199,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/users/sLYLxmYBvdq",
+							"raw": "http://127.0.0.1/api/users/P4K7VQ9XTYL",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -210,7 +210,7 @@
 							"path": [
 								"api",
 								"users",
-								"sLYLxmYBvdq"
+								"P4K7VQ9XTYL"
 							]
 						}
 					},
@@ -262,7 +262,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1/api/users/JPASFdOlnLS",
+							"raw": "http://127.0.0.1/api/users/b3ywnJ1xw9u",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -273,7 +273,7 @@
 							"path": [
 								"api",
 								"users",
-								"JPASFdOlnLS"
+								"b3ywnJ1xw9u"
 							]
 						}
 					},
@@ -285,7 +285,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/users/JPASFdOlnLS",
+							"raw": "http://127.0.0.1/api/users/b3ywnJ1xw9u",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -296,7 +296,7 @@
 							"path": [
 								"api",
 								"users",
-								"JPASFdOlnLS"
+								"b3ywnJ1xw9u"
 							]
 						}
 					},
@@ -335,7 +335,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/productos/OKr6Xs46nea",
+							"raw": "http://127.0.0.1/api/productos/G4YXT9K5QLV",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -346,7 +346,7 @@
 							"path": [
 								"api",
 								"productos",
-								"OKr6Xs46nea"
+								"G4YXT9K5QLV"
 							]
 						}
 					},
@@ -398,7 +398,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1/api/productos/Ve8wAnPo71B",
+							"raw": "http://127.0.0.1/api/productos/dj7QriwvbJh",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -409,7 +409,7 @@
 							"path": [
 								"api",
 								"productos",
-								"Ve8wAnPo71B"
+								"dj7QriwvbJh"
 							]
 						}
 					},
@@ -421,7 +421,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/productos/Ve8wAnPo71B",
+							"raw": "http://127.0.0.1/api/productos/dj7QriwvbJh",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -432,7 +432,7 @@
 							"path": [
 								"api",
 								"productos",
-								"Ve8wAnPo71B"
+								"dj7QriwvbJh"
 							]
 						}
 					},
@@ -471,7 +471,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones/D6UlbesjFes",
+							"raw": "http://127.0.0.1/api/valoraciones/G7pXkT3L9qY",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -482,7 +482,7 @@
 							"path": [
 								"api",
 								"valoraciones",
-								"D6UlbesjFes"
+								"G7pXkT3L9qY"
 							]
 						}
 					},
@@ -525,7 +525,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/valoraciones/3J97GU9UB1y",
+							"raw": "http://127.0.0.1/api/valoraciones/uz76kSMuE6a",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -536,7 +536,7 @@
 							"path": [
 								"api",
 								"valoraciones",
-								"3J97GU9UB1y"
+								"uz76kSMuE6a"
 							]
 						}
 					},
@@ -575,7 +575,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/ventas/0fe3fd18-a0f6-4139-99be-6e1dad2cd420",
+							"raw": "http://127.0.0.1/api/ventas/kY8XqT5L9v3",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -586,7 +586,7 @@
 							"path": [
 								"api",
 								"ventas",
-								"0fe3fd18-a0f6-4139-99be-6e1dad2cd420"
+								"kY8XqT5L9v3"
 							]
 						}
 					},
@@ -599,7 +599,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"guid\": \"venta-12345\",\r\n  \"comprador\": {\r\n    \"id\": 1,\r\n    \"nombre\": \"Juan Pérez\",\r\n    \"email\": \"juan@example.com\"\r\n  },\r\n  \"lineaVentas\": [\r\n    {\r\n      \"producto_id\": 1,\r\n      \"cantidad\": 2,\r\n      \"precio\": 100\r\n    },\r\n    {\r\n      \"producto_id\": 2,\r\n      \"cantidad\": 1,\r\n      \"precio\": 150\r\n    }\r\n  ],\r\n  \"precioTotal\": 350\r\n}\r\n",
+							"raw": "{\r\n  \"comprador\": {\r\n    \"id\": 1,\r\n    \"nombre\": \"Juan Pérez\",\r\n    \"email\": \"juan@example.com\"\r\n  },\r\n  \"estado\": \"proce\",\r\n  \"lineaVentas\": [\r\n    {\r\n      \"producto_id\": 1,\r\n      \"cantidad\": 2,\r\n      \"precio\": 100\r\n    },\r\n    {\r\n      \"producto_id\": 2,\r\n      \"cantidad\": 1,\r\n      \"precio\": 150\r\n    }\r\n  ],\r\n  \"precioTotal\": 350\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -629,7 +629,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1/api/ventas/venta-12345",
+							"raw": "http://127.0.0.1/api/ventas/TfVlrgiUnfz",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -640,7 +640,7 @@
 							"path": [
 								"api",
 								"ventas",
-								"venta-12345"
+								"TfVlrgiUnfz"
 							]
 						}
 					},
