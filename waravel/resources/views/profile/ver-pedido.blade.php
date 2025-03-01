@@ -160,30 +160,39 @@
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400">Fecha</p>
                                 <h3 class="text-xl font-normal text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ \Carbon\Carbon::parse($pedido->created_at)->format('d-m-y') }}</h3>
                             </div>
-                            @if($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto')
-                            <div class="min-w-1/3">
-                                <dd class="text-primary-800 dark:text-primary-300 flex-1 items-center rounded bg-blue-200 px-3 py-1 text-sm font-medium break-all dark:bg-blue-600">
-                                    <svg class="me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11.917 9.724 16.5 19 7.5" />
-                                    </svg>
-                                    Procesado
-                                </dd>
-                            </div>
+                            @if($pedido->estado == 'Cancelado')
+                                <div class="min-w-1/3">
+                                    <dd class="text-red-800 dark:text-red-300 flex-1 items-center rounded bg-red-200 px-3 py-1 text-sm font-medium break-all dark:bg-red-600">
+                                        <svg class="me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                        </svg>
+                                        Cancelado
+                                    </dd>
+                                </div>
+                            @elseif($pedido->estado == 'Devuelto')
+                                <div class="min-w-1/3">
+                                    <dd class="text-purple-800 dark:text-purple-300 flex-1 items-center rounded bg-purple-200 px-3 py-1 text-sm font-medium break-all dark:bg-purple-600">
+                                        <svg class="me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5L3 12l6 7M21 12H3"/>
+                                        </svg>
+                                        Devuelto
+                                    </dd>
+                                </div>
                             @endif
                         </div>
                     </div>
                 </div>
-                <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 mt-4 p-6">
+                <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 mt-4 px-6 py-2">
                     <table class="w-full text-left font-medium text-gray-900 dark:text-white md:table-fixed">
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                        <tbody>
                         @forelse($pedido->lineaVentas as $linea)
-                            <tr>
-                                <td class="whitespace-nowrap py-4" style="width: 60%">
+                            <tr class="{{ $loop->last ? 'mt-10' : 'mb-2 border-b border-gray-300 dark:border-gray-700' }}">
+                                <td class="py-4" style="width: 60%;">
                                     <div class="flex items-center gap-4">
-                                        <div class="flex items-center aspect-square w-10 h-10 shrink-0">
-                                            <img class="h-auto w-full max-h-full" src=" {{ asset( 'storage/' . $linea['producto']['imagenes'][0]) }}" alt="imac image" />
+                                        <div class="shrink-0">
+                                            <img class="h-20 w-20 object-cover rounded-md" src="{{ asset('storage/' . ($linea['producto']['imagenes'][0] ?? 'default.jpg')) }}" alt="imagen de {{ $linea['producto']['nombre'] }}" />
                                         </div>
-                                        <span>{{ $linea['producto']['nombre'] }}</span>
+                                        <span class="text-base font-medium text-gray-900 dark:text-white">{{ $linea['producto']['nombre'] }}</span>
                                     </div>
                                 </td>
 
@@ -192,9 +201,11 @@
                                 <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">{{ $linea['precioTotal'] }} €</td>
                             </tr>
                         @empty
-                            <p class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem">
-                                No hay productos en el pedido
-                            </p>
+                            <tr>
+                                <td colspan="3" class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem;">
+                                    No hay productos en el pedido
+                                </td>
+                            </tr>
                         @endforelse
                         </tbody>
                     </table>
