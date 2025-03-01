@@ -36,6 +36,7 @@ class UsersSeeder extends Seeder
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
         ]);
+
         //clientes
         User::create([
             'guid' =>'2G6HueqixE5',
@@ -49,7 +50,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 2
+        ]);//id 3
         User::create([
             'guid' =>'DU6jCZtareb',
             'name' => 'María García',
@@ -62,7 +63,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 3
+        ]);//id 4
         User::create([
             'guid' =>'yEC3KBt6CFY',
             'name' => 'Pedro Martínez',
@@ -75,7 +76,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 4
+        ]);//id 5
         User::create([
             'guid' =>'X9vB7LpQ2ZM',
             'name' => 'Laura Gómez',
@@ -88,7 +89,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 5
+        ]);//id 6
         User::create([
             'guid' =>'G5Yt9XqK8VL',
             'name' => 'Diego Ruiz',
@@ -101,7 +102,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 6
+        ]);//id 7
         User::create([
             'guid' =>'J2pM6ZcQ4BR',
             'name' => 'Sofía López',
@@ -114,7 +115,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 7
+        ]);//id 8
         User::create([
             'guid' =>'W7Xn3TfY9KD',
             'name' => 'Javier Torres',
@@ -127,7 +128,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 8
+        ]);//id 9
         User::create([
             'guid' =>'P8Lq5VZK2YM',
             'name' => 'Laura Castro',
@@ -140,7 +141,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 9
+        ]);//id 10
         User::create([
             'guid' =>'M4B9XQK7YtN',
             'name' => 'Ana Lopez',
@@ -153,7 +154,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 10
+        ]);//id 11
         User::create([
             'guid' =>'Z6TQ8LpX5YV',
             'name' => 'Carlos Fernandez',
@@ -166,7 +167,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 11
+        ]);//id 12
         User::create([
             'guid' =>'X9KpL3YV7QT',
             'name' => 'Isabella Rodriguez',
@@ -179,7 +180,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 12
+        ]);//id 13
         User::create([
             'guid' =>'B6YtQ8XZ5LM',
             'name' => 'Jose Luis',
@@ -192,8 +193,35 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
-        ]);//id 13
+        ]);//id 14
 
+        //admins
+        User::create([
+            'guid' =>'B6YtY6GPD1M',
+            'name' => 'Carlos Fernández',
+            'email' => 'carlos@example.com',
+            'password' => 'SuperAdmin456!',
+            'role' => 'admin',
+            'email_verified_at' => now(),
+            'remember_token' => '',
+            'created_at' => now(),
+            'updated_at' => now(),
+            'password_reset_token' => null,
+            'password_reset_expires_at' => null,
+        ]);
+        User::create([
+            'guid' =>'LMAtY6GPD1M',
+            'name' => 'Isabella Rodríguez',
+            'email' => 'isabella@example.com',
+            'password' => 'Password123?',
+            'role' => 'admin',
+            'email_verified_at' => now(),
+            'remember_token' => '',
+            'created_at' => now(),
+            'updated_at' => now(),
+            'password_reset_token' => null,
+            'password_reset_expires_at' => null,
+        ]);
 
 
     }
