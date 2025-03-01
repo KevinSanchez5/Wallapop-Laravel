@@ -21,6 +21,7 @@ Route::middleware('guest')->group(function () {
 
     Route::post('passchange', [PasswordResetController::class, 'store'])
         ->name('passchange.store');
+
 });
 
 Route::middleware('auth')->group(function () {
@@ -51,8 +52,6 @@ Route::middleware('auth')->group(function () {
         Route::get('misventas', [ClienteController::class, 'misVentas'])
             ->name('cliente.misventas');
 
-        Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])
-            ->name('pagarcarrito');
     });
 
     /*

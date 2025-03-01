@@ -6,6 +6,7 @@ use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
 use App\Http\Controllers\Views\ProfileControllerView;
+use App\Http\Controllers\VentaController;
 use App\Http\Controllers\Views\ValoracionesControllerView;
 use App\Http\Middleware\AdminRoleAuth;
 use App\Http\Middleware\UserRoleAuth;
@@ -68,6 +69,8 @@ Route::post('/carrito/addToCart', [CarritoControllerView::class, 'addToCartOrEdi
 Route::put('/carrito/removeOne', [CarritoControllerView::class, 'deleteOneFromCart'])->name('carrito.removeOne');
 Route::put('/carrito/addOne', [CarritoControllerView::class, 'addOneToCart'])->name('carrito.addOne');
 Route::delete('/carrito/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
+Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])
+    ->name('pagarcarrito');
 
 Route::get('/passchange', function () {
     return view('auth.passchange');
