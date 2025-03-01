@@ -96,8 +96,6 @@ class ProfileControllerView extends Controller
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
         $query = Venta::where('comprador->id',$cliente->id);
 
-        Log::info($cliente->id);
-
         $pedidos = $query->orderBy('created_at', 'desc')->paginate(6);
 
         Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
