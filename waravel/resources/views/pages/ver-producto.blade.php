@@ -166,7 +166,7 @@
 
                 <!-- Botón Banear/Rehabilitar (Solo para administradores) -->
                 @if(auth()->check() && auth()->user()->role === 'admin')
-                    <form action="{{ route('admin.banProduct', $producto->guid) }}" method="POST" class="w-full sm:w-auto">
+                    <form action="{{ route('admin.ban.product', $producto->guid) }}" method="POST" class="w-full sm:w-auto">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="p-3 text-black rounded-md bg-[#BFF205] hover:bg-[#96bf03]

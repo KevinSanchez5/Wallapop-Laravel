@@ -61,7 +61,7 @@
             <a href="" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-shopping-cart"></i> &nbsp; Gestionar Ventas
             </a>
-            <a href="{{ route('admins.add.form') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+            <a href="#" id="openModal" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-user-plus"></i> &nbsp; Añadir Admin
             </a>
             <div class="relative">
@@ -87,17 +87,54 @@
             </button>
         </form>
 
-
-        <!-- Modal -->
+        <!-- Modal Backup-->
         <div id="backupModal" class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-lg w-1/3">
-                <h2 class="text-lg font-bold mb-4">Restaurar Backup</h2>
-                <ul id="backupList" class="space-y-2">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-lg w-1/3 relative">
+                <button id="closeBackupModal" class="absolute top-2 right-2 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 text-2xl" onclick="document.getElementById('backupModal').classList.add('hidden')">
+                    &times;
+                </button>
+                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Restaurar Backup</h2>
+                <ul id="backupList" class="space-y-2 text-gray-900 dark:text-gray-100">
                 </ul>
-                <button id="closeModal" class="mt-4 px-4 py-2 bg-gray-500 text-white rounded">Cerrar</button>
+                <button id="closeBackupModal" class="mt-4 px-4 py-2 bg-gray-500 dark:bg-gray-700 text-white dark:text-gray-300 hover:bg-gray-600 dark:hover:bg-gray-600 rounded transition">
+                    Cerrar
+                </button>
             </div>
         </div>
+
+        <!-- Modal Añadir Administrador -->
+        <div id="adminModal" class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-lg w-1/3 relative">
+                <!-- Botón de cerrar como X en la esquina superior derecha -->
+                <button id="closeAdminModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl" onclick="document.getElementById('adminModal').classList.add('hidden')">
+                    &times;
+                </button>
+
+                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Añadir Administrador</h2>
+
+                <form id="adminForm">
+                    @csrf
+                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Nombre:</label>
+                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
+
+                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Email:</label>
+                    <input type="email" id="email" name="email" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
+
+                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Contraseña:</label>
+                    <input type="password" id="password" name="password" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
+
+                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Confirmar Contraseña:</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
+
+                    <button type="submit" class="w-full bg-[#BFF205] text-black py-2 rounded-lg hover:bg-[#96BF03] transition">
+                        <b>Guardar Administrador</b>
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
+
     <div class="w-64 h-full"></div>
 
     <!-- Contenido Principal -->
@@ -106,8 +143,8 @@
     </main>
 
     <!-- Scripts -->
-    <script>document
-        .addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             const html = document.documentElement;
             const botonModoOscuro = document.getElementById('modoOscuroBtn');
             const iconoLuz = document.getElementById('modoOscuroIconLuz');
@@ -164,7 +201,7 @@
                     } else {
                         data.forEach(backup => {
                             let li = document.createElement('li');
-                            li.classList.add("p-2", "bg-gray-200", "rounded", "cursor-pointer", "hover:bg-gray-300");
+                            li.classList.add("p-2", "bg-gray-200", "rounded", "cursor-pointer", "hover:bg-gray-300", "dark:bg-gray-700", "dark:hover:bg-gray-600", "dark:text-white");
                             li.textContent = backup;
                             li.addEventListener('click', function () {
                                 restoreBackup(backup);
@@ -184,8 +221,12 @@
             }
         });
 
-        document.getElementById('closeModal').addEventListener('click', function () {
+        document.getElementById('closeBackupModal').addEventListener('click', function () {
             document.getElementById('backupModal').classList.add('hidden');
+        });
+
+        document.getElementById('closeAdminModal').addEventListener('click', function () {
+            document.getElementById('adminModal').classList.add('hidden');
         });
 
         window.addEventListener('click', function (event) {
@@ -193,6 +234,38 @@
             if (!modal.classList.contains('hidden') && !modal.querySelector('.bg-white').contains(event.target)) {
                 modal.classList.add('hidden');
             }
+        });
+
+        document.getElementById('openModal').addEventListener('click', function () {
+            document.getElementById('adminModal').classList.remove('hidden');
+        });
+
+        document.getElementById('adminForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+
+            fetch("{{ route('admin.store') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    }
+                    if (data.admin) {
+                        document.getElementById('adminModal').classList.add('hidden');
+                        location.reload(); // Recargar la página para actualizar la lista de admins
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al agregar administrador:", error);
+                    alert("Error al procesar la solicitud.");
+                });
         });
 
         function restoreBackup(filename) {
