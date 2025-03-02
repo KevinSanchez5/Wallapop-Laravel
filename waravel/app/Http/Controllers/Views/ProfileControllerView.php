@@ -165,6 +165,38 @@ class ProfileControllerView extends Controller
         return view('profile.partials.mis-ventas', compact('cliente','ventas'));
     }
 
+    function showFilteredSales()
+    {
+        Log::info('Accediendo a la página de mis ventas filtradas');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus ventas.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo ventas');
+        $query = Venta::whereJsonContains('lineaVentas', [['vendedor' => ['id' => $cliente->id]]]);
+
+        if (request()->has('estado') && request('estado')!== 'Todos') {
+            $query->where('estado', request('estado'));
+            Log::info('Filtro por estado aplicado', ['estado' => request('estado')]);
+        }
+
+        $ventas = $query->orderBy('created_at', 'desc')->paginate(6);
+
+        Log::info('Ventas obtenidas correctamente, mostrando la vista de mis ventas filtradas');
+        return view('profile.partials.mis-ventas', compact('cliente','ventas'));
+    }
+
     public function showSale($guid){
         Log::info('Accediendo a la página de detalle de una venta');
 

@@ -44,7 +44,7 @@
                                     $selectedStatus = request('estado', 'todos');
                                 @endphp
 
-                                <form method="GET" action="{{ route('profile.orders.search') }}">
+                                <form method="GET" action="{{ route('profile.sales.search') }}">
                                     <select name="estado" id="estado" onchange="this.form.submit()"
                                             class="block w-full min-w-[8rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500">
                                         @foreach ($orderStatuses as $value => $label)
