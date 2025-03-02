@@ -104,10 +104,10 @@ class VentaSeeder extends Seeder
             'guid' => 'V3XKYQ9T57L',
             'estado' => 'Entregado',
             'comprador' => [
-                'guid' => 'DU6jCZtareb',
-                'id' => 2,
-                'nombre' => 'Maria',
-                'apellido' => 'Garcia'
+                'guid' => 'G5Yt9XqK8VL',
+                'id' => 5,
+                'nombre' => 'Diego',
+                'apellido' => 'Ruiz'
             ],
             'lineaVentas' => [
                 [
@@ -132,10 +132,10 @@ class VentaSeeder extends Seeder
                 ],
                 [
                     'vendedor' => [
-                        'guid' => 'G5Yt9XqK8VL',
-                        'id' => 5,
-                        'nombre' => 'Diego',
-                        'apellido' => 'Ruiz'
+                        'guid' => 'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
                     ],
                     'cantidad' => 2,
                     'producto' => [
@@ -187,7 +187,7 @@ class VentaSeeder extends Seeder
                 ],
                 [
                     'vendedor' => [
-                        'guid' => 'X9YT7KQLV53',
+                        'guid' => 'yEC3KBt6CFY',
                         'id' => 3,
                         'nombre' => 'Pedro',
                         'apellido' => 'Martinez'
@@ -213,18 +213,18 @@ class VentaSeeder extends Seeder
             'guid' => '2G6HueqixE5',
             'estado' => 'Enviado',
             'comprador' => [
-                'guid' => 'yEC3KBt6CFY',
-                'id' => 3,
-                'nombre' => 'Pedro',
-                'apellido' => 'Martinez'
+                'guid' => '2G6HueqixE5',
+                'id' => 1,
+                'nombre' => 'Juan',
+                'apellido' => 'Perez'
             ],
             'lineaVentas' => [
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'yEC3KBt6CFY',
+                        'id' => 3,
+                        'nombre' => 'Pedro',
+                        'apellido' => 'Martinez'
                     ],
                     'cantidad' => 1,
                     'producto' => [
@@ -275,10 +275,10 @@ class VentaSeeder extends Seeder
                 ],
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
                     ],
                     'cantidad' => 1,
                     'producto' => [
@@ -309,10 +309,10 @@ class VentaSeeder extends Seeder
             'lineaVentas' => [
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'yEC3KBt6CFY',
+                        'id' => 3,
+                        'nombre' => 'Pedro',
+                        'apellido' => 'Martinez'
                     ],
                     'cantidad' => 1,
                     'producto' => [
@@ -335,18 +335,18 @@ class VentaSeeder extends Seeder
             'guid' => 'X9vB7LpQ2ZM',
             'estado' => 'Cancelado',
             'comprador' => [
-                'guid' => 'DU6jCZtareb',
-                'id' => 2,
-                'nombre' => 'Maria',
-                'apellido' => 'Garcia'
+                'guid' => '2G6HueqixE5',
+                'id' => 1,
+                'nombre' => 'Juan',
+                'apellido' => 'Perez'
             ],
             'lineaVentas' => [
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
                     ],
                     'cantidad' => 3,
                     'producto' => [
@@ -377,10 +377,10 @@ class VentaSeeder extends Seeder
             'lineaVentas' => [
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
                     ],
                     'cantidad' => 1,
                     'producto' => [
@@ -445,10 +445,10 @@ class VentaSeeder extends Seeder
             'lineaVentas' => [
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'yEC3KBt6CFY',
+                        'id' => 3,
+                        'nombre' => 'Pedro',
+                        'apellido' => 'Martinez'
                     ],
                     'cantidad' => 2,
                     'producto' => [
@@ -471,18 +471,18 @@ class VentaSeeder extends Seeder
             'guid' => 'VYQ8XK4T9L5',
             'estado' => 'Entregado',
             'comprador' => [
-                'guid' => 'DU6jCZtareb',
-                'id' => 2,
-                'nombre' => 'Maria',
-                'apellido' => 'Garcia'
+                'guid' => '2G6HueqixE5',
+                'id' => 1,
+                'nombre' => 'Juan',
+                'apellido' => 'Perez'
             ],
             'lineaVentas' => [
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'yEC3KBt6CFY',
+                        'id' => 3,
+                        'nombre' => 'Pedro',
+                        'apellido' => 'Martinez'
                     ],
                     'cantidad' => 1,
                     'producto' => [
@@ -499,10 +499,10 @@ class VentaSeeder extends Seeder
                 ],
                 [
                     'vendedor' => [
-                        'guid' => '2G6HueqixE5',
-                        'id' => 1,
-                        'nombre' => 'Juan',
-                        'apellido' => 'Perez'
+                        'guid' => 'DU6jCZtareb',
+                        'id' => 2,
+                        'nombre' => 'Maria',
+                        'apellido' => 'Garcia'
                     ],
                     'cantidad' => 1,
                     'producto' => [
