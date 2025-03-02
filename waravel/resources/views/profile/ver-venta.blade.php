@@ -29,40 +29,9 @@
                         <h3 class="text-md font-normal text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ $cliente->direccion->calle }}, {{ $cliente->direccion->numero }}, {{ $cliente->direccion->piso }}º{{ $cliente->direccion->letra }}, {{ $cliente->direccion->codigoPostal }}</h3>
                     </div>
 
-                    <hr class="bottomLine my-4 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem)" />
-
-                    <div class="space-y-2">
-                        <dl class="flex items-center justify-between gap-4">
-                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">Precio sin IVA</dt>
-                            <dd id="totalPrice" class="text-xl font-bold text-gray-500 dark:text-gray-400">{{ number_format($pedido->precioTotal / 1.21, 2) }} €</dd>
-                        </dl>
-                    </div>
-
-                    <div class="space-y-2">
-                        <dl class="flex items-center justify-between gap-4">
-                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">Iva</dt>
-                            <dd id="totalPrice" class="text-xl font-bold text-gray-500 dark:text-gray-400">{{ number_format($pedido->precioTotal - ($pedido->precioTotal / 1.21), 2) }} €</dd>
-                        </dl>
-                    </div>
-
-                    <hr class="bottomLine my-4 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem)" />
-
-                    <dl class="mt-4 flex items-center justify-between gap-4">
-                        <dt class="text-xl font-bold text-gray-500 dark:text-gray-400">Total</dt>
-                        <dd id="finalTotal" class="text-xl font-bold text-gray-900 dark:text-white">{{ number_format($pedido->precioTotal, 2) }} €</dd>
-                    </dl>
-
-                    @if($pedido->estado == 'Pendiente')
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <a href="#" class="bg-black text-white text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
-                                Cancelar
-                            </a>
-                            <a href="#" class="bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
-                                Ver Factura
-                            </a>
-                        </div>
-                    @elseif(!($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto'))
-                        <a href="#" class="mt-4 block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Ver factura</a>
+                    @if($venta->estado == 'Pendiente' || $venta->estado == 'Procesando')
+                        <hr class="bottomLine my-4 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem)" />
+                        <a href="#" class="mt-4 block w-full text-white bg-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Cancelar</a>
                     @endif
                 </div>
             </div>
@@ -70,7 +39,7 @@
             <div class="w-full md:w-[55%]">
                 <h2 class="mb-2 text-xl font-semibold text-gray-900 transition-all duration-300 sm:text-2xl dark:text-white">Detalles del pedido</h2>
                 <div class="w-full rounded-lg bg-white shadow-lg transition-all duration-300 dark:bg-gray-800">
-                    @if(!($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto'))
+                    @if(!($venta->estado == 'Cancelado' || $venta->estado == 'Devuelto'))
                     <div class="p-6 pt-8">
                         <div class="w-full max-w-3xl px-4">
                             <div class="flex items-center justify-between">
@@ -86,7 +55,7 @@
                                             <span class="text-sm mt-2 text-gray-500 dark:text-gray-400">Pendiente</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            @if($pedido->estado == 'Entregado' || $pedido->estado == 'Enviado' || $pedido->estado == 'Procesando')
+                                            @if($venta->estado == 'Entregado' || $venta->estado == 'Enviado' || $venta->estado == 'Procesando')
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#BFF205] dark:text-black text-white z-20">
                                             @else
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 dark:text-gray-500 text-white z-20">
@@ -102,7 +71,7 @@
                                             <span class="text-sm mt-2 text-gray-500 dark:text-gray-400">Procesando</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            @if($pedido->estado == 'Entregado' || $pedido->estado == 'Enviado')
+                                            @if($venta->estado == 'Entregado' || $venta->estado == 'Enviado')
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#BFF205] dark:text-black text-white z-20">
                                             @else
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 dark:text-gray-500 text-white z-20">
@@ -114,7 +83,7 @@
                                             <span class="text-sm mt-2 text-gray-500 dark:text-gray-400">En reparto</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            @if($pedido->estado == 'Entregado')
+                                            @if($venta->estado == 'Entregado')
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#BFF205] dark:text-black text-white z-20">
                                             @else
                                                 <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 dark:text-gray-500 text-white z-20">
@@ -128,13 +97,13 @@
                                     </div>
                                     <!-- Progress Bar -->
                                     <div class="absolute top-5 left-0 right-0 h-1 bg-gray-300 w-full z-0"></div>
-                                    @if($pedido->estado == 'Pendiente')
+                                    @if($venta->estado == 'Pendiente')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-1/4 z-10"></div>
-                                    @elseif($pedido->estado == 'Procesando')
+                                    @elseif($venta->estado == 'Procesando')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-2/4 z-10"></div>
-                                    @elseif($pedido->estado == 'Enviado')
+                                    @elseif($venta->estado == 'Enviado')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-3/4 z-10"></div>
-                                    @elseif($pedido->estado == 'Entregado')
+                                    @elseif($venta->estado == 'Entregado')
                                         <div class="absolute top-5 left-0 h-1 bg-[#BFF205] w-full z-10"></div>
                                     @endif
                                 </div>
@@ -144,23 +113,23 @@
                     @endif
                     <div class="row p-6">
                         <div class="grid grid-flow-col gap-4">
-                            @if($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto')
+                            @if($venta->estado == 'Cancelado' || $venta->estado == 'Devuelto')
                                 <div class="min-w-1/3">
                             @else
                                 <div class="min-w-1/2">
                             @endif
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400">Nº pedido</p>
-                                <h3 class="text-xl font-normal break-all text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ $pedido->guid }}</h3>
+                                <h3 class="text-xl font-normal break-all text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ $venta->guid }}</h3>
                             </div>
-                            @if($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto')
+                            @if($venta->estado == 'Cancelado' || $venta->estado == 'Devuelto')
                                 <div class="min-w-1/3">
                             @else
                                 <div class="min-w-1/2">
                             @endif
                                 <p class="text-base font-normal text-gray-500 dark:text-gray-400">Fecha</p>
-                                <h3 class="text-xl font-normal text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ \Carbon\Carbon::parse($pedido->created_at)->format('d-m-y') }}</h3>
+                                <h3 class="text-xl font-normal text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ \Carbon\Carbon::parse($venta->created_at)->format('d-m-y') }}</h3>
                             </div>
-                            @if($pedido->estado == 'Cancelado')
+                            @if($venta->estado == 'Cancelado')
                                 <div class="min-w-1/3">
                                     <dd class="text-red-800 dark:text-red-300 flex-1 items-center rounded bg-red-200 px-3 py-1 text-sm font-medium break-all dark:bg-red-600">
                                         <svg class="me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -169,7 +138,7 @@
                                         Cancelado
                                     </dd>
                                 </div>
-                            @elseif($pedido->estado == 'Devuelto')
+                            @elseif($venta->estado == 'Devuelto')
                                 <div class="min-w-1/3">
                                     <dd class="text-purple-800 dark:text-purple-300 flex-1 items-center rounded bg-purple-200 px-3 py-1 text-sm font-medium break-all dark:bg-purple-600">
                                         <svg class="me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -185,21 +154,47 @@
                 <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 mt-4 px-6 py-2">
                     <table class="w-full text-left font-medium text-gray-900 dark:text-white md:table-fixed">
                         <tbody>
-                        @forelse($pedido->lineaVentas as $linea)
-                            <tr class="{{ $loop->last ? 'mt-10' : 'mb-2 border-b border-gray-300 dark:border-gray-700' }}">
-                                <td class="py-4" style="width: 60%;">
-                                    <div class="flex items-center gap-4">
-                                        <div class="shrink-0">
-                                            <img class="h-20 w-20 object-cover rounded-md" src="{{ asset('storage/' . ($linea['producto']['imagenes'][0] ?? 'default.jpg')) }}" alt="imagen de {{ $linea['producto']['nombre'] }}" />
+                        @forelse($venta->lineaVentas as $linea)
+                            @if($linea['vendedor']['guid'] != $vendedor->guid)
+                                <tr class="{{ $loop->last ? 'mt-10' : 'mb-2 border-b border-gray-300 dark:border-gray-700' }}">
+                                    <td class="py-4" style="width: 60%;">
+                                        <div class="flex items-center gap-4">
+                                            <div class="flex items-center justify-center w-20 h-20 bg-gray-300 rounded-md dark:bg-gray-700">
+                                                <svg class="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                                    <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+                                                <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                            </div>
                                         </div>
-                                        <span class="text-base font-medium text-gray-900 dark:text-white">{{ $linea['producto']['nombre'] }}</span>
-                                    </div>
-                                </td>
+                                    </td>
 
-                                <td class="p-4 text-base font-normal text-gray-900 dark:text-white">x{{ $linea['cantidad'] }}</td>
+                                    <td class="p-4">
+                                        <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+                                    </td>
 
-                                <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">{{ $linea['precioTotal'] }} €</td>
-                            </tr>
+                                    <td class="p-4 text-right">
+                                        <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-full"></div>
+                                    </td>
+                                </tr>
+                            @else
+                                <tr class="{{ $loop->last ? 'mt-10' : 'mb-2 border-b border-gray-300 dark:border-gray-700' }}">
+                                    <td class="py-4" style="width: 60%;">
+                                        <div class="flex items-center gap-4">
+                                            <div class="shrink-0">
+                                                <img class="h-20 w-20 object-cover rounded-md" src="{{ asset('storage/' . ($linea['producto']['imagenes'][0] ?? 'default.jpg')) }}" alt="imagen de {{ $linea['producto']['nombre'] }}" />
+                                            </div>
+                                            <span class="text-base font-medium text-gray-900 dark:text-white">{{ $linea['producto']['nombre'] }}</span>
+                                        </div>
+                                    </td>
+
+                                    <td class="p-4 text-base font-normal text-gray-900 dark:text-white">x{{ $linea['cantidad'] }}</td>
+
+                                    <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">{{ $linea['precioTotal'] }} €</td>
+                                </tr>
+                            @endif
                         @empty
                             <tr>
                                 <td colspan="3" class="text-base font-normal text-gray-500 dark:text-gray-400 text-center" style="height: 10rem; line-height: 10rem;">

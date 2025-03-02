@@ -42,7 +42,7 @@ describe('Carrito', () => {
 
         // Asegurase que el precio total es 0
         cy.get('#totalPrice').invoke('text')
-           .should('equal', '0 €');
+           .should('equal', '0.00 €');
         cy.get('#finalTotal').invoke('text')
             .should('equal', '0 €');
 
@@ -121,7 +121,7 @@ describe('Carrito', () => {
 
         // Asegurase que el precio total es 0
         cy.get('#totalPrice').invoke('text')
-            .should('equal', '0 €');
+            .should('equal', '0.00 €');
         cy.get('#finalTotal').invoke('text')
             .should('equal', '0 €');
 
