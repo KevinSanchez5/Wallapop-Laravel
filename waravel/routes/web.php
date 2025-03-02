@@ -23,6 +23,7 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile/myProducts', [ProfileControllerView::class, 'show'])->name('profile.products');
     Route::get('/profile/myReviews', [ProfileControllerView::class,'showReviews'])->name('profile.reviews');
     Route::get('/profile/myOrders', [ProfileControllerView::class, 'showOrders'])->name('profile.orders');
+    Route::get('/profile/mySales/search', [ProfileControllerView::class, 'showFilteredSales'])->name('profile.sales.search');
     Route::get('/profile/mySales', [ProfileControllerView::class, 'showSales'])->name('profile.sales');
     Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
     Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('order.detail');
