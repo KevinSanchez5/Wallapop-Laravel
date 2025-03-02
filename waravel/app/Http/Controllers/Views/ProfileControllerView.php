@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Views;
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Producto;
+use App\Models\User;
 use App\Models\Valoracion;
 use App\Models\Venta;
 use Illuminate\Http\RedirectResponse;
@@ -131,6 +132,95 @@ class ProfileControllerView extends Controller
 
         Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
         return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
+    }
+
+    // Mis ventas
+
+    public function showSales(){
+        Log::info('Accediendo a la página de mis ventas');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus ventas.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo ventas');
+        $query = Venta::whereJsonContains('lineaVentas', [['vendedor' => ['id' => $cliente->id]]]);
+
+        Log::info($query->get());
+        Log::info($cliente->id);
+
+        $ventas = $query->orderBy('created_at', 'desc')->paginate(6);
+
+        Log::info('Ventas obtenidas correctamente, mostrando la vista de mis ventas');
+        return view('profile.partials.mis-ventas', compact('cliente','ventas'));
+    }
+
+    public function showSale($guid){
+        Log::info('Accediendo a la página de detalle de una venta');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus ventas.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $vendedor = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$vendedor) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo ventas');
+        $query = Venta::where('guid', $guid);
+
+        $venta = $query->first();
+
+        if (!$venta) {
+            return redirect()->route('profile')->with('error', 'No se ha encontrado la venta.');
+        }
+
+        Log::info('Venta encontrada, verificando que le pertenece al cliente');
+
+        $found = false;
+        foreach ($venta->lineaVentas as $lineaVenta) {
+            if (isset($lineaVenta['vendedor']['id']) && $lineaVenta['vendedor']['id'] === $vendedor->id) {
+                Log::info('La línea de venta pertenece al vendedor');
+                $found = true;
+                break;
+            }
+        }
+
+        Log::info('Buscardo el cliente asociado con la venta');
+        $cliente = Cliente::find($venta->comprador->id);
+
+        if (!$cliente) {
+            Log::error('No se ha encontrado el comprador.');
+            return redirect()->route('profile')->with('error', 'No se ha encontrado el comprador.');
+        }
+
+        Log::info('El cliente es válido, buscando su usuario');
+        $usuario = User::find($cliente->usuario_id);
+
+        Log::info($usuario);
+
+        if (!$found) {
+            Log::error('La venta no le pertenece al cliente.');
+            return redirect()->route('profile')->with('error', 'No tienes permisos para ver esta venta.');
+        }
+        Log::info('La venta es válida y le pertenece al cliente, mostrando la vista de detalle de la venta');
+        return view('profile.ver-venta', compact('venta', 'cliente', 'usuario', 'vendedor'));
     }
 
     // Temporal
