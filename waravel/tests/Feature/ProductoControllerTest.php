@@ -26,7 +26,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => '604ab08d96a',
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
@@ -50,6 +50,7 @@ class ProductoControllerTest extends TestCase
                 'descripcion' => 'Descripción del producto ' . $i,
                 'estadoFisico' => 'Nuevo',
                 'precio' => rand(10, 100),
+                'stock' => rand(10, 100),
                 'categoria' => 'Tecnologia',
                 'estado' => 'Disponible',
                 'imagenes' => json_encode(['imagen' . $i . '.png']),
@@ -66,7 +67,7 @@ class ProductoControllerTest extends TestCase
             'productos' => [
                 '*' => [
                     'id', 'guid', 'vendedor_id', 'nombre', 'descripcion',
-                    'estadoFisico', 'precio', 'categoria', 'estado',
+                    'estadoFisico', 'precio', 'stock', 'categoria', 'estado',
                     'imagenes', 'created_at', 'updated_at'
                 ]
             ],
@@ -88,7 +89,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => '368d8057196',
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
@@ -105,12 +106,13 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoShow',
+            'guid' => 'guidProShow',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
@@ -127,6 +129,7 @@ class ProductoControllerTest extends TestCase
             'nombre' => $producto->nombre,
             'descripcion' => $producto->descripcion,
             'precio' => $producto->precio,
+            'stock' => $producto->stock,
             'categoria' => $producto->categoria,
             'estado' => $producto->estado,
         ]);
@@ -147,7 +150,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => 'e661e53e6ec',
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
@@ -164,20 +167,21 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoShow',
+            'guid' => 'guidProdSho',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
         ]);
 
-        Redis::del('producto_' . $producto->id);
+        Redis::del('producto_' . $producto->guid);
 
-        $response = $this->getJson("/api/productos/{$producto->id}");
+        $response = $this->getJson("/api/productos/{$producto->guid}");
 
         $response->assertStatus(200);
 
@@ -186,11 +190,12 @@ class ProductoControllerTest extends TestCase
             'nombre' => $producto->nombre,
             'descripcion' => $producto->descripcion,
             'precio' => $producto->precio,
+            'stock' => $producto->stock,
             'categoria' => $producto->categoria,
             'estado' => $producto->estado,
         ]);
 
-        $productoEnRedis = json_decode(Redis::get('producto_' . $producto->id), true);
+        $productoEnRedis = json_decode(Redis::get('producto_' . $producto->guid), true);
         $this->assertEquals($producto->id, $productoEnRedis['id']);
         $this->assertEquals($producto->nombre, $productoEnRedis['nombre']);
         $this->assertEquals($producto->descripcion, $productoEnRedis['descripcion']);
@@ -217,7 +222,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => '0b5fbcc5380',
             'nombre' => 'pepe',
             'apellido' => 'perez',
             'avatar' => 'avatar.png',
@@ -234,12 +239,13 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $data = [
-            'guid' => 'guidProductoCreado',
+            'guid' => 'guidProdCre',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => ['imagenProducto.png'],
@@ -253,6 +259,7 @@ class ProductoControllerTest extends TestCase
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
         ]);
@@ -270,6 +277,7 @@ class ProductoControllerTest extends TestCase
             'descripcion' => 'Este es un producto sin nombre',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => ['imagenProducto.png'],
@@ -293,7 +301,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => '4eb10299201',
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
@@ -310,12 +318,13 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoUpdate',
+            'guid' => 'guidProUpda',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
@@ -328,6 +337,7 @@ class ProductoControllerTest extends TestCase
             'descripcion' => 'Este es un producto actualizado',
             'estadoFisico' => 'Nuevo',
             'precio' => 109.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => ['imagenProductoActualizada.png'],
@@ -342,6 +352,7 @@ class ProductoControllerTest extends TestCase
             'nombre' => 'Producto actualizado',
             'descripcion' => 'Este es un producto actualizado',
             'precio' => 109.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
         ]);
@@ -386,7 +397,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => '759a0a32be2',
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
@@ -403,22 +414,24 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoInvalidUpdate',
+            'guid' => 'guidProdInv',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
         ]);
 
-        $response = $this->putJson("/api/productos/{$producto->id}", [
+        $response = $this->putJson("/api/productos/{$producto->guid}", [
             'nombre' => '',
             'descripcion' => 'Descripción válida',
             'estadoFisico' => 'Nuevo',
             'precio' => -1,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => ['imagenProductoInvalida.png'],
@@ -444,7 +457,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => 'e4fdf1cc8ae',
             'nombre' => 'pepe',
             'apellido' => 'perez',
             'avatar' => 'avatar.png',
@@ -461,12 +474,13 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoDestroy',
+            'guid' => 'guidProdDes',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
@@ -508,7 +522,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => 'f9ae56ca8af',
             'nombre' => 'pepe',
             'apellido' => 'perez',
             'avatar' => 'avatar.png',
@@ -525,12 +539,13 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoFoto',
+            'guid' => 'guidProdFot',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto Test',
             'descripcion' => 'Descripción de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => [],
@@ -538,7 +553,7 @@ class ProductoControllerTest extends TestCase
 
         $file = UploadedFile::fake()->image('photo.jpg');
 
-        $response = $this->postJson("/api/productos/{$producto->id}/upload", [
+        $response = $this->postJson("/api/productos/{$producto->guid}/upload", [
             'image' => $file,
         ]);
 
@@ -594,7 +609,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => '37de621825c',
             'nombre' => 'pepe',
             'apellido' => 'perez',
             'avatar' => 'avatar.png',
@@ -611,12 +626,13 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoFoto',
+            'guid' => 'guidProFoto',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto Test',
             'descripcion' => 'Descripción de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => [],
@@ -624,7 +640,7 @@ class ProductoControllerTest extends TestCase
 
         $file = UploadedFile::fake()->image('photo.svg');
 
-        $response = $this->postJson("/api/productos/$producto->id/upload", [
+        $response = $this->postJson("/api/productos/$producto->guid/upload", [
             'image' => $file,
         ]);
 
@@ -649,7 +665,7 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $cliente = Cliente::create([
-            'guid' => Str::uuid(),
+            'guid' => 'cfff4aad66f',
             'nombre' => 'pepe',
             'apellido' => 'perez',
             'avatar' => 'avatar.png',
@@ -666,12 +682,13 @@ class ProductoControllerTest extends TestCase
         ]);
 
         $producto = Producto::create([
-            'guid' => 'guidProductoFoto',
+            'guid' => 'guidProduFo',
             'vendedor_id' => $cliente->id,
             'nombre' => 'Producto Test',
             'descripcion' => 'Descripción de prueba',
             'estadoFisico' => 'Nuevo',
             'precio' => 99.99,
+            'stock' => 50,
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => [],
@@ -679,27 +696,27 @@ class ProductoControllerTest extends TestCase
 
         $file = UploadedFile::fake()->image('photo.jpg');
 
-        $this->postJson("/api/productos/{$producto->id}/upload", [
+        $this->postJson("/api/productos/{$producto->guid}/upload", [
             'image' => $file,
         ]);
 
-        $this->postJson("/api/productos/{$producto->id}/upload", [
+        $this->postJson("/api/productos/{$producto->guid}/upload", [
             'image' => $file,
         ]);
 
-        $this->postJson("/api/productos/{$producto->id}/upload", [
+        $this->postJson("/api/productos/{$producto->guid}/upload", [
             'image' => $file,
         ]);
 
-        $this->postJson("/api/productos/{$producto->id}/upload", [
+        $this->postJson("/api/productos/{$producto->guid}/upload", [
             'image' => $file,
         ]);
 
-        $this->postJson("/api/productos/{$producto->id}/upload", [
+        $this->postJson("/api/productos/{$producto->guid}/upload", [
             'image' => $file,
         ]);
 
-        $response = $this->postJson("/api/productos/{$producto->id}/upload", [
+        $response = $this->postJson("/api/productos/{$producto->guid}/upload", [
             'image' => $file,
         ]);
 
