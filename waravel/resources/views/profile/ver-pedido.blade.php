@@ -71,7 +71,7 @@
                 <h2 class="mb-2 text-xl font-semibold text-gray-900 transition-all duration-300 sm:text-2xl dark:text-white">Detalles del pedido</h2>
                 <div class="w-full rounded-lg bg-white shadow-lg transition-all duration-300 dark:bg-gray-800">
                     @if(!($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto'))
-                    <div class="p-6">
+                    <div class="p-6 pt-8">
                         <div class="w-full max-w-3xl px-4">
                             <div class="flex items-center justify-between">
                                 <div class="relative w-full flex items-center">
