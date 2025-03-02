@@ -251,9 +251,10 @@ class VentaController extends Controller
     public function pagoSuccess(Request $request)
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
+        Log::info("Pago correcto iniciando el almacenamiento de la venta");
 
         try {
-            $sessionId = $request->query('session_id');
+            $sessionId = $request->query('session_id') ?? session('stripe_session_id');
             $checkoutSession = Session::retrieve($sessionId);
 
             // Verificar el estado del pago (payment_intent)
@@ -272,7 +273,7 @@ class VentaController extends Controller
 
                 session()->forget('carrito'); // Eliminar el carrito de la sesión
                 session()->forget('venta');   // Eliminar la venta de la sesión
-
+                session()->forget('stripe_session_id');
 
                 return redirect()->route('payment.success'); // Ruta donde el usuario ve el mensaje de éxito
 
@@ -325,7 +326,7 @@ class VentaController extends Controller
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
         $OUR_DOMAIN = env('APP_URL');
-
+        Log::info('Creando sesion para el pago en stripe');
         try {
             $checkoutSession = Session::create([
                 'line_items' => [[
@@ -333,13 +334,16 @@ class VentaController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => $OUR_DOMAIN . '/pago/success',
+                'success_url' => $OUR_DOMAIN . '/pago/save',
                 'cancel_url' => $OUR_DOMAIN . '/pago/cancelled',
             ]);
 
+            Log::info('Usuario redirigido y pagando en stripe');
+            session(['stripe_session_id' => $checkoutSession->id]);
             return $checkoutSession;
 
         } catch (\Exception $e){
+            Log::warning('Fallo al crear pago en stripe');
             return response()-> json(['error' => $e->getMessage()]);
         }
     }
