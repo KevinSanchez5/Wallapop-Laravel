@@ -7,6 +7,7 @@ use App\Models\Producto;
 use App\Models\Venta;
 use App\Utils\GuidGenerator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
@@ -155,15 +156,28 @@ class VentaController extends Controller
         Log::info('Creando lineas de venta a partir de lineas de carrito');
         $lineasVenta = [];
         $precioDeTodo = 0;
+        $productosDisponibles = [];
         foreach($carrito->lineasCarrito as $linea){
             Log::info('Validando disponibilidad de productos y precios en base de datos');
             $producto = Producto::find($linea->producto->id);
             if(!$producto || $producto->stock < $linea->cantidad ||$producto->estado !== 'Disponible') {
-                Log::warning('Producto no disponible: ' . ($producto ? $producto->nombre : 'Producto desconocido'));
-                return redirect()->route('payment.error')->with('message', 'Producto no disponible: '.  ($producto ? $producto->nombre : 'Producto desconocido'));
+                Log::warning('El producto ya no está disponible: ' . ($producto ? $producto->nombre : 'Producto desconocido'));
+                $productosDisponibles = array_filter($carrito->lineasCarrito, function ($item) use ($linea) {
+                    return $item->producto->id !== $linea->producto->id;
+                });
+                $nuevoPrecioTotal = array_reduce($productosDisponibles, function ($carry, $item) {
+                    return $carry + ($item->producto->precio * $item->cantidad);
+                }, 0);
+                $nuevaCantidad = array_reduce($productosDisponibles, function ($carry, $item) {
+                    return $carry + $item->cantidad;
+                });
+                session()->put('carrito', (object)['lineasCarrito' => $productosDisponibles,
+                    'precioTotal' => $nuevoPrecioTotal,
+                    'itemAmount' => $nuevaCantidad]);
+                return redirect()->route('payment.error')->with('message', 'El producto ya no está disponible: '.  ($producto ? $producto->nombre : 'Producto desconocido'));
             }
             $precioLinea = $producto->precio * $linea->cantidad;
-
+            $precioDeTodo+= $precioLinea;
             $lineasVenta[] = [
                 'vendedor' => [
                     'id' => $linea->producto->vendedor->id,
@@ -183,9 +197,11 @@ class VentaController extends Controller
                 ],
                 'precioTotal' => $precioLinea,
             ];
-            $precioDeTodo+= $precioLinea;
         }
-
+        if (empty($lineasVenta)) {
+            session()->forget('carrito');
+            return redirect()->route('payment.error')->with('error', 'Todos los productos han sido eliminados del carrito.');
+        }
 
         $venta = [
             'guid' => GuidGenerator::generarId(),
@@ -222,7 +238,7 @@ class VentaController extends Controller
 
         $venta= $this->validandoVentaAPartirDeCarrito();
 
-        if($venta instanceof JsonResponse){
+        if($venta instanceof RedirectResponse){
             return $venta;// Retorna si hay errores al crear la venta
         }
         session(['venta' => $venta]);
