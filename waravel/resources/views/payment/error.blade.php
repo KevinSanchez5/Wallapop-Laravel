@@ -13,11 +13,11 @@
                 @if(session($key))
                     @php
                         $bgColor = $color == 'red' ? 'bg-red-200' : 'bg-yellow-200';
-                        $textColor = $color == 'red' ? 'text-red-600' : 'text-yellow-600';
+                        $textColor = $color == 'red' ? 'text-red-700' : 'text-yellow-500';
                     @endphp
 
                     <div class="mt-4 p-4 {{ $bgColor }} {{ $textColor }} rounded-md">
-                        <p>{{ session($key) }}</p>
+                        <p class="font-bold">{{ session($key) }}</p>
                     </div>
                 @endif
             @endforeach
