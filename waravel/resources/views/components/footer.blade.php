@@ -15,9 +15,9 @@
 
         <!-- Enlaces -->
         <div class="flex flex-wrap justify-center space-x-8 sm:space-x-6 mb-4 sm:mb-0">
-            <a href="" class="font-medium hover:text-white transition-colors">Quiénes somos</a>
+            <a href="./pages/quienesSomos.html" class="font-medium hover:text-white transition-colors">Quiénes somos</a>
             <a href="" class="font-medium hover:text-white transition-colors">Contacto</a>
-            <a href="" class="font-medium hover:text-white transition-colors">Términos y condiciones</a>
+            <a href="./pages/terminos.html" class="font-medium hover:text-white transition-colors">Términos y condiciones</a>
         </div>
 
         <!-- Redes Sociales -->
