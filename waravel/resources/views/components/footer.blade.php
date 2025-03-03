@@ -10,7 +10,7 @@
                     <path d="M19.54 30.81a1.44 1.44 0 0 1-1.44-1.44V15.9a1.44 1.44 0 0 1 1.44-1.44h13.47a1.44 1.44 0 0 1 1.44 1.44c0 7.1-7.6 14.91-14.91 14.91Z"/>
                 </svg>
             </div>
-            <span class="text-3xl font-semibold">Waravel</span>
+            <span class="text-3xl font-semibold text-3xl font-extrabold text-gray-800" style="font-family: 'Inter', sans-serif;">Waravel</span>
         </div>
 
         <!-- Enlaces -->
