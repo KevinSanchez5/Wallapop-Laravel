@@ -34,7 +34,7 @@ class AdminController extends Controller
 
         $latestClients = User::where('role', 'cliente')
             ->orderBy('updated_at', 'desc')
-            ->limit(8)
+            ->limit(10)
             ->get();
 
         return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'admins', 'latestProducts', 'latestClients'));
