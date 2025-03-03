@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Producto;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ProductosSeeder extends Seeder
 {
@@ -235,80 +236,59 @@ class ProductosSeeder extends Seeder
                 'updated_at' => now(),
 
         ]);
-        /*
-        Producto::create([
-            'guid' => 'YQ7LXK9V53T',
-            'vendedor_id' => 9,
-            'nombre' => 'Monitor Gaming 27"',
-            'descripcion' => 'Monitor de 27 pulgadas con tasa de refresco de 144Hz y resolución QHD. Ideal para gaming y diseño gráfico.',
-            'estadoFisico' => 'Nuevo',
-            'precio' => 300.00,
-            'stock' => 10,
-            'categoria' => 'Tecnologia',
-            'estado' => 'Disponible',
-            'imagenes' => ['productos/monitor1.webp', 'productos/monitor2.webp'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
 
-        Producto::create([
-            'guid' => 'K9QXT7VYL53',
-            'vendedor_id' => 8,
-            'nombre' => 'Teclado Mecánico RGB',
-            'descripcion' => 'Teclado mecánico con retroiluminación RGB y switches Cherry MX. Perfecto para gamers y programadores.',
-            'estadoFisico' => 'Nuevo',
-            'precio' => 120.00,
-            'stock' => 15,
-            'categoria' => 'Tecnologia',
-            'estado' => 'Disponible',
-            'imagenes' => ['productos/teclado1.webp', 'productos/teclado2.webp'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $productos = [
+            ['Silla Gamer Ergonómica', 'Hogar', 120.00, 'Nuevo'],
+            ['Teclado Mecánico RGB', 'Tecnologia', 60.00, 'Nuevo'],
+            ['Smart TV 55" 4K', 'Tecnologia', 500.00, 'Nuevo'],
+            ['Auriculares Bluetooth', 'Tecnologia', 35.00, 'Nuevo'],
+            ['Bicicleta de Montaña', 'Deporte', 300.00, 'Nuevo'],
+            ['Mochila de Senderismo 60L', 'Otros', 70.00, 'Nuevo'],
+            ['Juego de Ollas de Acero Inoxidable', 'Hogar', 90.00, 'Nuevo'],
+            ['Robot Aspirador Inteligente', 'Hogar', 250.00, 'Nuevo'],
+            ['Cámara Réflex Canon', 'Tecnologia', 400.00, 'Usado'],
+            ['Patinete Eléctrico', 'Tecnologia', 350.00, 'Nuevo'],
+            ['Reloj Casio Vintage', 'Ropa', 30.00, 'Nuevo'],
+            ['Mesa de Oficina Ajustable', 'Hogar', 200.00, 'Nuevo'],
+            ['Monitor Gaming 144Hz', 'Tecnologia', 180.00, 'Nuevo'],
+            ['Cojín Ortopédico para Silla', 'Hogar', 25.00, 'Nuevo'],
+            ['Guitarra Electrica Acoustica', 'Musica', 150.00, 'Nuevo'],
+            ['Batería Portátil 12V', 'Tecnologia', 50.00, 'Nuevo'],
+            ['Disco Duro SSD 256GB', 'Tecnologia', 120.00, 'Nuevo'],
+            ['Mouse Gaming Logitech', 'Tecnologia', 45.00, 'Nuevo'],
+            ['Teclado Gaming Logitech', 'Tecnologia', 55.00, 'Nuevo'],
+            ['Cargador Portátil 100W', 'Tecnologia', 30.00, 'Nuevo'],
+            ['Pantalla LED 4K', 'Tecnologia', 150.00, 'Nuevo'],
+            ['Smartwatch Apple Watch', 'Tecnologia', 120.00, 'Nuevo'],
+            ['Smart TV Samsung SmartThings', 'Tecnologia', 250.00, 'Nuevo'],
+            ['Auriculares Bluetooth Sony', 'Tecnologia', 40.00, 'Nuevo'],
+            ['Reloj Digital Philips', 'Ropa', 25.00, 'Nuevo'],
+            ['Mesa de Cocina Inglesa', 'Hogar', 250.00, 'Nuevo'],
+            ['Silla de Escritorio', 'Hogar', 150.00, 'Nuevo'],
+            ['Pantalla LED 27" Full HD', 'Tecnologia', 100.00, 'Nuevo'],
+            ['Smartwatch Apple Watch Series 6', 'Tecnologia', 180.00, 'Nuevo'],
+            ['Smart TV Samsung SmartThings 3', 'Tecnologia', 300.00, 'Nuevo'],
+            ['Auriculares Bluetooth Panasonic', 'Tecnologia', 50.00, 'Nuevo'],
+            ['Reloj Digital Philips 4K', 'Ropa', 30.00, 'Nuevo'],
+            ['Mesa de Cocina Ergonómica', 'Hogar', 200.00, 'Nuevo'],
+            ['Silla de Escritorio Ergonómica', 'Hogar', 150.00, 'Nuevo'],
+        ];
 
-        Producto::create([
-            'guid' => 'T5YXQK9L73V',
-            'vendedor_id' => 7,
-            'nombre' => 'Silla Gaming Ergonómica',
-            'descripcion' => 'Silla ergonómica con soporte lumbar y reposacabezas ajustable. Ideal para largas sesiones de gaming o trabajo.',
-            'estadoFisico' => 'Nuevo',
-            'precio' => 200.00,
-            'stock' => 5,
-            'categoria' => 'Hogar',
-            'estado' => 'Disponible',
-            'imagenes' => ['productos/silla1.webp', 'productos/silla2.webp'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        Producto::create([
-            'guid' => '9X7TQY5KVL3',
-            'vendedor_id' => 6,
-            'nombre' => 'Auriculares Inalámbricos',
-            'descripcion' => 'Auriculares con cancelación de ruido y sonido envolvente. Perfectos para música y llamadas.',
-            'estadoFisico' => 'Nuevo',
-            'precio' => 150.00,
-            'stock' => 20,
-            'categoria' => 'Tecnologia',
-            'estado' => 'Disponible',
-            'imagenes' => ['productos/auriculares1.webp', 'productos/auriculares2.webp'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        Producto::create([
-            'guid' => 'QKYX9T753LV',
-            'vendedor_id' => 5,
-            'nombre' => 'Mesa de Oficina',
-            'descripcion' => 'Mesa de oficina con diseño moderno y espacio amplio. Ideal para trabajar desde casa.',
-            'estadoFisico' => 'Nuevo',
-            'precio' => 180.00,
-            'stock' => 8,
-            'categoria' => 'Hogar',
-            'estado' => 'Disponible',
-            'imagenes' => ['productos/mesa1.webp', 'productos/mesa2.webp'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);*/
+        foreach ($productos as $producto) {
+            Producto::create([
+                'guid' => Str::upper(Str::random(11)),
+                'vendedor_id' => rand(4, 12),
+                'nombre' => $producto[0],
+                'descripcion' => 'Descripción de ' . $producto[0],
+                'estadoFisico' => $producto[3],
+                'precio' => $producto[2],
+                'stock' => rand(10, 100),
+                'categoria' => $producto[1],
+                'estado' => 'Disponible',
+                'imagenes' => ['productos/producto.webp'],
+                'created_at' => now()->subDays(7),
+                'updated_at' => now()->subDays(7),
+            ]);
+        }
     }
 }

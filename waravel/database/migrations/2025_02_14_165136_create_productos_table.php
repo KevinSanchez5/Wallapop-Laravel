@@ -30,7 +30,8 @@ return new class extends Migration
                 'Musica',
                 'Deporte',
                 'Cine',
-                'Cocina'
+                'Cocina',
+                'Otros'
             ]);
             $table->enum('estado', ['Disponible', 'Vendido', 'Desactivado', 'Baneado']);
             $table->json('imagenes'); // TODO - Cuidado a la hora de hacer la lógica
