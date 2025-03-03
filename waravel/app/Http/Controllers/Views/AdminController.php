@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
+use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Valoracion;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
