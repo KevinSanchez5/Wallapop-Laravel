@@ -69,7 +69,7 @@
                     <i class="fas fa-database"></i> &nbsp; Copia de Seguridad
                 </a>
                 <div class="absolute right-0 hidden mt-2 space-y-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg w-48" id="backupMenu">
-                    <a href="{{ route('admin.backup') }}" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <a href="{{ route('admin.backup') }}" id="exportBackupButton" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
                         <i class="fas fa-arrow-down"></i> &nbsp; Exportar
                     </a>
                     <a href="" id="importBackupButton" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
