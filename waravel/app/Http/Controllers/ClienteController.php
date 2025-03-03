@@ -59,7 +59,7 @@ class ClienteController extends Controller
             return response()->json(json_decode($clienteRedis));
         }
         Log::info('Buscando cliente de la base de datos');
-        $cliente = Cliente::where('guid', $guid)->firstOrFail();
+        $cliente = Cliente::where('guid', $guid)->first();
 
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
@@ -113,7 +113,7 @@ class ClienteController extends Controller
         $cliente = Redis::get('cliente_' . $guid);
         if (!$cliente) {
             Log::info('Buscando cliente de la base de datos');
-            $cliente = Cliente::where('guid',$guid)->firstOrFail();
+            $cliente = Cliente::where('guid',$guid)->first();
         }
 
         if (!$cliente) {
@@ -199,7 +199,7 @@ class ClienteController extends Controller
     {
         Log::info("Buscando favoritos para el cliente con Guid: {$guid}");
 
-        $cliente = Cliente::where('guid',$guid)->firstOrFail();
+        $cliente = Cliente::where('guid',$guid)->first();
 
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
@@ -216,40 +216,48 @@ class ClienteController extends Controller
     {
         Log::info("Intentando agregar un producto a favoritos para el cliente con Guid: {$guid}");
 
-        $cliente = Cliente::where('guid',$guid)->firstOrFail();
+        $cliente = Cliente::where('guid', $guid)->first();
         if (!$cliente) {
             Log::info("Cliente con Guid {$guid} no encontrado");
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
-        $producto = Producto::where($request->producto_guid);
+        $producto = Producto::where('guid', $request->producto_guid)->first();
         if (!$producto) {
             Log::info("Producto con Guid {$request->producto_guid} no encontrado");
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        $cliente->favoritos()->attach($producto->guid);
-        Log::info("Producto con Guid {$producto->guid} agregado a favoritos");
+        // Agregar el producto a los favoritos usando el 'id' de ambos, cliente y producto
+        $cliente->favoritos()->attach($producto->id);
+
+        Log::info("Producto con Id {$producto->id} agregado a favoritos");
 
         return response()->json(['message' => 'Producto agregado a favoritos']);
     }
+
 
     // Quitar un producto de favoritos
     public function removeFromFavorites(Request $request, $guid)
     {
         Log::info("Intentando eliminar un producto de favoritos para el cliente con Guid: {$guid}");
-        $cliente = Cliente::where('guid',$guid)->firstOrFail();
+
+        // Buscar el cliente por 'guid'
+        $cliente = Cliente::where('guid', $guid)->first();
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
-        $producto = Producto::where($request->producto_guid);
+        // Buscar el producto por 'id' (no 'guid')
+        $producto = Producto::find($request->producto_id); // Cambiar 'producto_guid' por 'producto_id'
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        $cliente->favoritos()->detach($producto->guid);
-        Log::info("Producto con Guid {$producto->guid} eliminado de favoritos para el cliente con guid: {$guid}");
+        // Eliminar el producto de los favoritos
+        $cliente->favoritos()->detach($producto->id); // Usamos 'producto_id' aquí
+
+        Log::info("Producto con Id {$producto->id} eliminado de favoritos para el cliente con guid: {$guid}");
 
         return response()->json(['message' => 'Producto eliminado de favoritos']);
     }
@@ -259,7 +267,7 @@ class ClienteController extends Controller
         $cliente = Redis::get('cliente_' . $guid);
 
         if (!$cliente) {
-            $cliente = Cliente::where('guid',$guid)->firstOrFail();
+            $cliente = Cliente::where('guid',$guid)->first();
         }else{
             $cliente = Cliente::hydrate([$cliente])->first();;
         }
