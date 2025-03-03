@@ -95,7 +95,7 @@
                     <h5 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-200">Valoraciones Totales</h5>
                     <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ array_sum($puntuaciones) }}</p>
                 </div>
-                <a href="#" class="block text-sm text-black bg-[#BFF205] hover:bg-[#96bf03] py-2 px-4 rounded-lg text-center mt-4 transform hover:scale-105 transition-all duration-300">
+                <a href="{{route('admin.reviews')}}" class="block text-sm text-black bg-[#BFF205] hover:bg-[#96bf03] py-2 px-4 rounded-lg text-center mt-4 transform hover:scale-105 transition-all duration-300">
                     <b>Ver Todos</b>
                 </a>
             </div>
