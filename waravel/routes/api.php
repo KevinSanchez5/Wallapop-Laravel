@@ -17,44 +17,44 @@ Route::get('/user', function (Request $request) {
 
 Route::middleware('api')->group(function () {
     Route::get('/productos', [ProductoController::class, 'index']);
-    Route::get('/productos/{id}', [ProductoController::class, 'show']);
+    Route::get('/productos/{guid}', [ProductoController::class, 'show']);
     Route::post('/productos', [ProductoController::class, 'store']);
-    Route::put('/productos/{id}', [ProductoController::class, 'update']);
-    Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
-    Route::post('/productos/{id}/upload', [ProductoController::class, 'addListingPhoto']);
-    Route::delete('/productos/{id}/removeListingPhoto', [ProductoController::class, 'deleteListingPhoto']);
+    Route::put('/productos/{guid}', [ProductoController::class, 'update']);
+    Route::delete('/productos/{guid}', [ProductoController::class, 'destroy']);
+    Route::post('/productos/{guid}/upload', [ProductoController::class, 'addListingPhoto']);
+    Route::delete('/productos/{guid}/removeListingPhoto', [ProductoController::class, 'deleteListingPhoto']);
 
     Route::get('/clientes', [ClienteController::class, 'index']);
-    Route::get('/clientes/{id}', [ClienteController::class, 'show']);
+    Route::get('/clientes/{guid}', [ClienteController::class, 'show']);
     Route::post('/clientes', [ClienteController::class, 'store']);
-    Route::put('/clientes/{id}', [ClienteController::class, 'update']);
-    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
-    Route::post('/clientes/{id}/upload', [ClienteController::class, 'updateProfilePhoto']);
-    Route::get('/clientes/{id}/favoritos', [ClienteController::class, 'searchFavorites']);
-    Route::post('/clientes/{id}/favoritos', [ClienteController::class, 'addToFavorites']);
-    Route::delete('/clientes/{id}/favoritos', [ClienteController::class, 'removeFromFavorites']);
+    Route::put('/clientes/{guid}', [ClienteController::class, 'update']);
+    Route::delete('/clientes/{guid}', [ClienteController::class, 'destroy']);
+    Route::post('/clientes/{guid}/upload', [ClienteController::class, 'updateProfilePhoto']);
+    Route::get('/clientes/{guid}/favoritos', [ClienteController::class, 'searchFavorites']);
+    Route::post('/clientes/{guid}/favoritos', [ClienteController::class, 'addToFavorites']);
+    Route::delete('/clientes/{guid}/favoritos', [ClienteController::class, 'removeFromFavorites']);
 
     Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::get('/users/{guid}', [UserController::class, 'show']);
     Route::get('/users/email/{email}', [UserController::class, 'showEmail']);
     Route::post('/users', [UserController::class, 'store']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::put('/users/{guid}', [UserController::class, 'update']);
+    Route::delete('/users/{guid}', [UserController::class, 'destroy']);
     Route::post('/users/correo-codigo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
     Route::post('/users/verificar-codigo', [UserController::class, 'verificarCodigoCambiarContrasenya']);
     Route::get('/users/verificar-correo/{email}', [UserController::class, 'validarEmail']);
 
     Route::get('/valoraciones', [ValoracionController::class, 'index']);
-    Route::get('/valoraciones/{id}', [ValoracionController::class, 'show']);
+    Route::get('/valoraciones/{guid}', [ValoracionController::class, 'show']);
     Route::post('/valoraciones', [ValoracionController::class, 'store']);
-    Route::put('/valoraciones/{id}', [ValoracionController::class, 'update']);
-    Route::delete('/valoraciones/{id}', [ValoracionController::class, 'destroy']);
+    Route::put('/valoraciones/{guid}', [ValoracionController::class, 'update']);
+    Route::delete('/valoraciones/{guid}', [ValoracionController::class, 'destroy']);
 
     Route::get('/ventas', [VentaController::class, 'index']);
-    Route::get('/ventas/{id}', [VentaController::class, 'show']);
+    Route::get('/ventas/{guid}', [VentaController::class, 'show']);
     Route::post('/ventas', [VentaController::class, 'store']);
-    Route::put('/ventas/{id}', [VentaController::class, 'update']);
-    Route::delete('/ventas/{id}', [VentaController::class, 'destroy']);
+    Route::put('/ventas/{guid}', [VentaController::class, 'update']);
+    Route::delete('/ventas/{guid}', [VentaController::class, 'destroy']);
 
 
     Route::get('/backups', [BackupController::class, 'getAllBackups']);

@@ -9,6 +9,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Tests\TestCase;
+use App\Utils\GuidGenerator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+
 
 class ClienteControllerTest extends TestCase
 {
@@ -30,7 +34,7 @@ class ClienteControllerTest extends TestCase
         ]);
 
         $this->cliente = Cliente::create([
-            'guid' => 'cliente-guid',
+            'guid' => GuidGenerator::generarId(),
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
@@ -51,7 +55,7 @@ class ClienteControllerTest extends TestCase
     {
         for ($i = 1; $i <= 10; $i++) {
             Cliente::create([
-                'guid' => 'guid-' . $i,
+                'guid' => GuidGenerator::generarId(),
                 'nombre' => "Cliente $i",
                 'apellido' => "Apellido $i",
                 'avatar' => "avatar$i.png",
@@ -85,11 +89,12 @@ class ClienteControllerTest extends TestCase
         $this->assertEquals(11, $responseData['paginacion']['elementos_totales']);
     }
 
+
     public function test_show(): void
     {
         Redis::del('cliente_' . $this->cliente->id);
 
-        $response = $this->getJson("/api/clientes/{$this->cliente->id}");
+        $response = $this->getJson("/api/clientes/{$this->cliente->guid}");
 
         $response->assertStatus(200);
 
@@ -105,8 +110,8 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $this->user->id,
         ]);
 
-        $clienteRedis = json_decode(Redis::get('cliente_' . $this->cliente->id), true);
-        $this->assertEquals($this->cliente->id, $clienteRedis['id']);
+        $clienteRedis = json_decode(Redis::get('cliente_' . $this->cliente->guid), true);
+        $this->assertEquals($this->cliente->guid, $clienteRedis['guid']);
         $this->assertEquals($this->cliente->nombre, $clienteRedis['nombre']);
         $this->assertEquals($this->cliente->apellido, $clienteRedis['apellido']);
         $this->assertEquals($this->cliente->avatar, $clienteRedis['avatar']);
@@ -159,8 +164,10 @@ class ClienteControllerTest extends TestCase
 
     public function test_store(): void
     {
+        $guid = GuidGenerator::generarId();
+
         $data = [
-            'guid' => 'cliente2-guid',
+            'guid' => $guid,
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'avatar' => 'avatar.png',
@@ -190,15 +197,18 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $data['usuario_id'],
         ]);
 
-        // Comparo dirección aparte para no tener problemas con el tipo json
         $cliente = Cliente::where('guid', $data['guid'])->first();
-        $this->assertEquals(json_decode(json_encode($data['direccion'])), $cliente->direccion);
+
+        $this->assertEquals($data['direccion'], (array) $cliente->direccion);
     }
+
+
 
     public function test_store_avatar_null(): void
     {
+        $guid = GuidGenerator::generarId();
         $data = [
-            'guid' => 'cliente2-guid',
+            'guid' => $guid,
             'nombre' => 'Pepe',
             'apellido' => 'Perez',
             'telefono' => '123456789',
@@ -276,15 +286,14 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $this->user->id,
         ];
 
-        $response = $this->putJson("/api/clientes/{$this->cliente->id}", $data);
+        Redis::del('cliente_' . $this->cliente->guid);
 
-        $this->cliente->refresh();
+        $response = $this->putJson("/api/clientes/{$this->cliente->guid}", $data);
 
         $response->assertStatus(200);
 
-        Redis::set('cliente_' . $this->cliente->id, json_encode($data));
-
         $this->assertDatabaseHas('clientes', [
+            'guid' => $this->cliente->guid,
             'nombre' => 'nombre_update',
             'apellido' => 'apellido_update',
             'avatar' => 'avatar_update.png',
@@ -293,19 +302,29 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $this->user->id,
         ]);
 
-        // Comparo dirección aparte para no tener problemas con el tipo json
-        $cliente = Cliente::find($this->cliente->id);
-        $this->assertEquals(json_decode(json_encode($data['direccion'])), $cliente->direccion);
+        $cliente = Cliente::where('guid', $this->cliente->guid)->first();
+        $this->assertEquals('nombre_update', $cliente->nombre);
+        $this->assertEquals('apellido_update', $cliente->apellido);
+        $this->assertEquals('avatar_update.png', $cliente->avatar);
+        $this->assertEquals('123456789', $cliente->telefono);
+        $this->assertTrue($cliente->activo);
+        $this->assertEquals($this->user->id, $cliente->usuario_id);
+        $this->assertEquals($data['direccion'], (array) $cliente->direccion);
 
-        $clienteActualizado = json_decode(Redis::get('cliente_' . $this->cliente->id), true);
-        $this->assertEquals($data['nombre'], $clienteActualizado['nombre']);
-        $this->assertEquals($data['apellido'], $clienteActualizado['apellido']);
-        $this->assertEquals($data['avatar'], $clienteActualizado['avatar']);
-        $this->assertEquals($data['telefono'], $clienteActualizado['telefono']);
-        $this->assertEquals($data['direccion'], $clienteActualizado['direccion']);
-        $this->assertEquals($data['activo'], $clienteActualizado['activo']);
-        $this->assertEquals($data['usuario_id'], $clienteActualizado['usuario_id']);
+        $clienteRedis = json_decode(Redis::get('cliente_' . $this->cliente->guid), true);
+        $this->assertEquals($cliente->guid, $clienteRedis['guid']);
+        $this->assertEquals($cliente->nombre, $clienteRedis['nombre']);
+        $this->assertEquals($cliente->apellido, $clienteRedis['apellido']);
+        $this->assertEquals($cliente->avatar, $clienteRedis['avatar']);
+        $this->assertEquals($cliente->telefono, $clienteRedis['telefono']);
+        $this->assertEquals(json_decode(json_encode($cliente->direccion), true), $clienteRedis['direccion']);
+        $this->assertTrue($clienteRedis['activo']);
+        $this->assertEquals($cliente->usuario_id, $clienteRedis['usuario_id']);
     }
+
+
+
+
 
     public function test_update_not_found(): void
     {
@@ -349,7 +368,7 @@ class ClienteControllerTest extends TestCase
             'usuario_id' => $this->user->id,
         ];
 
-        $response = $this->putJson("/api/clientes/{$this->cliente->id}", $data);
+        $response = $this->putJson("/api/clientes/{$this->cliente->guid}", $data);
 
         $this->cliente->refresh();
 
@@ -360,12 +379,12 @@ class ClienteControllerTest extends TestCase
 
     public function test_destroy(): void
     {
-        $response = $this->deleteJson("/api/clientes/{$this->cliente->id}");
+        $response = $this->deleteJson("/api/clientes/{$this->cliente->guid}");
 
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Cliente eliminado correctamente']);
 
-        $this->assertDatabaseMissing('clientes', ['id' => $this->cliente->id]);
+        $this->assertDatabaseMissing('clientes', ['guid' => $this->cliente->guid]);
     }
 
     public function test_destroy_not_found(): void
@@ -380,8 +399,10 @@ class ClienteControllerTest extends TestCase
 
     public function test_search_favorites(): void
     {
+        $guidProducto = GuidGenerator::generarId();
+
         $producto = Producto::create([
-            'guid' => 'guid-producto',
+            'guid' => $guidProducto,
             'vendedor_id' => $this->cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
@@ -390,15 +411,18 @@ class ClienteControllerTest extends TestCase
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
+            'stock' => 10,
         ]);
 
         $this->cliente->favoritos()->attach($producto->id);
 
-        $response = $this->getJson("/api/clientes/{$this->cliente->id}/favoritos");
+        $response = $this->getJson("/api/clientes/{$this->cliente->guid}/favoritos");
 
         $response->assertStatus(200);
-        $response->assertJsonFragment(['id' => $producto->id]);
+
+        $response->assertJsonFragment(['guid' => $producto->guid]);
     }
+
 
     public function test_search_favorites_cliente_not_found(): void
     {
@@ -411,7 +435,7 @@ class ClienteControllerTest extends TestCase
     public function test_add_to_favorites(): void
     {
         $producto = Producto::create([
-            'guid' => 'guid-producto',
+            'guid' => GuidGenerator::generarId(),
             'vendedor_id' => $this->cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
@@ -420,25 +444,33 @@ class ClienteControllerTest extends TestCase
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
+            'stock' => 10,
         ]);
 
-        $response = $this->postJson("/api/clientes/{$this->cliente->id}/favoritos", [
-            'producto_id' => $producto->id
+
+        $response = $this->postJson("/api/clientes/{$this->cliente->guid}/favoritos", [
+            'producto_guid' => $producto->guid,
         ]);
+
 
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Producto agregado a favoritos']);
 
+
         $this->assertDatabaseHas('cliente_favoritos', [
             'cliente_id' => $this->cliente->id,
-            'producto_id' => $producto->id
+            'producto_id' => $producto->id,
         ]);
     }
 
+
+
     public function test_add_to_favorites_cliente_not_found(): void
     {
+        $guidProducto = GuidGenerator::generarId();
+
         $producto = Producto::create([
-            'guid' => 'guid-producto',
+            'guid' => $guidProducto,
             'vendedor_id' => $this->cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
@@ -447,21 +479,23 @@ class ClienteControllerTest extends TestCase
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
+            'stock' => 10,
         ]);
 
         $response = $this->postJson("/api/clientes/999/favoritos", [
             'producto_id' => $producto->id
         ]);
 
+
         $response->assertStatus(404);
         $response->assertJson(['message' => 'Cliente no encontrado']);
     }
 
+
     public function test_add_to_favorites_producto_not_found(): void
     {
-
-        $response = $this->postJson("/api/clientes/{$this->cliente->id}/favoritos", [
-            'producto_id' => 999
+        $response = $this->postJson("/api/clientes/{$this->cliente->guid}/favoritos", [
+            'producto_guid' => 'guid-producto-inexistente'
         ]);
 
         $response->assertStatus(404);
@@ -471,7 +505,7 @@ class ClienteControllerTest extends TestCase
     public function test_remove_from_favorites(): void
     {
         $producto = Producto::create([
-            'guid' => 'guid-producto',
+            'guid' => GuidGenerator::generarId(),
             'vendedor_id' => $this->cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
@@ -480,16 +514,19 @@ class ClienteControllerTest extends TestCase
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
+            'stock' => 10,
         ]);
 
         $this->cliente->favoritos()->attach($producto->id);
 
-        $response = $this->deleteJson("/api/clientes/{$this->cliente->id}/favoritos", [
+        $response = $this->deleteJson("/api/clientes/{$this->cliente->guid}/favoritos", [
             'producto_id' => $producto->id
         ]);
 
+
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Producto eliminado de favoritos']);
+
 
         $this->assertDatabaseMissing('cliente_favoritos', [
             'cliente_id' => $this->cliente->id,
@@ -497,10 +534,14 @@ class ClienteControllerTest extends TestCase
         ]);
     }
 
+
+
     public function test_remove_from_favorites_cliente_not_found(): void
     {
+        $guidProducto = GuidGenerator::generarId();
+
         $producto = Producto::create([
-            'guid' => 'guid-producto',
+            'guid' => $guidProducto,
             'vendedor_id' => $this->cliente->id,
             'nombre' => 'Producto de prueba',
             'descripcion' => 'Este es un producto de prueba',
@@ -509,23 +550,97 @@ class ClienteControllerTest extends TestCase
             'categoria' => 'Tecnologia',
             'estado' => 'Disponible',
             'imagenes' => json_encode(['imagenProducto.png']),
+            'stock' => 10,
         ]);
 
+
         $response = $this->deleteJson("/api/clientes/999/favoritos", [
-            'producto_id' => $producto->id
+            'producto_guid' => $producto->guid
         ]);
+
 
         $response->assertStatus(404);
         $response->assertJson(['message' => 'Cliente no encontrado']);
     }
 
+
     public function test_remove_from_favorites_producto_not_found(): void
     {
-        $response = $this->deleteJson("/api/clientes/{$this->cliente->id}/favoritos", [
-            'producto_id' => 999
+
+        $response = $this->deleteJson("/api/clientes/{$this->cliente->guid}/favoritos", [
+            'producto_guid' => '999',
         ]);
 
         $response->assertStatus(404);
         $response->assertJson(['message' => 'Producto no encontrado']);
     }
+
+    public function test_update_profile_photo_success(): void
+    {
+        Storage::fake('public');
+
+        $file = UploadedFile::fake()->image('avatar_test.jpg');
+        $response = $this->actingAs($this->user)
+            ->postJson("/api/clientes/{$this->cliente->guid}/upload", [
+                'avatar' => $file,
+            ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'message' => 'Avatar actualizado',
+        ]);
+
+        $this->assertDatabaseHas('clientes', [
+            'guid' => $this->cliente->guid,
+            'avatar' => 'clientes/avatares/' . $this->cliente->guid . '.jpg',
+        ]);
+
+        Storage::disk('public')->assertExists('clientes/avatares/' . $this->cliente->guid . '.jpg');
+
+        $this->assertNull(Redis::get('cliente_' . $this->cliente->guid));
+    }
+
+    public function test_update_profile_photo_invalid_format(): void
+    {
+        $file = UploadedFile::fake()->create('avatar_test.txt', 100);
+
+        $response = $this->actingAs($this->user)
+            ->postJson("/api/clientes/{$this->cliente->guid}/upload", [
+                'avatar' => $file,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['avatar']);
+    }
+
+    public function test_update_profile_photo_client_not_found(): void
+    {
+        $file = UploadedFile::fake()->image('avatar_test.jpg');
+
+        Redis::del('cliente_' . $this->cliente->guid);
+
+        $fakeGuid = 'fake-guid-that-does-not-exist';
+
+        $response = $this->actingAs($this->user)
+            ->postJson("/api/clientes/{$fakeGuid}/upload", [
+                'avatar' => $file,
+            ]);
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'Cliente no encontrado',
+        ]);
+    }
+
+    public function test_update_profile_photo_missing_file(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->postJson("/api/clientes/{$this->cliente->guid}/upload", []);
+
+        $response->assertStatus(422);
+        
+        $response->assertJsonValidationErrors(['avatar']);
+    }
+
+
 }
