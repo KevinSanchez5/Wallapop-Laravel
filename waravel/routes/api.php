@@ -43,6 +43,7 @@ Route::middleware('api')->group(function () {
     Route::post('/users/correo-codigo', [UserController::class, 'enviarCorreoRecuperarContrasenya']);
     Route::post('/users/verificar-codigo', [UserController::class, 'verificarCodigoCambiarContrasenya']);
     Route::get('/users/verificar-correo/{email}', [UserController::class, 'validarEmail']);
+    Route::patch('/users/cambio-contraseña', [UserController::class, 'cambioContrasenya']);
 
     Route::get('/valoraciones', [ValoracionController::class, 'index']);
     Route::get('/valoraciones/{guid}', [ValoracionController::class, 'show']);
