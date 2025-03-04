@@ -10,14 +10,14 @@
                     <path d="M19.54 30.81a1.44 1.44 0 0 1-1.44-1.44V15.9a1.44 1.44 0 0 1 1.44-1.44h13.47a1.44 1.44 0 0 1 1.44 1.44c0 7.1-7.6 14.91-14.91 14.91Z"/>
                 </svg>
             </div>
-            <span class="text-3xl font-semibold">Waravel</span>
+            <span class="text-3xl font-semibold text-3xl font-extrabold text-gray-800" style="font-family: 'Inter', sans-serif;">Waravel</span>
         </div>
 
         <!-- Enlaces -->
         <div class="flex flex-wrap justify-center space-x-8 sm:space-x-6 mb-4 sm:mb-0">
-            <a href="" class="font-medium hover:text-white transition-colors">Quiénes somos</a>
+            <a href="./pages/quienesSomos.html" class="font-medium hover:text-white transition-colors">Quiénes somos</a>
             <a href="" class="font-medium hover:text-white transition-colors">Contacto</a>
-            <a href="" class="font-medium hover:text-white transition-colors">Términos y condiciones</a>
+            <a href="./pages/terminos.html" class="font-medium hover:text-white transition-colors">Términos y condiciones</a>
         </div>
 
         <!-- Redes Sociales -->

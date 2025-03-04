@@ -103,31 +103,51 @@
         </div>
 
         <!-- Modal Añadir Administrador -->
-        <div id="adminModal" class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-lg w-1/3 relative">
-                <!-- Botón de cerrar como X en la esquina superior derecha -->
-                <button id="closeAdminModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl" onclick="document.getElementById('adminModal').classList.add('hidden')">
+        <div id="adminModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity">
+            <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-md relative transform scale-95 transition-transform">
+                <!-- Botón de cerrar (X) -->
+                <button id="closeAdminModal"
+                        class="absolute top-3 right-3 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white text-2xl transition"
+                        onclick="document.getElementById('adminModal').classList.add('hidden')">
                     &times;
                 </button>
 
-                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Añadir Administrador</h2>
+                <!-- Título -->
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-5 text-center">Añadir Administrador</h2><br>
 
+                <!-- Formulario -->
                 <form id="adminForm">
                     @csrf
-                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Nombre:</label>
-                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
 
-                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Email:</label>
-                    <input type="email" id="email" name="email" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="name" class="block text-gray-700 dark:text-gray-300 font-medium">Nombre</label>
+                            <input type="text" id="name" name="name" required
+                                   class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#BFF205]">
+                        </div>
 
-                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Contraseña:</label>
-                    <input type="password" id="password" name="password" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
+                        <div>
+                            <label for="email" class="block text-gray-700 dark:text-gray-300 font-medium">Email</label>
+                            <input type="email" id="email" name="email" required
+                                   class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#BFF205]">
+                        </div>
 
-                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Confirmar Contraseña:</label>
-                    <input type="password" id="password_confirmation" name="password_confirmation" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mb-3" required>
+                        <div>
+                            <label for="password" class="block text-gray-700 dark:text-gray-300 font-medium">Contraseña</label>
+                            <input type="password" id="password" name="password" required
+                                   class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#BFF205]">
+                        </div>
 
-                    <button type="submit" class="w-full bg-[#BFF205] text-black py-2 rounded-lg hover:bg-[#96BF03] transition">
-                        <b>Guardar Administrador</b>
+                        <div>
+                            <label for="password_confirmation" class="block text-gray-700 dark:text-gray-300 font-medium">Confirmar Contraseña</label>
+                            <input type="password" id="password_confirmation" name="password_confirmation" required
+                                   class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#BFF205]">
+                        </div>
+                    </div><br><br>
+
+                    <button type="submit"
+                            class="w-full mt-5 bg-[#BFF205] text-black py-2 rounded-lg font-semibold hover:bg-[#96BF03] transition">
+                        Guardar Administrador
                     </button>
                 </form>
             </div>

@@ -4,7 +4,6 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -53,20 +52,4 @@ Route::middleware('auth')->group(function () {
             ->name('cliente.misventas');
 
     });
-
-    /*
-    // Rutas del administrador
-    Route::middleware('admin')->group(function () {
-        Route::get('admin/dashboard', [AdminController::class, 'dashboard'])
-            ->name('admin.dashboard');
-
-        Route::get('admin/usuarios', [AdminController::class, 'gestionUsuarios'])
-            ->name('admin.gestionUsuarios');
-
-        Route::get('admin/productos', [AdminController::class, 'gestionProductos'])
-            ->name('admin.gestionProductos');
-
-        Route::get('admin/almacen', [AdminController::class, 'almacen'])
-            ->name('admin.almacen');
-    });*/
 });

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
+use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Valoracion;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -34,7 +34,7 @@ class AdminController extends Controller
 
         $latestClients = User::where('role', 'cliente')
             ->orderBy('updated_at', 'desc')
-            ->limit(8)
+            ->limit(10)
             ->get();
 
         return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'admins', 'latestProducts', 'latestClients'));

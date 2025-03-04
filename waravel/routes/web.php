@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\Views\AdminController;
 use App\Http\Controllers\Views\CarritoControllerView;
 use App\Http\Controllers\Views\ClienteControllerView;
 use App\Http\Controllers\Views\ProductoControllerView;
