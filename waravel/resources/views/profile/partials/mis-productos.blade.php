@@ -21,6 +21,10 @@
                     class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
                 <b>Mis ventas</b>
             </button>
+            <button onclick="window.location.href='{{ route('profile.sales') }}'"
+                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
+                <b>Favoritos</b>
+            </button>
         </div>
         <div id="productos" class="seccion">
             <div class="animate-fadeIn">
