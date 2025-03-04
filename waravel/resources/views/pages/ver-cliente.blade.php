@@ -151,6 +151,30 @@
 
             document.getElementById(seccion).classList.remove('hidden');
         }
+
+        async function addToFavorite(productId) {
+            await fetch("{{ route('favorito.añadir') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": " {{ csrf_token() }}",
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    amount: amount,
+                }),
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status === 200) {
+                        updateCartLogo(data.itemAmount);
+                        showNotification();
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                })
+            hideSpinner();
+        }
     </script>
 
     <style>
