@@ -391,14 +391,14 @@ class VentaController extends Controller
             return redirect()->route('profile')->with('error', 'Venta no encontrada');
         }
 
-        /*
+
         $user = Auth()->user();
 
         if ($user->guid !== $venta['comprador']['guid']) {
             Log::warning('Usuario no autorizado para cancelar la venta', ['guid' => $guid]);
             return redirect()->route('profile')->with('error', 'No tienes permiso para cancelar esta venta');
         }
-*/
+
         if($venta['estado'] == 'Pendiente'){
             $reembolsoResult = $this->reembolsarPago($venta['payment_intent_id'], $venta['precioTotal']);
             if($reembolsoResult['status'] != 'success') {
@@ -429,19 +429,19 @@ class VentaController extends Controller
 
     public function reembolsarPago($paymentIntentId, $coste){
         Stripe::setApiKey(env('STRIPE_SECRET'));
-
+        Log::info('Reembolsando pago en stripe');
         try{
             $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
-            $charge = Charge::retrieve($paymentIntentId);
-                if ($paymentIntent->status != 'succeeded' && $charge->refounded==true) {
-                Log::error("Intento de reembolso fallido: No se encontraron cargos en el PaymentIntent ID: " . $paymentIntentId);
-                return [ 'status'=> 'error','message' => 'Esa venta no ha sido pagada'];
+            $chargeId = $paymentIntent->latest_charge;
+            $charge = Charge::retrieve($chargeId);
+                if ($paymentIntent->status != 'succeeded' || $charge->refunded==true) {
+                Log::error("Intento de reembolso fallido: ya se ha reembolsado ese pago " . $paymentIntentId);
+                return [ 'status'=> 'error','message' => 'Esa venta no ha sido pagada o ya ha sido reembolsada'];
             }
-            $chargeId = $charge->id;
 
             $reembolso = Refund::create([
                 'charge' => $chargeId,
-                'amount' => $coste,
+                'amount' => $coste*100,
             ]);
             return [
                 'status' => 'success',
