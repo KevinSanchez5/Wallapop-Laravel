@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\User;
 use App\Models\Producto;
 use App\Models\Venta;
 use App\Utils\GuidGenerator;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Stripe\Charge;
 use Stripe\PaymentIntent;
 use Stripe\Price;
 use Stripe\Product;
@@ -37,6 +39,7 @@ class VentaController extends Controller
                 'comprador' => $venta->comprador,
                 'lineaVentas' => $venta->lineaVentas,
                 'precioTotal' => $venta->precioTotal,
+                'paymentIntentId' => $venta->payment_intent_id,
                 'created_at' => $venta->created_at->toDateTimeString(),
                 'updated_at' => $venta->updated_at->toDateTimeString(),
             ];
@@ -264,6 +267,17 @@ class VentaController extends Controller
         Log::info('Venta guardada correctamente');
     }
 
+    public function restandoStockDeProductosComprados($venta)
+    {
+        Log::info('Restando el stock de los productos comprados');
+        foreach($venta['lineaVentas'] as $lineaVenta){
+            $producto = Producto::find($lineaVenta['producto']['id']);
+
+            $producto->stock -= $lineaVenta['cantidad'];
+            $producto->save();
+        }
+    }
+
     public function pagoSuccess(Request $request)
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -271,9 +285,13 @@ class VentaController extends Controller
 
         try {
             $sessionId = $request->query('session_id') ?? session('stripe_session_id');
-            $checkoutSession = Session::retrieve($sessionId);
 
-            // Verificar el estado del pago (payment_intent)
+            if (!$sessionId) {
+                Log::error("Error en pagoSuccess: No se encontró session_id");
+                return redirect()->route('payment.error')->with('error', 'Error en el pago: Sesión de Stripe no encontrada.');
+            }
+
+            $checkoutSession = Session::retrieve($sessionId);
             $paymentIntent = PaymentIntent::retrieve($checkoutSession->payment_intent);
 
             if ($paymentIntent->status == 'succeeded') {
@@ -281,27 +299,24 @@ class VentaController extends Controller
                 if(!$venta){
                     return redirect()-> route('pago.error')->with('error', 'Venta no encontrada');
                 }
-                //TODO nuevo campo en caso de reembolso
-                //$venta['payment_intent_id'] = $checkoutSession->payment_intent;
-                $venta['payment_intent_id'] = $checkoutSession->payment_intent; // Asignar el payment_intent
+                $venta['payment_intent_id'] = $checkoutSession->payment_intent; // Asignar el payment_intent, campo para el reembolso
 
+                $this->restandoStockDeProductosComprados($venta);
                 $this->guardarVenta($venta);
 
-                session()->forget('carrito'); // Eliminar el carrito de la sesión
-                session()->forget('venta');   // Eliminar la venta de la sesión
-                session()->forget('stripe_session_id');
+                session()->forget(['carrito','venta','stripe_session_id']);
 
-                return redirect()->route('payment.success'); // Ruta donde el usuario ve el mensaje de éxito
+                return redirect()->route('payment.success');
 
             } else {
-
-                return redirect()->route('payment.error'); // Ruta para error de pago
+                Log::warning("El pago no se completó correctamente. Estado: " . $paymentIntent->status);
+                return redirect()->route('payment.error')->with('error', 'Lo sentimos un error durante el pago de su carrito');
             }
         } catch (\Exception $e) {
+            Log::error("Excepción en pagoSuccess: " . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
-
 
     /**
      * Funcion que inserta un nuevo precio a stripe para permitir el pago exacto
@@ -364,25 +379,78 @@ class VentaController extends Controller
         }
     }
 
+    public function cancelarVenta($guid)
+    {
+        Log::info('Cancelando venta con guid: ' . $guid);
 
-    //TODO posible funcion para reembolsar el pago y cancelar la venta
-    // siempre y cuando no alcance un estado diferente a procesado
-    public function reembolsarPago($paymentIntentId){
+        $venta = Venta::where('guid', $guid)->first();
+
+        if(!$venta){
+            Log::warning('Venta no encontrada');
+            //Probablemente cambiar la ruta?
+            return redirect()->route('profile')->with('error', 'Venta no encontrada');
+        }
+
+        /*
+        $user = Auth()->user();
+
+        if ($user->guid !== $venta['comprador']['guid']) {
+            Log::warning('Usuario no autorizado para cancelar la venta', ['guid' => $guid]);
+            return redirect()->route('profile')->with('error', 'No tienes permiso para cancelar esta venta');
+        }
+*/
+        if($venta['estado'] == 'Pendiente'){
+            $reembolsoResult = $this->reembolsarPago($venta['payment_intent_id'], $venta['precioTotal']);
+            if($reembolsoResult['status'] != 'success') {
+                Log::error("Reembolso fallido, cancelación no realizada.");
+                return redirect()->route('profile')->with('error', 'No se pudo realizar el reembolso. La venta no ha sido cancelada.');
+            }
+            $this->devolviendoProductos($venta);
+            $venta->update(['estado' => 'Cancelado']);
+            $venta->save();
+            //Probablemente cambiar la ruta?
+            return redirect()->route('profile')->with('success', 'Venta Cancelada');
+        } else {
+            Log::warning('No se puede cancelar la venta ya que su estado no es Pendiente');
+            //Probablemente cambiar la ruta?
+            return redirect()->route('payment.error')->with('error', 'No se puede cancelar la venta ya que el estado de su compra es: ' . $venta['estado']);
+        }
+    }
+
+    public function devolviendoProductos($venta){
+        Log::info('Devolviendo al stock los productos de venta que se quiere cancelar');
+        foreach($venta['lineaVentas'] as $lineaVenta){
+            $producto = Producto::find($lineaVenta['producto']['id']);
+
+            $producto->stock += $lineaVenta['cantidad'];
+            $producto->save();
+        }
+    }
+
+    public function reembolsarPago($paymentIntentId, $coste){
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         try{
-            $paymentIntentId = PaymentIntent::retrieve($paymentIntentId);
-            $chargeId = $paymentIntentId->charges->data[0]->id;
+            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+            $charge = Charge::retrieve($paymentIntentId);
+                if ($paymentIntent->status != 'succeeded' && $charge->refounded==true) {
+                Log::error("Intento de reembolso fallido: No se encontraron cargos en el PaymentIntent ID: " . $paymentIntentId);
+                return [ 'status'=> 'error','message' => 'Esa venta no ha sido pagada'];
+            }
+            $chargeId = $charge->id;
 
             $reembolso = Refund::create([
                 'charge' => $chargeId,
-                'amount' => $paymentIntentId->amount,
+                'amount' => $coste,
             ]);
-            return response()->json([
-                'message'=> 'Reembolso realizado', 'reembolso' => $reembolso
-            ]);
+            return [
+                'status' => 'success',
+                'message'=> 'Reembolso realizado',
+                'reembolso' => $reembolso
+            ];
         } catch (\Exception $e){
-            return response()-> json(['error' => $e->getMessage()]);
+            Log::error("Error en reembolsarPago: " . $e->getMessage());
+            return ['status' => 'error',  'message' => $e->getMessage()];
         }
     }
 }

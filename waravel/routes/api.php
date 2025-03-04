@@ -55,6 +55,7 @@ Route::middleware('api')->group(function () {
     Route::post('/ventas', [VentaController::class, 'store']);
     Route::put('/ventas/{guid}', [VentaController::class, 'update']);
     Route::delete('/ventas/{guid}', [VentaController::class, 'destroy']);
+    Route::put('ventas/cancelar/{guid}', [VentaController::class, 'cancelarVenta']);
 
 
     Route::get('/backups', [BackupController::class, 'getAllBackups']);
