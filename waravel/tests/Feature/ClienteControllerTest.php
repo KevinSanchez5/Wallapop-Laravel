@@ -638,7 +638,7 @@ class ClienteControllerTest extends TestCase
             ->postJson("/api/clientes/{$this->cliente->guid}/upload", []);
 
         $response->assertStatus(422);
-        
+
         $response->assertJsonValidationErrors(['avatar']);
     }
 

@@ -66,7 +66,7 @@ class ProductoController extends Controller
         }
 
         Log::info('Buscando producto de la base de datos');
-        $producto = Producto::where('guid',$guid)->firstOrFail();
+        $producto = Producto::where('guid',$guid)->first();
 
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
@@ -113,7 +113,7 @@ class ProductoController extends Controller
         $producto = Redis::get('producto_'.$guid);
         if (!$producto) {
             Log::info('Buscando producto de la base de datos');
-            $producto = Producto::where('guid',$guid)->firstOrFail();
+            $producto = Producto::where('guid',$guid)->first();
         }
 
         if (!$producto) {
@@ -171,7 +171,7 @@ class ProductoController extends Controller
             $producto = json_decode($producto, true);
         } else {
             Log::info('Buscando producto de la base de datos');
-            $producto = Producto::where('guid',$guid)->firstOrFail();
+            $producto = Producto::where('guid',$guid)->first();
         }
 
         if (!$producto) {
@@ -201,7 +201,7 @@ class ProductoController extends Controller
 
         if (!$product) {
             Log::info('Buscando producto de la base de datos');
-            $product = Producto::where('guid',$guid)->firstOrFail();
+            $product = Producto::where('guid',$guid)->first();
         }else{
             $product = Producto::hydrate(json_decode($product, true));
         }
