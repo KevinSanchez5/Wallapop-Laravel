@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Cliente;
 use App\Models\User;
 use App\Models\Valoracion;
+use App\Utils\GuidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
@@ -22,7 +23,6 @@ class ValoracionControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Log::spy();
 
         $this->usuario = User::create([
             'name'     => 'usuario',
@@ -32,7 +32,7 @@ class ValoracionControllerTest extends TestCase
         ]);
 
         $this->cliente = Cliente::create([
-            'guid'      => 'cliente-guid',
+            'guid'      => GuidGenerator::generarId(),
             'nombre'    => 'Pepe',
             'apellido'  => 'Perez',
             'avatar'    => 'avatar.png',
@@ -56,7 +56,7 @@ class ValoracionControllerTest extends TestCase
         ]);
 
         $this->cliente2 = Cliente::create([
-            'guid'      => 'cliente2-guid',
+            'guid'      =>  GuidGenerator::generarId(),
             'nombre'    => 'Maria',
             'apellido'  => 'Garcia',
             'avatar'    => 'avatar.png',
@@ -78,7 +78,7 @@ class ValoracionControllerTest extends TestCase
     {
         for ($i = 1; $i <= 20; $i++) {
             Valoracion::create([
-                'guid' => 'guid-' . $i,
+                'guid' =>  GuidGenerator::generarId(),
                 'comentario' => 'Comentario de la valoracion' . $i,
                 'puntuacion' => 4,
                 'clienteValorado_id' => $this->cliente->id,
@@ -110,7 +110,7 @@ class ValoracionControllerTest extends TestCase
     public function test_show(): void
     {
         $valoracion = Valoracion::create([
-            'guid' => 'guid-1',
+            'guid' => GuidGenerator::generarId(),
             'comentario' => 'Comentario de la valoracion',
             'puntuacion' => 5,
             'clienteValorado_id' => $this->cliente->id,
@@ -121,7 +121,7 @@ class ValoracionControllerTest extends TestCase
 
         Redis::del('valoracion_' . $valoracion->id, json_encode($valoracion));
 
-        $response = $this->getJson("/api/valoraciones/{$valoracion->id}");
+        $response = $this->getJson("/api/valoraciones/{$valoracion->guid}");
 
         $response->assertStatus(200);
 
@@ -134,7 +134,7 @@ class ValoracionControllerTest extends TestCase
             'autor_id' => $valoracion->autor_id,
         ]);
 
-        $valoracionRedis = json_decode(Redis::get('valoracion_' . $valoracion->id), true);
+        $valoracionRedis = json_decode(Redis::get('valoracion_' . $valoracion->guid), true);
         $this->assertEquals($valoracion->id, $valoracionRedis['id']);
         $this->assertEquals($valoracion->guid, $valoracionRedis['guid']);
         $this->assertEquals($valoracion->comentario, $valoracionRedis['comentario']);
@@ -146,7 +146,7 @@ class ValoracionControllerTest extends TestCase
     public function test_show_from_redis(): void
     {
         $valoracion = Valoracion::create([
-            'guid' => 'guid-1',
+            'guid' => GuidGenerator::generarId(),
             'comentario' => 'Comentario de la valoracion',
             'puntuacion' => 5,
             'clienteValorado_id' => $this->cliente->id,
@@ -192,8 +192,9 @@ class ValoracionControllerTest extends TestCase
 
     public function test_store(): void
     {
+        $guid = GuidGenerator::generarId();
         $data = [
-            'guid' => 'guid-1',
+            'guid' => $guid,
             'comentario' => 'Comentario de la valoracion',
             'puntuacion' => 5,
             'clienteValorado_id' => $this->cliente->id,
@@ -205,7 +206,7 @@ class ValoracionControllerTest extends TestCase
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('valoraciones', [
-            'guid' => 'guid-1',
+            'guid' => $data['guid'],
             'comentario' => 'Comentario de la valoracion',
             'puntuacion' => 5,
             'clienteValorado_id' => $this->cliente->id,
@@ -233,7 +234,7 @@ class ValoracionControllerTest extends TestCase
     public function test_destroy(): void
     {
         $valoracion = Valoracion::create([
-            'guid' => 'guid-1',
+            'guid' => GuidGenerator::generarId(),
             'comentario' => 'Comentario de la valoracion',
             'puntuacion' => 5,
             'clienteValorado_id' => $this->cliente->id,
@@ -244,15 +245,15 @@ class ValoracionControllerTest extends TestCase
 
         Redis::set('valoracion_' . $valoracion->id, json_encode($valoracion));
 
-        $response = $this->deleteJson("/api/valoraciones/{$valoracion->id}");
+        $response = $this->deleteJson("/api/valoraciones/{$valoracion->guid}");
 
         $response->assertStatus(200);
 
         $this->assertDatabaseMissing('valoraciones', [
-            'id' => $valoracion->id,
+            'guid' => $valoracion->id,
         ]);
 
-        $this->assertNull(Redis::get('valoracion_' . $valoracion->id));
+        $this->assertNull(Redis::get('valoracion_' . $valoracion->guid));
     }
 
     public function test_destroy_not_found(): void
