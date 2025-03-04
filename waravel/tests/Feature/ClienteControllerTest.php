@@ -323,9 +323,6 @@ class ClienteControllerTest extends TestCase
     }
 
 
-
-
-
     public function test_update_not_found(): void
     {
         $data = [
@@ -638,7 +635,7 @@ class ClienteControllerTest extends TestCase
             ->postJson("/api/clientes/{$this->cliente->guid}/upload", []);
 
         $response->assertStatus(422);
-        
+
         $response->assertJsonValidationErrors(['avatar']);
     }
 

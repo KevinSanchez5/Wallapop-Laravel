@@ -54,11 +54,13 @@ class UserController extends Controller
             return response()->json(json_decode($userRedis));
         }
         Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-        $user = User::where('guid', $guid)->firstOrFail();
+        $user = User::where('guid', $guid)->first();
 
         if(!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
+
+        Redis::set('user_' . $guid, json_encode($user), 'EX', 1800);
 
         Log::info("Usuario encontrado", ['user_guid' => $guid]);
         return response()->json($user);
@@ -88,7 +90,7 @@ class UserController extends Controller
         $user = Redis::get('user_'. $guid);
         if(!$user) {
             Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-            $user = User::where('guid', $guid)->firstOrFail();
+            $user = User::where('guid', $guid)->first();
         }
 
         if(!$user) {
@@ -137,7 +139,7 @@ class UserController extends Controller
             Log::info("Usuario encontrado en Redis");
         } else {
             Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-            $user = User::where('guid',$guid)->firstOrFail();
+            $user = User::where('guid',$guid)->first();
         }
 
         if(!$user) {
@@ -193,7 +195,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'exception' => $e->getMessage()
             ]);
-            return response()->json(['error' => $e->getMessage()], 503);//fallo al enviar email
+            return response()->json(['error' => $e->getMessage()], 503);
         }
 
         return response()->json([
