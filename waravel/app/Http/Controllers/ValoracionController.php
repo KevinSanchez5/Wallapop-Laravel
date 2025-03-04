@@ -57,7 +57,7 @@ class ValoracionController extends Controller
         }
 
         Log::info('Valoración no encontrada en Redis, buscando en la base de datos');
-        $valoracion = Valoracion::where('guid',$guid)->firstOrFail();
+        $valoracion = Valoracion::where('guid',$guid)->first();
 
         if (!$valoracion) {
             return response()->json(['message' => 'Valoracion no encontrada'], 404);
@@ -99,9 +99,9 @@ class ValoracionController extends Controller
 
         if (!$valoracion) {
             Log::info('Valoración no encontrada en Redis, buscando en la base de datos');
-            $valoracion = Valoracion::where('guid',$guid)->firstOrFail();
+            $valoracion = Valoracion::where('guid',$guid)->first();
         } else {
-            $valoracion = Valoracion::where('guid',$guid)->firstOrFail();
+            $valoracion = Valoracion::where('guid',$guid)->first();
         }
 
         if (!$valoracion) {
