@@ -40,7 +40,7 @@ describe('Iniciar Sesión', () => {
         cy.get(".container").contains("Juan Pérez").should("be.visible").click();
         cy.contains("Cerrar sesión").click();
 
-        cy.contains("Iniciar sesión").should("be.visible");
+        cy.get('a[href="http://localhost/login"]').should("be.visible");
     });
 
 });
