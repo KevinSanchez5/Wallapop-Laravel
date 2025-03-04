@@ -35,14 +35,14 @@ describe('Test de registro de cuenta', () => {
     cy.contains('Siguiente').click();
 
     // Completar la tercera parte del formulario (Contraseña)
-    cy.get('input[name="password"]').type('contraseña123'); // Campo de contraseña
-    cy.get('input[name="password_confirmation"]').type('contraseña123'); // Campo de repetir contraseña
+    cy.get('input[name="password"]').type('Password123?'); // Campo de contraseña
+    cy.get('input[name="password_confirmation"]').type('Password123?'); // Campo de repetir contraseña
 
     // Hacer clic en el botón "Registrarse"
     cy.contains('Registrarse').click();
 
     // Verificar que el registro fue exitoso, por ejemplo, que redirige a la página de inicio
-    cy.url().should('include', '/');
-    cy.contains('Waravel').should('be.visible');
+    cy.url().should('eq', 'http://localhost/');
+    cy.get('input[data-test-id="logged-user"]').contains('Juan');
   });
 });
