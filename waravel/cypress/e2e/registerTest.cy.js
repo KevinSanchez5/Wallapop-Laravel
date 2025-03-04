@@ -4,7 +4,7 @@ describe('Test de registro de cuenta', () => {
     cy.visit('http://localhost');
 
     // Hacer clic en el enlace "Account"
-    cy.contains('Account').click();
+      cy.get('a[href="http://localhost/login"]').click();
 
     // Verifica que redirige a la página de inicio de sesión
     cy.url().should('include', '/login');
@@ -16,13 +16,13 @@ describe('Test de registro de cuenta', () => {
     cy.url().should('include', '/register');
 
     // Completar la primera parte del formulario (Datos personales)
-    cy.get('input[name="email"]').type('test@example.com'); // Campo de email
-    cy.get('input[name="telefono"]').type('123456789'); // Campo de teléfono
+    cy.get('input[name="email"]').type('test999@example.com'); // Campo de email
+    cy.get('input[name="telefono"]').type('623456789'); // Campo de teléfono
     cy.get('input[name="nombre"]').type('Juan'); // Campo de nombre
     cy.get('input[name="apellidos"]').type('Pérez'); // Campo de apellidos
 
     // Hacer clic en el botón "Siguiente"
-    cy.contains('Siguiente').click();
+    cy.get('button[type="button"]').contains('Siguiente').click();
 
     // Completar la segunda parte del formulario (Dirección)
     cy.get('input[name="direccion[calle]"]').type('Calle Falsa'); // Campo de calle
