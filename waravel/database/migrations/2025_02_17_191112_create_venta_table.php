@@ -23,8 +23,7 @@ return new class extends Migration
                 'Procesando',
                 'Enviado',
                 'Entregado',
-                'Cancelado',
-                'Devuelto'
+                'Cancelado'
             ]);
             $table->timestamps();
         });

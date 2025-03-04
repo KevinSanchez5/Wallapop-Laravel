@@ -367,7 +367,7 @@ class VentaSeeder extends Seeder
         ]);
         Venta::create([
             'guid' => 'G5Yt9XqK8VL',
-            'estado' => 'Devuelto',
+            'estado' => 'Cancelado',
             'comprador' => [
                 'guid' => 'X9vB7LpQ2ZM',
                 'id' => 4,

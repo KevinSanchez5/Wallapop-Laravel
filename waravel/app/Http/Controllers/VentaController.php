@@ -137,57 +137,99 @@ class VentaController extends Controller
 
         return response()->json(['message' => 'Venta eliminada correctamente']);
     }
-
     public function validandoVentaAPartirDeCarrito()
     {
         Log::info('Creando venta a partir de carrito');
 
-        $carrito = session()->get('carrito');
-        if (!$carrito || empty($carrito) || empty($carrito->lineasCarrito)) {
+        $carrito = $this->validarCarrito();
+        if (!$carrito) {
             return redirect()->route('payment.error')->with('error', 'No hay productos en el carrito');
         }
-        $usuario=Auth::user();
 
-        if (!$usuario){
-            return redirect()->route('payment.error')->with('error', 'No hay usuario registrado');
-        }
-        $cliente= Cliente::where('usuario_id', $usuario->id)->first();
-        if(!$cliente){
-            return redirect()->route('payment.error')->with('error', 'No se encontro cliente registrado');
+        $cliente = $this->validarUsuario();
+        if (!$cliente) {
+            return redirect()->route('payment.error')->with('error', 'No hay usuario registrado o no se encontró cliente.');
         }
 
-        Log::info('Creando lineas de venta a partir de lineas de carrito');
         $lineasVenta = [];
         $precioDeTodo = 0;
-        $productosDisponibles = [];
-        foreach($carrito->lineasCarrito as $linea){
-            Log::info('Validando disponibilidad de productos y precios en base de datos');
-            $producto = Producto::find($linea->producto->id);
-            if(!$producto || $producto->stock < $linea->cantidad ||$producto->estado !== 'Disponible') {
-                Log::warning('El producto ya no está disponible: ' . ($producto ? $producto->nombre : 'Producto desconocido'));
-                $productosDisponibles = array_filter($carrito->lineasCarrito, function ($item) use ($linea) {
-                    return $item->producto->id !== $linea->producto->id;
-                });
-                $nuevoPrecioTotal = array_reduce($productosDisponibles, function ($carry, $item) {
-                    return $carry + ($item->producto->precio * $item->cantidad);
-                }, 0);
-                $nuevaCantidad = array_reduce($productosDisponibles, function ($carry, $item) {
-                    return $carry + $item->cantidad;
-                });
-                session()->put('carrito', (object)['lineasCarrito' => $productosDisponibles,
-                    'precioTotal' => $nuevoPrecioTotal,
-                    'itemAmount' => $nuevaCantidad]);
-                return redirect()->route('payment.error')->with('message', 'El producto ya no está disponible: '.  ($producto ? $producto->nombre : 'Producto desconocido'));
+
+        foreach ($carrito->lineasCarrito as $linea) {
+            $resultado = $this->validarProducto($linea);
+            if ($resultado instanceof RedirectResponse) {
+                return $resultado;
             }
-            $precioLinea = $producto->precio * $linea->cantidad;
-            $precioDeTodo+= $precioLinea;
-            $lineasVenta[] = [
+
+            $lineasVenta[] = $resultado['lineaVenta'];
+            $precioDeTodo += $resultado['precioLinea'];
+        }
+
+        if (empty($lineasVenta)) {
+            session()->forget('carrito');
+            return redirect()->route('payment.error')->with('error', 'Todos los productos han sido eliminados del carrito.');
+        }
+
+        $venta = $this->crearVenta($cliente, $lineasVenta, $precioDeTodo);
+
+        $validator = Validator::make($venta, [
+            'guid' => 'required|string|max:255|unique:ventas',
+            'comprador' => 'required|array',
+            'lineaVentas' => 'required|array',
+            'precioTotal' => 'required|numeric|min:0',
+            'estado' => 'required|string|max:25',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('payment.error')->with('error', 'Hubo un error en los datos de la venta.');
+        }
+
+        Log::info('Carrito validado, se procede al pago de este');
+        return $venta;
+    }
+
+    private function validarCarrito()
+    {
+        $carrito = session()->get('carrito');
+        return ($carrito && !empty($carrito->lineasCarrito)) ? $carrito : null;
+    }
+
+    private function validarUsuario()
+    {
+        $usuario = Auth::user();
+        if (!$usuario) return null;
+
+        return Cliente::where('usuario_id', $usuario->id)->first();
+    }
+
+    private function validarProducto($linea)
+    {
+        $producto = Producto::find($linea->producto->id);
+        if (!$producto || $producto->estado !== 'Disponible' || $producto->stock == 0) {
+            Log::warning('El producto ya no está disponible: ' . ($producto ? $producto->nombre : 'Producto desconocido'));
+
+            // Eliminar producto del carrito y recalcular precios
+            $carrito = session()->get('carrito');
+            $carrito->lineasCarrito = array_filter($carrito->lineasCarrito, fn($item) => $item->producto->id !== $linea->producto->id);
+            $carrito->precioTotal = array_reduce($carrito->lineasCarrito, fn($carry, $item) => $carry + ($item->producto->precio * $item->cantidad), 0);
+            $carrito->itemAmount = array_reduce($carrito->lineasCarrito, fn($carry, $item) => $carry + $item->cantidad);
+
+            session()->put('carrito', $carrito);
+            return redirect()->route('payment.error')->with('message', 'El producto ya no está disponible: ' . ($producto ? $producto->nombre : 'Producto desconocido'));
+        }
+
+        if ($producto->stock < $linea->cantidad) {
+            Log::warning("Producto pedido mayor al stock en venta, se cambia la cantidad a los máximos posibles");
+            $linea->cantidad = $producto->stock;
+        }
+
+        return [
+            'lineaVenta' => [
                 'vendedor' => [
                     'id' => $linea->producto->vendedor->id,
                     'guid' => $linea->producto->vendedor->guid,
                     'nombre' => $linea->producto->vendedor->nombre,
                     'apellido' => $linea->producto->vendedor->apellido,
-                    ],
+                ],
                 'cantidad' => $linea->cantidad,
                 'producto' => [
                     'id' => $linea->producto->id,
@@ -198,42 +240,27 @@ class VentaController extends Controller
                     'precio' => $linea->producto->precio,
                     'categoria' => $linea->producto->categoria,
                 ],
-                'precioTotal' => $precioLinea,
-            ];
-        }
-        if (empty($lineasVenta)) {
-            session()->forget('carrito');
-            return redirect()->route('payment.error')->with('error', 'Todos los productos han sido eliminados del carrito.');
-        }
+                'precioTotal' => $producto->precio * $linea->cantidad,
+            ],
+            'precioLinea' => $producto->precio * $linea->cantidad
+        ];
+    }
 
-        $venta = [
+    private function crearVenta($cliente, $lineasVenta, $precioDeTodo)
+    {
+        return [
             'guid' => GuidGenerator::generarId(),
             'comprador' => [
-                'id' => $usuario->id,
-                'guid' => $usuario->guid,
+                'id' => $cliente->usuario->id,
+                'guid' => $cliente->usuario->guid,
                 'nombre' => $cliente->nombre,
-                'apellido' =>$cliente->apellido,
+                'apellido' => $cliente->apellido,
             ],
             'lineaVentas' => $lineasVenta,
             'precioTotal' => $precioDeTodo,
             'estado' => 'Pendiente',
             'created_at' => now(),
         ];
-
-        $validator = Validator::make($venta, [
-            'guid' => 'required|string|max:255|unique:ventas',
-            'comprador' => 'required|array',
-            'lineaVentas' => 'required|array',
-            'precioTotal' => 'required|numeric|min:0',
-            'estado' => 'required|string|max:25',
-        ]);
-        if ($validator->fails()) {
-            return redirect()->route('payment.error')->with('error', 'Hubo un error en los datos de la venta.');
-        }
-
-
-        Log::info('Carrito validado, se procede al pago de este');
-        return $venta;
     }
 
     public function procesarCompra(){
