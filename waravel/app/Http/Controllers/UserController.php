@@ -175,6 +175,11 @@ class UserController extends Controller
         Log::info('Buscando usuario por email', ['email' => $email]);
         $user = $this->findUserByEmail($email);
 
+        if(!$user){
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
         $codigo = strtoupper(Str::random(10));
         $user->password_reset_token = Hash::make($codigo);
         $user->password_reset_expires_at = now()->addMinutes(5);
@@ -241,7 +246,7 @@ class UserController extends Controller
 
         if (!$user) {
             Log::warning('Usuario no encontrado', ['email' => $email]);
-            return response()->json(['message' => 'User not found'], 404);
+            return null;
         }
 
         Log::info("Usuario encontrado", ['email' => $email, 'user_id' => $user->id]);
