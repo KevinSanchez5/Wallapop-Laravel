@@ -31,6 +31,7 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileControllerView::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile/changePassword', [ProfileControllerView::class, 'cambioContrasenya'])->name('profile.change.password');
 
     Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
     Route::get('/producto/add', [ProductoControllerView::class, 'showAddForm'])->name('producto.add');

@@ -11,11 +11,13 @@ use App\Models\Venta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use function Laravel\Prompts\error;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileControllerView extends Controller
 {
@@ -391,5 +393,68 @@ class ProfileControllerView extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function cambioContrasenya(Request $request)
+    {
+        Log::info('Iniciando cambio de contraseña');
+
+        Log::info('Validando cambio de contraseña');
+        Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255|exists:users,email',
+            'oldPassword' => ['required', 'string', 'min:8', 'max:20'],
+            'newPassword' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+            'confirmPassword' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+        ]);
+
+        Log::info('Validación completada con éxito');
+
+        $email = $request->email;
+        $oldPassword = $request->oldPassword;
+        $newPassword = $request->newPassword;
+
+        Log::info('Buscando usuario por email', ['email' => $email]);
+        $user = User::where('email', $email)->first();
+
+        $response = ['success' => false, 'message' => ''];
+
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            $response['message'] = 'Usuario no encontrado';
+            return response()->json($response, 404);
+        }
+
+        if (!Hash::check($oldPassword, $user->password)) {
+            Log::warning('Contraseña antigua incorrecta', ['email' => $email]);
+            $response['message'] = 'La contraseña antigua es incorrecta';
+            return response()->json($response, 400);
+        }
+
+        if ($newPassword !== $request->confirmPassword) {
+            Log::warning('Las contraseñas no coinciden', ['email' => $email]);
+            $response['message'] = 'Las contraseñas no coinciden';
+            return response()->json($response, 400);
+        }
+
+        Log::info('Actualizando la contraseña');
+        try {
+            $user->password = Hash::make($newPassword);
+            $user->password_reset_token = null;
+            $user->password_reset_expires_at = null;
+            $user->updated_at = now();
+            $user->save();
+
+            Log::info('Contraseña actualizada exitosamente', ['email' => $user->email]);
+
+            $response['success'] = true;
+            $response['message'] = 'Contraseña cambiada con éxito';
+            $response['user'] = $user;
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar la contraseña', ['error' => $e->getMessage()]);
+            $response['message'] = 'Hubo un error al cambiar la contraseña';
+            return response()->json($response, 500);
+        }
+
+        return response()->json($response);
     }
 }
