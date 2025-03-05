@@ -48,6 +48,7 @@ class RegisteredUserController extends Controller
                 'name' => $validated['nombre'],
                 'email' => $validated['email'],
                 'email_verified_at' => now(),
+                'role' => 'cliente',
                 'password' => Hash::make($validated['password']),
             ]);
 
@@ -64,7 +65,6 @@ class RegisteredUserController extends Controller
 
             // Crear cliente con la dirección como JSON
             $cliente = Cliente::create([
-                'guid' => Str::uuid(),
                 'nombre' => $validated['nombre'],
                 'apellido' => $validated['apellidos'],
                 'avatar' => "clientes/avatar.png",
