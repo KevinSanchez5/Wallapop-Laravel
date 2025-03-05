@@ -6,6 +6,36 @@
 @section('content')
     <x-header />
 
+    <!-- Notificación -->
+    <div id="toast-success"
+         class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm border border-black"
+         role="alert"
+         style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
+            <svg class="w-10 h-10" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                 viewBox="0 0 20 20">
+                <path
+                    d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+            </svg>
+            <span class="sr-only">Check icon</span>
+        </div>
+        <div class="ms-3 text-md font-normal ml-5">Artículo añadido a favoritos</div>
+    </div>
+
+    <div id="toast-failure"
+         class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm border border-black"
+         role="alert"
+         style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
+            <svg class="w-10 h-10" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.536 12.036a1 1 0 0 1-1.414 1.414L10 11.914l-2.122 2.036a1 1 0 0 1-1.414-1.414L8.586 10 6.464 7.878a1 1 0 0 1 1.414-1.414L10 8.586l2.122-2.122a1 1 0 1 1 1.414 1.414L11.414 10l2.122 2.036Z"/>
+            </svg>
+            <span class="sr-only">Error icon</span>
+        </div>
+        <div class="ms-3 text-md font-normal ml-5">Artículo eliminado de favoritos</div>
+    </div>
+
+
     <div class="container mx-auto py-6 flex flex-col md:flex-row gap-6">
 
         <div style="min-height: 600px" class="w-full md:w-1/4 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6">
@@ -95,12 +125,23 @@
                                     </div>
                                 </div>
                                 @if(auth()->check() && auth()->user()->role === 'cliente')
-                                <a href="#" onclick="addToFavorite('{{ $producto->guid }}', '{{ auth()->user()->id }}'); return false" class="bg-white text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800 transition duration-300 transform hover:scale-105 flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                    <span id="favorite-text-{{ $producto->guid }}">Añadir a Favoritos</span>
-                                </a>
+                                    @php $isFavorite = false; @endphp
+                                    @if($productosFavoritos)
+                                        @foreach($productosFavoritos as $favorito)
+                                            @if($favorito == $producto->id)
+                                                @php $isFavorite = true; @endphp
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                    <a href="#" onclick="toggleFavorite('{{ $producto->guid }}', '{{ auth()->user()->id }}'); return false"
+                                       class="bg-white text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800 transition duration-300 transform hover:scale-105 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5">
+                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <span id="favorite-text-{{ $producto->guid }}">
+                                            {{ $isFavorite ? 'Eliminar de Favoritos' : 'Añadir a Favoritos' }}
+                                        </span>
+                                    </a>
                                 @endif
                             </li>
                         @empty
@@ -152,12 +193,15 @@
             document.getElementById(seccion).classList.remove('hidden');
         }
 
-        async function addToFavorite(productoGuid, userId) {
+        async function toggleFavorite(productoGuid, userId) {
             const textElement = document.getElementById(`favorite-text-${productoGuid}`);
+            const isFavorite = textElement.textContent.trim() === "Eliminar de Favoritos";
+            const route = isFavorite ? "{{ route('favorito.eliminar') }}" : "{{ route('favorito.añadir') }}";
+            const method = isFavorite ? "DELETE" : "POST";
 
             try {
-                let response = await fetch("{{ route('favorito.añadir') }}", {
-                    method: "POST",
+                let response = await fetch(route, {
+                    method: method,
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": "{{ csrf_token() }}",
@@ -168,18 +212,53 @@
                 let data = await response.json();
 
                 if (data.status === 200) {
-                    if (textElement.textContent === "Añadir a Favoritos") {
-                        textElement.textContent = "Eliminar de Favoritos";
+                    textElement.textContent = isFavorite ? "Añadir a Favoritos" : "Eliminar de Favoritos";
+
+                    if (isFavorite) {
+                        showFailureNotification();
                     } else {
-                        textElement.textContent = "Añadir a Favoritos";
+                        showSuccessNotification();
                     }
-                } else {
-                    alert("Error al añadir el producto a favoritos.");
                 }
             } catch (error) {
                 console.error(error);
             }
         }
+
+        function showSuccessNotification() {
+            let toast = document.getElementById('toast-success');
+
+            toast.classList.remove("hidden");
+            toast.classList.remove("opacity-0");
+            toast.classList.add("opacity-100");
+
+            setTimeout(() => {
+                toast.classList.remove("opacity-100");
+                toast.classList.add("opacity-0");
+
+                setTimeout(() => {
+                    toast.classList.add("hidden");
+                }, 500);
+            }, 3000)
+        }
+
+        function showFailureNotification() {
+            let toast = document.getElementById('toast-failure');
+
+            toast.classList.remove("hidden");
+            toast.classList.remove("opacity-0");
+            toast.classList.add("opacity-100");
+
+            setTimeout(() => {
+                toast.classList.remove("opacity-100");
+                toast.classList.add("opacity-0");
+
+                setTimeout(() => {
+                    toast.classList.add("hidden");
+                }, 500);
+            }, 3000)
+        }
+
     </script>
 
     <style>
