@@ -7,6 +7,7 @@ use App\Models\Cliente;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ClienteControllerView extends Controller
 {
@@ -38,19 +39,35 @@ class ClienteControllerView extends Controller
     }
 
     // Agregar un producto a favoritos
-    public function añadirFavorito(Request $request, $guid)
+    public function añadirFavorito(Request $request)
     {
-        Log::info("Intentando agregar un producto a favoritos para el cliente con Guid: {$guid}");
+        Log::info("Intentando agregar un producto a favoritos para el cliente logeado");
 
-        $cliente = Cliente::where('guid', $guid)->first();
+        $validator = Validator::make($request->all(), [
+            'productoGuid' => 'required',
+            'userId' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            Log::warning('No se han proporcionado los campos necesarios');
+            return response()->json($validator->errors(), 400);
+        }
+
+        $productGuid = $request->input('productoGuid');
+        $userId = $request->input('userId');
+
+        Log::info($productGuid . $userId);
+
+
+        $cliente = Cliente::where('usuario_id', $userId)->first();
         if (!$cliente) {
-            Log::info("Cliente con Guid {$guid} no encontrado");
+            Log::info("Cliente con Guid {$cliente->guid} no encontrado");
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
-        $producto = Producto::where('guid', $request->producto_guid)->first();
+        $producto = Producto::where('guid', $productGuid)->first();
         if (!$producto) {
-            Log::info("Producto con Guid {$request->producto_guid} no encontrado");
+            Log::info("Producto con Guid {$productGuid} no encontrado");
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
@@ -59,7 +76,7 @@ class ClienteControllerView extends Controller
 
         Log::info("Producto con Id {$producto->id} agregado a favoritos");
 
-        return response()->json(['message' => 'Producto agregado a favoritos']);
+        return response()->json(['status' => 200, 'message' => 'Producto agregado a favoritos']);
     }
 
 
