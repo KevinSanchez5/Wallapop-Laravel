@@ -26,8 +26,8 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile/mySales/search', [ProfileControllerView::class, 'showFilteredSales'])->name('profile.sales.search');
     Route::get('/profile/mySales', [ProfileControllerView::class, 'showSales'])->name('profile.sales');
     Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
-    Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('order.detail');
-    Route::get('/profile/mySales/{guid}', [ProfileControllerView::class, 'showSale'])->name('sale.detail');
+    Route::get('/profile/myOrders/{guid}', [VentaControllerView::class, 'showOrder'])->name('order.detail');
+    Route::get('/profile/mySales/{guid}', [VentaControllerView::class, 'showSale'])->name('sale.detail');
     Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileControllerView::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
@@ -41,6 +41,9 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::delete('/producto/{guid}', [ProductoControllerView::class, 'destroy'])->name('producto.destroy');
 
     Route::get('/pedido/overview', [CarritoControllerView::class, 'showOrder'])->name('carrito.checkout');
+
+    Route::get('myOrders/{guid}/review', [ValoracionesControllerView::class, 'writeReview'])->name('write.review');
+    Route::post('myOrders/{guid}/saveReview', [ValoracionesControllerView::class, 'storeReview'])->name('save.review');
 });
 
 Route::middleware(['auth', AdminRoleAuth::class])->group(function () {

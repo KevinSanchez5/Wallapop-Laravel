@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Views;
 use App\Http\Controllers\Controller;
 use App\Models\Carrito;
 use App\Models\Cliente;
-use App\Models\User;
 use App\Models\LineaCarrito;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class CarritoControllerView extends Controller
@@ -172,11 +172,11 @@ class CarritoControllerView extends Controller
         ]));
 
         if ($cart->lineasCarrito == null) {
-            Log::warning("No hay productos en el carrito");
-            return response()->json($validator->errors(), 404);
+            $lineas = [];
+        }else{
+            $lineas = $cart->lineasCarrito;
         }
 
-        $lineas = $cart->lineasCarrito;
         $found = false;
         $lineaPrice = 0;
 
@@ -185,7 +185,10 @@ class CarritoControllerView extends Controller
                 Log::info("Producto encontrado en el carrito, aumentando la cantidad");
                 if ($linea->cantidad + 1 > $linea->producto->stock){
                     Log::warning("El producto no tiene stock suficiente para agregar más");
-                    return response()->json("No hay stock suficiente para agregar más productos", 400);
+                    return response()->json([
+                        "status" => 400,
+                        "message" => "No hay stock suficiente para agregar más productos"
+                    ]);
                 }
                 $cart->precioTotal += $linea->producto->precio;
                 $linea->cantidad += 1;
@@ -210,7 +213,10 @@ class CarritoControllerView extends Controller
         }
 
         Log::warning("No se ha podido eliminar el producto del carrito");
-        return response()->json("Error", 404);
+        return response()->json([
+            "status" => 400,
+            "message" => "Error al intentar modificar el producto en el carrito"
+        ]);
     }
 
 
@@ -241,7 +247,25 @@ class CarritoControllerView extends Controller
 
         $productId = $request->get('productId');
         $amount = $request->get('amount');
-        $producto = Producto::where('guid', $productId)->firstOrFail();
+
+        $possibleError = $this->verifyProductDoesntBelongToCurrentUser($productId);
+
+        if ($possibleError ) {
+            Log::info($possibleError);
+            return $possibleError;
+        };
+
+        Log::info('Buscando el producto en la BBDD');
+        $producto = Producto::where('guid', $productId)->first();
+
+        if ($producto == null) {
+            Log::warning("Producto no encontrado en la BBDD");
+            return response()->json([
+                "message" => "No se ha encontrado el producto, por favor recarge la página",
+                "status" => 404
+            ]);
+        }
+
         $lineas = $cart->lineasCarrito;
         $found = false;
         $lineaPrice = 0;
@@ -251,11 +275,14 @@ class CarritoControllerView extends Controller
                 Log::info("Producto encontrado en el carrito, editándolo");
                 if ($linea->cantidad + $amount > $linea->producto->stock){
                     Log::warning("El producto no tiene stock suficiente para agregar más");
-                    return response()->json("No hay stock suficiente para agregar más productos", 400);
+                    return response()->json([
+                        "message" => "No hay stock suficiente para agregar más productos",
+                        "status" => 400
+                    ]);
                 }
                 $cart->precioTotal -= $linea->precioTotal;
                 $linea->cantidad += $amount;
-                $linea->precioTotal = $linea->cantidad * $producto->precio;
+                $linea->precioTotal = $linea->cantidad * $linea->producto->precio;
                 $lineaPrice = $linea->precioTotal;
                 $cart->precioTotal += $linea->precioTotal;
                 $found = true;
@@ -305,5 +332,33 @@ class CarritoControllerView extends Controller
 
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));
+    }
+
+    public function verifyProductDoesntBelongToCurrentUser($productoId){
+        Log::info('Verificando el producto no le pertence al cliente que ha iniciado sesión');
+
+        $user = Auth::user();
+
+        if ($user == null) {
+            return false;
+        }else  $cliente = Cliente::where('usuario_id', $user->id)->first();
+
+        $product = Producto::where('guid', $productoId)->first();
+
+        if ($product == null) {
+            return response()->json([
+               'message' => 'Producto no encontrado',
+               'status' => 404
+            ]);
+        }
+
+        if ($cliente->id == $product->vendedor_id) {
+            return response()->json([
+               'message' => 'No puedes añadir tus propios productos al carrito',
+               'status' => 400
+            ]);
+        }
+
+        return false;
     }
 }
