@@ -15,6 +15,6 @@ class AdminRoleAuth
             return $next($request);
         }
 
-        return redirect('/')->with('error', 'No tienes permiso para acceder a esta página.');
+        abort(403, 'No tienes permiso para acceder a esta página.');
     }
 }

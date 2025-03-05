@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailSender;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
@@ -10,6 +11,7 @@ use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -21,7 +23,7 @@ class AdminController extends Controller
         $totalUsers = User::where('role', 'cliente')->count();
         $totalProducts = Producto::count();
         $admins = User::where('role', 'admin')
-            ->where('id', '!=', auth()->id()) // Excluye al admin actual
+            ->where('id', '!=', auth()->id())
             ->get();
         $valoraciones = Valoracion::all();
         $puntuaciones = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
@@ -243,6 +245,23 @@ class AdminController extends Controller
         Log::info("Cambiando el estado del producto");
         $producto->estado = ($producto->estado === 'Baneado') ? 'Disponible' : 'Baneado';
         $producto->save();
+
+        // Enviamos el email
+        $user = User::find($producto->vendedor->usuario_id);
+
+        try {
+            Mail::to($user->email)->send(new EmailSender($user, null, $producto, 'productoBorrado'));
+            Log::info('Correo de aviso enviado', ['email' => $user->email]);
+        } catch(\Exception $e) {
+            Log::error('Error al enviar el correo de aviso', [
+                'email' => $user->email,
+                'exception' => $e->getMessage()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 503);
+        }
+        // Retornar a la vista de productos con un mensaje de éxito
+        Log::info("Redireccionando a la vista de productos");
+        return redirect()->route('admin.products')->with('success', 'Producto baneado correctamente.');
 
         // Retornar a la vista de productos con un mensaje de éxito
         Log::info("Redireccionando a la vista de productos");
