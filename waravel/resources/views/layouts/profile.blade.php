@@ -65,12 +65,12 @@
                     </div>
                 @endif
 
-                    <!-- Botón de Editar Perfil -->
-                    <div class="mt-8 mb-2 text-center">
-                        <a href="{{ route('profile.edit') }}" class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
-                            <b>Editar perfil</b>
-                        </a>
-                    </div>
+                <!-- Botón de Editar Perfil -->
+                <div class="mt-8 mb-2 text-center">
+                    <a href="{{ route('profile.edit') }}" class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
+                        <b>Editar perfil</b>
+                    </a>
+                </div>
 
                 <!-- Botón de Cambiar Contraseña -->
                 <div class="mt-8 mb-2 text-center">
@@ -78,6 +78,15 @@
                         <b>Cambiar Contraseña</b>
                     </button>
                 </div>
+
+                <form action="{{ route('profile.destroy.profile') }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu perfil?')"  class="mt-8 mb-2 text-center">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-6 py-3 rounded-lg text-gray-800 bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-[#dc2626] transition duration-300">
+                        <b>Eliminar perfil</b>
+                    </button>
+                </form>
+
 
                 <!-- Modal -->
                 <div id="modalChangePassword" class="fixed inset-0 hidden flex justify-center items-center bg-black bg-opacity-50 z-50">

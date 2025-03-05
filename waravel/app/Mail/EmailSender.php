@@ -29,7 +29,7 @@ class EmailSender extends Mailable
         $this->producto = $producto;
         $this->tipo = $tipo;
 
-        if (!in_array($tipo,['recuperarContrasenya', 'productoComprado'])){
+        if (!in_array($tipo,['recuperarContrasenya', 'productoComprado', 'eliminarPerfil'])){
             throw new InvalidArgumentException("Tipo de email no válido: $tipo");
         }
     }
@@ -45,6 +45,9 @@ class EmailSender extends Mailable
             ),
             'productoComprado' => new Envelope(
                 subject: 'Producto Comprado en Waravel'
+            ),
+            'eliminarPerfil' => new Envelope(
+                subject: 'Eliminación de perfil - Waravel'
             ),
         };
     }
@@ -68,6 +71,12 @@ class EmailSender extends Mailable
                 with: [
                     'usuario' => $this->usuario,
                     'producto' => $this->producto,
+                ]
+            ),
+            'eliminarPerfil' => new Content(
+                view: 'emails.eliminarPerfil',
+                with: [
+                    'usuario' => $this->usuario,
                 ]
             ),
         };

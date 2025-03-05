@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailSender;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
@@ -13,7 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use function Laravel\Prompts\error;
@@ -456,5 +459,71 @@ class ProfileControllerView extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function eliminarPerfil(Request $request)
+    {
+        Log::info('Iniciando proceso de eliminación del perfil');
+
+        $user = $request->user();
+
+        Log::info('Enviando correo de eliminación antes de cerrar sesión');
+        $this->enviarCorreoEliminarPerfil($request);
+
+        Log::info('Desconectando al usuario');
+        Auth::logout();
+
+        Log::info('Eliminando el perfil del usuario');
+        $user->delete();
+
+        Log::info('Perfil de usuario eliminado de la base de datos');
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+
+
+    public function enviarCorreoEliminarPerfil(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            Log::warning('Usuario no autenticado');
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        try {
+            Mail::to($user->email)->send(new EmailSender($user, null, null, 'eliminarPerfil'));
+            Log::info('Correo de eliminación enviado', ['email' => $user->email]);
+        } catch (\Exception $e) {
+            Log::error('Error al enviar el correo de eliminación', [
+                'email' => $user->email,
+                'exception' => $e->getMessage()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 503);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo enviado correctamente',
+        ], 200);
+    }
+
+
+    public function findUserByEmail($email)
+    {
+        Log::info("Buscando usuario por email", ['email' => $email]);
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            return null;
+        }
+
+        Log::info("Usuario encontrado", ['email' => $email, 'user_id' => $user->id]);
+        return $user;
     }
 }
