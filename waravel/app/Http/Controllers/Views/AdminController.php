@@ -120,42 +120,7 @@ class AdminController extends Controller
         return response()->download($filePath);
     }
 
-    public function listBackups()
-    {
-        $files = Storage::files($this->backupPath);
-        $backups = array_map(fn($file) => basename($file), $files);
-        return response()->json($backups);
-    }
 
-    public function restoreBackup($filename)
-    {
-        $backupFilePath = storage_path("app/{$this->backupPath}{$filename}");
-
-        if (!Storage::exists("{$this->backupPath}{$filename}")) {
-            return response()->json(['error' => 'El archivo de backup no existe'], 404);
-        }
-
-        // Comando para restaurar la base de datos
-        $command = sprintf(
-            'PGPASSWORD=%s psql -U %s -h %s -p %s -d %s -f %s',
-            env('DB_PASSWORD'),
-            env('DB_USERNAME'),
-            env('DB_HOST'),
-            env('DB_PORT'),
-            env('DB_DATABASE'),
-            $backupFilePath
-        );
-
-        $output = null;
-        $resultCode = null;
-        exec($command, $output, $resultCode);
-
-        if ($resultCode !== 0) {
-            return response()->json(['error' => 'Error al restaurar la base de datos'], 500);
-        }
-
-        return response()->json(['message' => 'Backup restaurado correctamente']);
-    }
 
     public function listClients()
     {
@@ -286,7 +251,7 @@ class AdminController extends Controller
 
     public function deleteReview($guid)
     {
-        $valoracion = Valoracion::findOrFail($guid);
+        $valoracion = Valoracion::where('guid', $guid)->first();
         //logers
         Log::info("Eliminando valoración");
         // Eliminar la valoración y retornar a la lista de valoraciones con un mensaje de éxito
