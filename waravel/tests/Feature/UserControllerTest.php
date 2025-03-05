@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Utils\GuidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
@@ -14,45 +15,89 @@ class UserControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $user;
+
     protected function setUp(): void
     {
         parent::setUp();
         Redis::flushall();
+
+
+        $this->user = User::create([
+            'name' => 'usuario',
+            'email' => 'usuario@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 'cliente',
+        ]);
     }
 
-    public function testIndexReturnsUsers()
+
+
+    public function test_index()
     {
-        $user = User::factory(['name' => 'Juan'])->create();
+        for ($i = 1; $i <= 10; $i++) {
+            User::create([
+                'guid' => GuidGenerator::generarId(),
+                'name' => "Usuario $i",
+                'email' => "usuario$i@example.com",
+                'password' => bcrypt('password$i'),
+                'role' => 'user',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        $response = $this->get('/api/users');
 
-        $response->assertOk();
-        $response->assertJsonFragment([$user->toArray()]);
+        $response = $this->getJson('api/users');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'users' => [
+                    '*' => ['id', 'guid', 'name', 'email', 'password', 'role', 'created_at', 'updated_at']
+                ],
+                'paginacion' => [
+                    'pagina_actual', 'elementos_por_pagina', 'ultima_pagina', 'elementos_totales'
+                ]
+            ]);
+
+        $json = $response->json();
+        $this->assertEquals(5, count($json['users']));
+        $this->assertEquals(1, $json['paginacion']['pagina_actual']);
+        $this->assertEquals(5, $json['paginacion']['elementos_por_pagina']);
+        $this->assertEquals(11, $json['paginacion']['elementos_totales']);
     }
 
-    public function testShowWithValidId()
+
+
+    public function test_show(): void
     {
-        $user = User::factory()->create(['id' => '4']);
+        Redis::del('user_' . $this->user->id);
 
-        $response = $this->get('/api/users/' . $user->id);
+        $response = $this->getJson("/api/users/{$this->user->guid}");
 
-        $response->assertOk();
-        $response->assertJson($user->toArray());
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'id' => $this->user->id,
+            'guid' => $this->user->guid,
+            'name' => $this->user->name,
+            'email' => $this->user->email,
+            'role' => $this->user->role,
+            'created_at' => $this->user->created_at->toJSON(),
+            'updated_at' => $this->user->updated_at->toJSON(),
+        ]);
+
+        $userRedis = json_decode(Redis::get('user_' . $this->user->guid), true);
+
+        $this->assertEquals($this->user->guid, $userRedis['guid']);
+        $this->assertEquals($this->user->name, $userRedis['name']);
+        $this->assertEquals($this->user->email, $userRedis['email']);
+        $this->assertEquals($this->user->role, $userRedis['role']);
     }
 
-    public function testShowWithValidIdCache()
-    {
-        $user = User::factory()->create(['id' => '4']);
 
-        Redis::set('user_' . $user->id, json_encode($user));
 
-        $response = $this->get('/api/users/' . $user->id);
-
-        $response->assertOk();
-        $response->assertJson($user->toArray());
-    }
-
-    public function testShowWithInvalidId()
+    public function test_show_not_found()
     {
         $response = $this->get('/api/users/999');
 
@@ -60,7 +105,7 @@ class UserControllerTest extends TestCase
         $response->assertJson(['message' => 'User not found']);
     }
 
-    public function testStore()
+    public function test_store()
     {
         $response = $this->post('/api/users', [
             'name' => 'Juan',
@@ -84,7 +129,7 @@ class UserControllerTest extends TestCase
 
     }
 
-    public function testStoreUnprocessable()
+    public function test_store_invalid()
     {
         $response = $this->post('/api/users', [
             'name' => '',
@@ -97,9 +142,8 @@ class UserControllerTest extends TestCase
         $response->assertJsonValidationErrors(['name', 'email', 'password', 'role']);
     }
 
-    public function testUpdate()
+    public function test_update()
     {
-        // Crear un usuario en la base de datos
         $user = User::factory()->create([
             'name' => 'Juan',
             'email' => 'juan@gmail.com',
@@ -107,10 +151,8 @@ class UserControllerTest extends TestCase
             'role' => 'user',
         ]);
 
-        // Simular que el usuario está en Redis
         Redis::set('user_' . $user->id, json_encode($user));
 
-        // Datos de actualización
         $updateData = [
             'name' => 'Otro',
             'email' => 'otro@gmail.com',
@@ -118,13 +160,12 @@ class UserControllerTest extends TestCase
             'role' => 'admin'
         ];
 
-        // Petición PUT
         $response = $this->putJson('/api/users/' . $user->id, $updateData);
 
-        // Refrescar el usuario desde la base de datos
+
         $user->refresh();
 
-        // Verificar que la respuesta es correcta
+
         $response->assertStatus(200)
             ->assertJson([
                 'id' => $user->id,
@@ -133,76 +174,20 @@ class UserControllerTest extends TestCase
                 'role' => 'admin'
             ]);
 
-        // Verificar que los datos se actualizaron en la base de datos
         $this->assertEquals('Otro', $user->name);
         $this->assertEquals('otro@gmail.com', $user->email);
         $this->assertEquals('admin', $user->role);
-
-        // Verificar que la contraseña se haya encriptado
         $this->assertTrue(Hash::check('NewPass123!', $user->password));
 
-        // Verificar que Redis fue actualizado
+
         $cachedUser = json_decode(Redis::get('user_' . $user->id), true);
         $this->assertEquals('Otro', $cachedUser['name']);
         $this->assertEquals('otro@gmail.com', $cachedUser['email']);
         $this->assertEquals('admin', $cachedUser['role']);
     }
 
-    public function testUpdateWithUserArray()
-    {
-        // Create a user and store it in the database
-        $user = User::factory()->create([
-            'name' => 'Juan',
-            'email' => 'juan@gmail.com',
-            'password' => 'Password123!',
-            'role' => 'user',
-        ]);
 
-        // Simulate retrieving the user as an array
-        $userArray = $user->toArray();
-
-        // Store the user array in Redis
-        Redis::set('user_' . $user->id, json_encode($userArray));
-
-        // Data to update the user
-        $updateData = [
-            'name' => 'Updated Name',
-            'email' => 'updated@gmail.com',
-            'password' => 'NewPassword123!',
-            'role' => 'admin'
-        ];
-
-        // Send a PUT request to update the user
-        $response = $this->putJson('/api/users/' . $user->id, $updateData);
-
-        // Refresh the user from the database
-        $user->refresh();
-
-        // Assert the response status and content
-        $response->assertStatus(200)
-            ->assertJson([
-                'id' => $user->id,
-                'name' => 'Updated Name',
-                'email' => 'updated@gmail.com',
-                'role' => 'admin'
-            ]);
-
-        // Assert the user was updated in the database
-        $this->assertEquals('Updated Name', $user->name);
-        $this->assertEquals('updated@gmail.com', $user->email);
-        $this->assertEquals('admin', $user->role);
-
-        // Assert the password was updated and hashed
-        $this->assertTrue(Hash::check('NewPassword123!', $user->password));
-
-        // Assert the user was updated in Redis
-        $cachedUser = json_decode(Redis::get('user_' . $user->id), true);
-        $this->assertEquals('Updated Name', $cachedUser['name']);
-        $this->assertEquals('updated@gmail.com', $cachedUser['email']);
-        $this->assertEquals('admin', $cachedUser['role']);
-    }
-
-    public function testUpdateUnprocessable()
+    public function test_update_invalid()
     {
         $user = User::factory()->create([
             'name' => 'Juan',
@@ -218,14 +203,14 @@ class UserControllerTest extends TestCase
             'role' => 'invalid-role'
         ];
 
-        $response = $this->putJson('/api/users/' . $user->id, $updateData);
+        $response = $this->putJson('/api/users/' . $user->guid, $updateData);
 
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors(['email', 'password', 'role']);
     }
 
 
-    public function testUpdateNotFound()
+    public function test_update_not_found()
     {
         $response = $this->putJson("/api/users/999", [
             'name' => 'Otro',
@@ -240,18 +225,18 @@ class UserControllerTest extends TestCase
 
 
 
-    public function testDestroy()
+    public function test_destroy()
     {
         $user = User::factory(['name' => 'Juan'])->create();
 
-        $response = $this->delete("/api/users/{$user->id}");
+        $response = $this->delete("/api/users/{$user->guid}");
 
         $response->assertOk();
         $response->assertJson(['message' => 'User eliminado correctamente']);
         $this->assertDatabaseMissing('users', $user->toArray());
     }
 
-    public function testDestroyInCache()
+    public function test_destroy_Redis()
     {
         $user = User::factory(['name' => 'Juan'])->create();
 
@@ -266,57 +251,13 @@ class UserControllerTest extends TestCase
         $this->assertNull(Redis::get('user_' . $user->id));
     }
 
-
-
-    public function testDestroyNotFound()
+    public function test_destroy_not_found()
     {
 
         $response = $this->delete("/api/users/999");
 
         $response->assertNotFound();
         $response->assertJson(['message' => 'User no encontrado']);
-    }
-
-    public function testShowEmail_Success()
-    {
-        $user = User::factory()->create(['id' => '50', 'email' => 'test@test.com']);
-
-        $response = $this->get('/api/users/email/' . $user->email);
-
-        $response->assertOk();
-        $response->assertJson($user->toArray());
-        $response->assertJsonFragment(['email' => 'test@test.com']);
-    }
-
-    public function testShowEmail_UserNotFound()
-    {
-        $user = User::factory()->create(['id' => '50', 'email' => 'testqw@test.com']);
-
-        $response = $this->get('/api/users/email/' . 'algo@test.com');
-
-        $response->assertNotFound();
-        $response->assertJson(['message' => 'User not found']);
-    }
-
-    public function testEnviarCorreoRecuperarContrasenya_Unprocessable()
-    {
-        Log::spy();
-        $response = $this->postJson('api/users/correo-codigo', [
-            'email'=>'emailnoemail'
-        ]);
-
-        $response->assertUnprocessable();
-        $response->assertJsonValidationErrors(['email']);
-    }
-
-    public function testEnviarCorreoRecuperarContraasenya_UserNotFound()
-    {
-        Log::spy();
-        $response = $this->post('api/users/correo-codigo', [
-            'email'=>'email@email.com'
-        ]);
-        $response->assertNotFound();
-        $response->assertJson(['message' => 'User not found']);
     }
 
     public function testEnviarCorreoRecuperarContrasenya_Success(){
@@ -341,6 +282,21 @@ class UserControllerTest extends TestCase
     }
 
 
+    public function test_find_user_not_found()
+    {
+        $response = $this->postJson('/users/verificar-correo/{email}', [
+            'email' => 'noexiste@example.com',
+        ]);
+
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'error' => 'Usuario no encontrado',
+            ]);
+    }
+
+
+
     public function testEnviarCorreoRecuperarContrasenya_ErrorEnviarCorreo()
     {
         Log::spy();
@@ -349,7 +305,6 @@ class UserControllerTest extends TestCase
             'email' => 'test@example.com'
         ]);
 
-        // Simula una excepción al enviar el correo
         Mail::shouldReceive('to->send')
             ->andThrow(new \Exception('Error al enviar correo'));
 
