@@ -95,11 +95,11 @@
                                     </div>
                                 </div>
                                 @if(auth()->check() && auth()->user()->role === 'cliente')
-                                <a href="#" class="bg-white text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800 transition duration-300 transform hover:scale-105 flex items-center gap-2">
+                                <a href="#" onclick="addToFavorite('{{ $producto->guid }}', '{{ auth()->user()->id }}'); return false" class="bg-white text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800 transition duration-300 transform hover:scale-105 flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5">
                                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    Añadir a Favoritos
+                                    <span id="favorite-text-{{ $producto->guid }}">Añadir a Favoritos</span>
                                 </a>
                                 @endif
                             </li>
@@ -152,28 +152,33 @@
             document.getElementById(seccion).classList.remove('hidden');
         }
 
-        async function addToFavorite(productId) {
-            await fetch("{{ route('favorito.añadir') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": " {{ csrf_token() }}",
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    amount: amount,
-                }),
-            }).then(response => response.json())
-                .then(data => {
-                    if (data.status === 200) {
-                        updateCartLogo(data.itemAmount);
-                        showNotification();
+        async function addToFavorite(productoGuid, userId) {
+            const textElement = document.getElementById(`favorite-text-${productoGuid}`);
+
+            try {
+                let response = await fetch("{{ route('favorito.añadir') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    },
+                    body: JSON.stringify({ productoGuid, userId })
+                });
+
+                let data = await response.json();
+
+                if (data.status === 200) {
+                    if (textElement.textContent === "Añadir a Favoritos") {
+                        textElement.textContent = "Eliminar de Favoritos";
+                    } else {
+                        textElement.textContent = "Añadir a Favoritos";
                     }
-                })
-                .catch(error => {
-                    console.error(error);
-                })
-            hideSpinner();
+                } else {
+                    alert("Error al añadir el producto a favoritos.");
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
     </script>
 
