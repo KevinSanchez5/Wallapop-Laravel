@@ -162,7 +162,10 @@
                           hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800
                           border-2 border-black dark:border-gray-600 transition duration-300
                           transform hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto text-center">
-                        <i class="fa fa-heart"></i> Añadir a Favoritos
+                        <i class="fa fa-heart"></i>
+                        <span id="favorite-text-{{ $producto->guid }}">
+                            {{ $productoFavorito ? 'Eliminar a Favoritos' : 'Añadir a Favoritos' }}
+                        </span>
                     </a>
                 @endif
 
