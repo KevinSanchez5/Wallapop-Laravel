@@ -64,7 +64,6 @@
                                 </span>
 
                             <div class="flex items-center gap-2">
-                                //si el estado del producto es baneado no sale lo siguiente
                                 @if($producto->estado == 'Baneado')
                                     <span class="inline-flex items-center justify-center px-4 py-2 rounded-full text-white bg-gray-500 w-32 text-center mr-25">
                                         Baneado
