@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Venta;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ActualizarEstadoVentas extends Command
@@ -31,10 +32,10 @@ class ActualizarEstadoVentas extends Command
 
         Venta::whereNotIn('estado', ['Entregado', 'Cancelado'])
             ->update([
-                'estado' =>  \DB::raw("
+                'estado' =>  DB::raw("
                     CASE
-                        WHEN estado = 'Pendiente' THEN 'Procesado'
-                        WHEN estado = 'Procesado' THEN 'Enviado'
+                        WHEN estado = 'Pendiente' THEN 'Procesando'
+                        WHEN estado = 'Procesando' THEN 'Enviado'
                         WHEN estado = 'Enviado' THEN 'Entregado'
                         ELSE estado
                     END

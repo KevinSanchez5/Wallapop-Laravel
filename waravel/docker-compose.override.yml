@@ -1,0 +1,5 @@
+services:
+  laravel.test:
+    entrypoint: ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+    volumes:
+      - './docker/supervisor:/etc/supervisor/conf.d'
