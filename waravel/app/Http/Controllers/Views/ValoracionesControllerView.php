@@ -246,12 +246,17 @@ class ValoracionesControllerView extends Controller
         $valoracionExistente = Valoracion::where('venta_id', $pedido->id)->first();
 
         if ($valoracionExistente) {
-            return redirect()->route('profile')->with('error', 'Ya has realizado una valoración en este pedido.');
+            return redirect()->back()->with('error', 'Ya has realizado una valoración en este pedido.');
+        }
+
+        if ($pedido->estado != 'Entregado'){
+            Log::error('El pedido no está en estado entregado.');
+            return redirect()->back()->with('error', 'No puedes escribir una valoración en un pedido que no ha sido entregado.');
         }
 
         if ($cliente->id!== $pedido->comprador->id) {
             Log::error('El cliente no es el mismo que realizó el pedido.');
-            return redirect()->route('profile')->with('error', 'No tienes permisos para escribir una valoración en este pedido.');
+            return redirect()->back()->with('error', 'No tienes permisos para escribir una valoración en este pedido.');
         }
 
         // Validación de los datos de la valoración
@@ -279,10 +284,11 @@ class ValoracionesControllerView extends Controller
             $valoracion->puntuacion = $rating;
             $valoracion->clienteValorado_id = $line['vendedor']['id'];
             $valoracion->autor_id = $cliente->id;
+            $valoracion->venta_id = $pedido->id;
             $valoracion->save();
         }
 
         Log::info('Valoración creada exitosamente');
-        return redirect()->route('profile')->with('success', 'Valoración añadida correctamente.');
+        return redirect()->back();
     }
 }

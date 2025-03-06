@@ -8,6 +8,7 @@ use App\Http\Controllers\Views\ProductoControllerView;
 use App\Http\Controllers\Views\ProfileControllerView;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\Views\ValoracionesControllerView;
+use App\Http\Controllers\Views\VentaControllerView;
 use App\Http\Middleware\AdminRoleAuth;
 use App\Http\Middleware\UserRoleAuth;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,10 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
 
     // Carrito de compras
     Route::get('/pedido/overview', [CarritoControllerView::class, 'showOrder'])->name('carrito.checkout');
+
+    // Valoraciones
+    Route::get('myOrders/{guid}/review', [ValoracionesControllerView::class, 'writeReview'])->name('write.review');
+    Route::post('myOrders/{guid}/saveReview', [ValoracionesControllerView::class, 'storeReview'])->name('save.review');
 });
 
 // Rutas protegidas para administradores

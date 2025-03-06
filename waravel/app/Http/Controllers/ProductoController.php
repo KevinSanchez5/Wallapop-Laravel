@@ -234,6 +234,9 @@ class ProductoController extends Controller
         Log::info('Guardando imagen del producto');
         $product->save();
 
+        Log::info('Eliminando producto de la cache');
+        Redis::del('producto_' . $guid);
+
         Log::info('Imagen guardada correctamente');
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
@@ -271,6 +274,9 @@ class ProductoController extends Controller
         $product->imagenes = $images;
         Log::info('Eliminando imagen del producto');
         $product->save();
+
+        Log::info('Eliminando producto de la cache');
+        Redis::del('producto_' . $guid);
 
         Log::info('Imagen eliminada correctamente');
         return response()->json(['message' => 'Foto eliminada', 'product' => $product]);
