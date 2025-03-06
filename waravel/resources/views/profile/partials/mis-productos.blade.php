@@ -54,16 +54,30 @@
                                 </div>
                             </div>
 
-                            <span class="inline-flex items-center justify-center px-4 py-2 rounded-full text-white
-                                    @if($producto->estado == 'Disponible') bg-green-500
-                                    @elseif($producto->estado == 'Vendido') bg-red-500
-                                    @elseif($producto->estado == 'Desactivado') bg-gray-500
-                                    @elseif($producto->estado == 'Baneado') bg-purple-500
-                                    @endif w-32 text-center mr-25">
-                                    {{ $producto->estado }}
-                                </span>
+                                @php
+                                    $estadoClasses = [
+                                        'Disponible' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+                                        'Vendido' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+                                        'Desactivado' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+                                        'Baneado' => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+                                    ];
 
-                            <div class="flex items-center gap-2">
+                                    $iconPaths = [
+                                        'Disponible' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />',
+                                        'Vendido' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />',
+                                        'Desactivado' => '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 5H7v14h3V5zm7 0h-3v14h3V5z" />',
+                                        'Baneado' => '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" /><path stroke="currentColor" stroke-width="2" d="M4.93 4.93l14.14 14.14" />'
+                                    ];
+                                @endphp
+
+                                <dd class="me-2 mt-1.5 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium {{ $estadoClasses[$producto->estado] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' }}">
+                                    <svg class="me-1 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        {!! $iconPaths[$producto->estado] ?? '' !!}
+                                    </svg>
+                                    {{ $producto->estado }}
+                                </dd>
+
+                                <div class="flex items-center gap-2">
                                 <a href="{{ route('producto.edit', $producto->guid) }}" class="p-2 bg-[#BFF205] text-black rounded-md hover:bg-[#A0D500] transition duration-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5">
                                         <path d="M12 20h9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
