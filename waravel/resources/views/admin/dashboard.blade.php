@@ -75,7 +75,7 @@
                                         <a href="{{ route('producto.show', $product->guid) }}" class="text-black dark:text-white hover:underline font-bold">
                                             {{ $product->nombre }}
                                         </a>
-                                        <span class="text-gray-600 dark:text-gray-400"> - ${{ number_format($product->precio, 2) }} - </span>
+                                        <span class="text-gray-600 dark:text-gray-400"> - {{ number_format($product->precio, 2) }}€ - </span>
                                         <a href="{{ route('cliente.ver', $product->vendedor->guid) }}" class="hover:underline text-blue-600 dark:text-blue-400 font-medium">
                                             {{ $product->vendedor->nombre }}
                                         </a>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailSender;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
@@ -10,6 +11,7 @@ use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -21,7 +23,7 @@ class AdminController extends Controller
         $totalUsers = User::where('role', 'cliente')->count();
         $totalProducts = Producto::count();
         $admins = User::where('role', 'admin')
-            ->where('id', '!=', auth()->id()) // Excluye al admin actual
+            ->where('id', '!=', auth()->id())
             ->get();
         $valoraciones = Valoracion::all();
         $puntuaciones = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
@@ -120,42 +122,7 @@ class AdminController extends Controller
         return response()->download($filePath);
     }
 
-    public function listBackups()
-    {
-        $files = Storage::files($this->backupPath);
-        $backups = array_map(fn($file) => basename($file), $files);
-        return response()->json($backups);
-    }
 
-    public function restoreBackup($filename)
-    {
-        $backupFilePath = storage_path("app/{$this->backupPath}{$filename}");
-
-        if (!Storage::exists("{$this->backupPath}{$filename}")) {
-            return response()->json(['error' => 'El archivo de backup no existe'], 404);
-        }
-
-        // Comando para restaurar la base de datos
-        $command = sprintf(
-            'PGPASSWORD=%s psql -U %s -h %s -p %s -d %s -f %s',
-            env('DB_PASSWORD'),
-            env('DB_USERNAME'),
-            env('DB_HOST'),
-            env('DB_PORT'),
-            env('DB_DATABASE'),
-            $backupFilePath
-        );
-
-        $output = null;
-        $resultCode = null;
-        exec($command, $output, $resultCode);
-
-        if ($resultCode !== 0) {
-            return response()->json(['error' => 'Error al restaurar la base de datos'], 500);
-        }
-
-        return response()->json(['message' => 'Backup restaurado correctamente']);
-    }
 
     public function listClients()
     {
@@ -279,6 +246,23 @@ class AdminController extends Controller
         $producto->estado = ($producto->estado === 'Baneado') ? 'Disponible' : 'Baneado';
         $producto->save();
 
+        // Enviamos el email
+        $user = User::find($producto->vendedor->usuario_id);
+
+        try {
+            Mail::to($user->email)->send(new EmailSender($user, null, $producto, 'productoBorrado'));
+            Log::info('Correo de aviso enviado', ['email' => $user->email]);
+        } catch(\Exception $e) {
+            Log::error('Error al enviar el correo de aviso', [
+                'email' => $user->email,
+                'exception' => $e->getMessage()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 503);
+        }
+        // Retornar a la vista de productos con un mensaje de éxito
+        Log::info("Redireccionando a la vista de productos");
+        return redirect()->route('admin.products')->with('success', 'Producto baneado correctamente.');
+
         // Retornar a la vista de productos con un mensaje de éxito
         Log::info("Redireccionando a la vista de productos");
         return redirect()->route('admin.products')->with('success', 'Estado del producto actualizado correctamente.');
@@ -286,7 +270,7 @@ class AdminController extends Controller
 
     public function deleteReview($guid)
     {
-        $valoracion = Valoracion::findOrFail($guid);
+        $valoracion = Valoracion::where('guid', $guid)->first();
         //logers
         Log::info("Eliminando valoración");
         // Eliminar la valoración y retornar a la lista de valoraciones con un mensaje de éxito
