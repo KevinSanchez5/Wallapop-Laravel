@@ -10,7 +10,7 @@
 
     <!-- Notificación exitosa -->
     <div id="toast-success"
-         class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm"
+         class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm"
          role="alert"
          style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
         <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
@@ -137,34 +137,6 @@
                 </span>
             </div>
 
-            @if(auth()->guest() || auth()->user()->role === 'cliente')
-                <p class="text-black dark:text-white text-base mt-4 text-center md:text-left">
-                    Cantidad:
-                </p>
-                <div class="flex items-center">
-                    <button onclick="removeOne()" type="button" id="decrement-button"
-                            data-input-counter-decrement="counter-input"
-                            class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
-                        <svg class="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M1 1h16"/>
-                        </svg>
-                    </button>
-                    <input disabled id="cantidad" type="text" data-input-counter
-                           class="w-12 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white"
-                           placeholder="1" value="1" required/>
-                    <button onclick="addOne()" type="button" id="increment-button"
-                            data-input-counter-increment="counter-input"
-                            class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
-                        <svg class="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 1v16M1 9h16"/>
-                        </svg>
-                    </button>
-                </div>
-            @endif
             <p class="text-gray-900 dark:text-gray-100 font-semibold text-xl mt-4 text-center md:text-left">
                 {{ $producto->precio }} €
             </p>
@@ -184,27 +156,58 @@
                         src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBlxJ4a_HfUSAVljwVgN7NkwtBk4IGTX_A&q={{ trim($producto->vendedor->direccion->codigoPostal) }},ES">
                     </iframe>
                 </div>
-            @endif
+            @endif<br>
 
-            <!-- Botones -->
-            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
-                <!-- Botón Agregar a Cesta (Solo para invitados o clientes) -->
+            @if($producto->estado === 'Disponible')
                 @if(auth()->guest() || auth()->user()->role === 'cliente')
-                    <a id="addLink" href="#" onclick="addToCart('{{ $producto->guid }}'); return false"
-                       class="bg-[#BFF205] text-gray-800 font-semibold py-3 px-6 rounded-md hover:bg-[#A8D403]
-                  transition duration-300 transform hover:scale-105 w-full sm:w-auto text-center flex items-center justify-center gap-2">
-                        <i class="fa fa-shopping-cart"></i> Agregar a Cesta
-                    </a>
+                    <div class="flex items-center justify-center space-x-4 mt-4">
+                        <p class="text-black dark:text-white text-base">
+                            Cantidad:
+                        </p>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="removeOne()" type="button" id="decrement-button"
+                                    data-input-counter-decrement="counter-input"
+                                    class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
+                                <svg class="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true"
+                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M1 1h16"/>
+                                </svg>
+                            </button>
+                            <input disabled id="cantidad" type="text" data-input-counter
+                                   class="w-12 text-center border-0 bg-transparent text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white"
+                                   placeholder="1" value="1" required/>
+                            <button onclick="addOne()" type="button" id="increment-button"
+                                    data-input-counter-increment="counter-input"
+                                    class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
+                                <svg class="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true"
+                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 1v16M1 9h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 @endif
+                <!-- Botones -->
+                <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+                    <!-- Botón Agregar a Cesta (Solo para invitados o clientes) -->
+                    @if(auth()->guest() || auth()->user()->role === 'cliente')
+                        <a id="addLink" href="#" onclick="addToCart('{{ $producto->guid }}'); return false"
+                           class="bg-[#BFF205] text-gray-800 font-semibold py-3 px-6 rounded-md hover:bg-[#A8D403]
+                      transition duration-300 transform hover:scale-105 w-full sm:w-auto text-center flex items-center justify-center gap-2">
+                            <i class="fa fa-shopping-cart"></i> Agregar a Cesta
+                        </a>
+                    @endif
 
-                <!-- Spinner de carga -->
-                <div id="spinner" class="hidden flex items-center justify-center w-full sm:w-auto">
-                    <svg class="h-5 w-5 animate-spin text-gray-500" viewBox="0 0 24 24" fill="none"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" stroke="#111827" stroke-width="4"></circle>
-                        <path d="M2 12a10 10 0 0110-10" stroke="#BFF205" stroke-width="4"></path>
-                    </svg>
-                </div>
+                    <!-- Spinner de carga -->
+                    <div id="spinner" class="hidden flex items-center justify-center w-full sm:w-auto">
+                        <svg class="h-5 w-5 animate-spin text-gray-500" viewBox="0 0 24 24" fill="none"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#111827" stroke-width="4"></circle>
+                            <path d="M2 12a10 10 0 0110-10" stroke="#BFF205" stroke-width="4"></path>
+                        </svg>
+                    </div>
 
                 <!-- Botón Añadir a Favoritos (Solo para clientes) -->
                 @if(auth()->check() && auth()->user()->role === 'cliente')
@@ -219,25 +222,32 @@
                     </a>
                 @endif
 
-                <!-- Botón Banear/Rehabilitar (Solo para administradores) -->
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                    <form action="{{ route('admin.ban.product', $producto->guid) }}" method="POST" class="w-full sm:w-auto">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="p-3 text-black rounded-md bg-[#BFF205] hover:bg-[#96bf03]
-                                       font-semibold w-full sm:w-auto text-center flex items-center justify-center gap-2">
-                            @if($producto->estado === 'Baneado')
-                                REHABILITAR
-                            @else
-                                <i class="fa fa-ban"></i> BANNEAR <i class="fa fa-ban"></i>
-                            @endif
-                        </button>
-                    </form>
-                @endif
-            </div>
+                    <!-- Botón Banear/Rehabilitar (Solo para administradores) -->
+                    @if(auth()->check() && auth()->user()->role === 'admin')
+                        <form action="{{ route('admin.ban.product', $producto->guid) }}" method="POST" class="w-full sm:w-auto">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="p-3 text-black rounded-md bg-[#BFF205] hover:bg-[#96bf03]
+                                           font-semibold w-full sm:w-auto text-center flex items-center justify-center gap-2">
+                                @if($producto->estado === 'Baneado')
+                                    REHABILITAR
+                                @else
+                                    <i class="fa fa-ban"></i> BANNEAR <i class="fa fa-ban"></i>
+                                @endif
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            @else
+                <!-- Producto Baneado -->
+                <div class="flex items-center justify-center w-full bg-gray-100 text-gray-500 text-center dark:bg-gray-800 dark:text-gray-400">
+                    <i class="fa fa-exclamation-triangle"></i> Producto baneado o no disponible, Sentimos las molestias
+                </div>
+            @endif
 
         </div>
     </div>
+
     <x-footer/>
 @endsection
 <script>
