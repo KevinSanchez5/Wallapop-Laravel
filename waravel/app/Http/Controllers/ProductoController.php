@@ -194,7 +194,6 @@ class ProductoController extends Controller
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
 
-
     public function addListingPhoto(Request $request, $guid) {
         Log::info('Buscando producto de la cache en Redis');
         $product = Redis::get('producto_' . $guid);
@@ -234,6 +233,9 @@ class ProductoController extends Controller
         Log::info('Guardando imagen del producto');
         $product->save();
 
+        Log::info('Eliminando producto de la cache');
+        Redis::del('producto_' . $guid);
+
         Log::info('Imagen guardada correctamente');
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
@@ -271,6 +273,9 @@ class ProductoController extends Controller
         $product->imagenes = $images;
         Log::info('Eliminando imagen del producto');
         $product->save();
+
+        Log::info('Eliminando producto de la cache');
+        Redis::del('producto_' . $guid);
 
         Log::info('Imagen eliminada correctamente');
         return response()->json(['message' => 'Foto eliminada', 'product' => $product]);

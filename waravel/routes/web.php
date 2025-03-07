@@ -50,6 +50,10 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
 
     // Carrito de compras
     Route::get('/pedido/overview', [CarritoControllerView::class, 'showOrder'])->name('carrito.checkout');
+
+    // Valoraciones
+    Route::get('myOrders/{guid}/review', [ValoracionesControllerView::class, 'writeReview'])->name('write.review');
+    Route::post('myOrders/{guid}/saveReview', [ValoracionesControllerView::class, 'storeReview'])->name('save.review');
 });
 
 // Rutas protegidas para administradores

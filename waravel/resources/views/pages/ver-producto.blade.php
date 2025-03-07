@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <x-header/>
 
-    <!-- Notificación -->
+    <!-- Notificación exitosa -->
     <div id="toast-success"
          class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm"
          role="alert"
@@ -23,6 +23,22 @@
         </div>
         <div class="ms-3 text-md font-normal ml-5">Artículo añadido al carrito.</div>
     </div>
+
+    <!-- Notificación error -->
+    <div id="toast-error"
+         class="opacity-0 hidden flex items-center w-full max-w-md p-4 mb-4 text-white bg-red-600 transition-opacity ease-in-out duration-700 shadow-sm"
+         role="alert"
+         style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div class="inline-flex items-center justify-center shrink-0 w-10 h-10">
+            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                 viewBox="0 0 24 24">
+                <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.66 15.66a1.5 1.5 0 0 1-2.12 2.12L12 14.12l-3.54 3.66a1.5 1.5 0 1 1-2.12-2.12L9.88 12l-3.66-3.54a1.5 1.5 0 1 1 2.12-2.12L12 9.88l3.54-3.66a1.5 1.5 0 0 1 2.12 2.12L14.12 12l3.66 3.54z"/>
+            </svg>
+            <span class="sr-only">Error icon</span>
+        </div>
+        <div id="errorMessage" class="ms-4 text-md font-normal">Hubo un error al añadir el artículo.</div>
+    </div>
+
 
     <div class="container mx-auto px-4 py-10">
         <!-- Contenedor principal con fondo claro/oscuro -->
@@ -66,25 +82,32 @@
             </div>
 
             <!-- Contenido del producto debajo del carrusel -->
-            <h3 class="font-semibold text-2xl text-gray-800 dark:text-white text-center md:text-left">
+            <h3 class="font-bold text-3xl text-gray-900 dark:text-white">
                 {{ $producto->nombre }}
             </h3>
-            <p class="text-gray-500 dark:text-gray-300 text-sm text-center md:text-left">
+            <p class="text-gray-500 dark:text-gray-300 text-lg mt-1">
                 {{ $producto->categoria }}
             </p>
-            <div class="mt-6 text-center md:text-left flex">
-                <p class="text-gray-600 dark:text-gray-400 text-sm"><b>Vendido por:&nbsp;</b></p>
+
+            <div class="mt-4 flex md:justify-start">
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Vendido por:</p>
                 <a href="{{ route('cliente.ver', $producto->vendedor->guid) }}"
-                   class="text-blue-500 dark:text-blue-400 font-semibold hover:underline">
+                   class="text-blue-500 dark:text-blue-400 font-semibold hover:underline ml-2">
                     {{ $producto->vendedor->nombre }} {{ $producto->vendedor->apellido }}
                 </a>
             </div>
-            <p class="text-gray-700 dark:text-gray-200 text-base mt-4 text-center md:text-left">
+
+            <p class="text-gray-700 dark:text-gray-200 text-lg mt-4 leading-relaxed">
                 {{ $producto->descripcion }}
             </p>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-2 text-center md:text-left">
-                Estado: {{ $producto->estadoFisico }}
-            </p>
+
+            <div class="flex items-center md:justify-start mt-3">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
+                <span class="ml-2 px-3 py-1 rounded-md text-sm font-medium
+                    {{ $producto->estadoFisico === 'Nuevo' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                    {{ $producto->estadoFisico }}
+                </span>
+            </div>
 
             @if(auth()->guest() || auth()->user()->role === 'cliente')
                 <p class="text-black dark:text-white text-base mt-4 text-center md:text-left">
@@ -113,11 +136,10 @@
                         </svg>
                     </button>
                 </div>
-
-                <p class="text-gray-900 dark:text-gray-100 font-semibold text-xl mt-4 text-center md:text-left">
-                    {{ $producto->precio }} €
-                </p>
             @endif
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-xl mt-4 text-center md:text-left">
+                {{ $producto->precio }} €
+            </p>
 
             @if(isset($producto->vendedor->direccion->codigoPostal))
                 <div class="mt-4">
@@ -228,6 +250,9 @@
                 if (data.status === 200) {
                     updateCartLogo(data.itemAmount);
                     showNotification();
+                }else if (data.status === 404 || data.status === 400) {
+                    const errorMsg = data.message;
+                    showErrorNotification(errorMsg);
                 }
             })
             .catch(error => {
@@ -283,6 +308,25 @@
         toast.classList.add("hidden");
     }
 
-    window.addEventListener('scroll', hideToastOnScroll);
+    function showErrorNotification(message) {
+        let toast = document.getElementById('toast-error');
+
+        const messageContainer = document.getElementById('errorMessage');
+        messageContainer.innerHTML = message;
+
+        toast.classList.remove("hidden");
+        toast.classList.remove("opacity-0");
+        toast.classList.add("opacity-100");
+
+        setTimeout(() => {
+            toast.classList.remove("opacity-100");
+            toast.classList.add("opacity-0");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 500);
+        }, 3000)
+    }
+
 </script>
 
