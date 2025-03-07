@@ -271,13 +271,18 @@ class AdminController extends Controller
     public function deleteReview($guid)
     {
         $valoracion = Valoracion::where('guid', $guid)->first();
-        //logers
+
+        if (!$valoracion) {
+            return redirect()->route('admin.reviews')->with('error', 'Valoración no encontrada.');
+        }
+
         Log::info("Eliminando valoración");
-        // Eliminar la valoración y retornar a la lista de valoraciones con un mensaje de éxito
         $valoracion->delete();
         Log::info("Valoración eliminada, Redireccionando a la lista de valoraciones");
+
         return redirect()->route('admin.reviews')->with('success', 'Valoración eliminada correctamente.');
     }
+
 
     public function deleteClient($guid)
     {
