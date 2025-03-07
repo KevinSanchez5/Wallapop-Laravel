@@ -82,11 +82,7 @@
                             </dd>
 
                             <div class="flex items-center gap-2">
-                                @if($producto->estado == 'Baneado')
-                                    <span class="inline-flex items-center justify-center px-4 py-2 rounded-full text-white bg-gray-500 w-32 text-center mr-25">
-                                        Baneado
-                                    </span>
-                                @else
+                                @if($producto->estado != 'Baneado')
                                     <a href="{{ route('producto.edit', $producto->guid) }}" class="p-2 bg-[#BFF205] text-black rounded-md hover:bg-[#A0D500] transition duration-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5">
                                             <path d="M12 20h9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
