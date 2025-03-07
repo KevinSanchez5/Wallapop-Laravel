@@ -24,6 +24,34 @@
         <div class="ms-3 text-md font-normal ml-5">Artículo añadido al carrito.</div>
     </div>
 
+    <div id="toast-success-fav"
+         class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm border border-black"
+         role="alert"
+         style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
+            <svg class="w-10 h-10" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                 viewBox="0 0 20 20">
+                <path
+                    d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+            </svg>
+            <span class="sr-only">Check icon</span>
+        </div>
+        <div class="ms-3 text-md font-normal ml-5">Artículo añadido a favoritos</div>
+    </div>
+
+    <div id="toast-failure-fav"
+         class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm border border-black"
+         role="alert"
+         style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
+            <svg class="w-10 h-10" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.536 12.036a1 1 0 0 1-1.414 1.414L10 11.914l-2.122 2.036a1 1 0 0 1-1.414-1.414L8.586 10 6.464 7.878a1 1 0 0 1 1.414-1.414L10 8.586l2.122-2.122a1 1 0 1 1 1.414 1.414L11.414 10l2.122 2.036Z"/>
+            </svg>
+            <span class="sr-only">Error icon</span>
+        </div>
+        <div class="ms-3 text-md font-normal ml-5">Artículo eliminado de favoritos</div>
+    </div>
+
     <div class="container mx-auto px-4 py-10">
         <!-- Contenedor principal con fondo claro/oscuro -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-5xl mx-auto">
@@ -158,13 +186,13 @@
 
                 <!-- Botón Añadir a Favoritos (Solo para clientes) -->
                 @if(auth()->check() && auth()->user()->role === 'cliente')
-                    <a href="#" class="bg-white text-gray-800 font-semibold py-3 px-6 rounded-md
+                    <a href="#" onclick="toggleFavorite('{{ $producto->guid }}', '{{ auth()->user()->id }}'); return false" class="bg-white text-gray-800 font-semibold py-3 px-6 rounded-md
                           hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800
                           border-2 border-black dark:border-gray-600 transition duration-300
                           transform hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto text-center">
                         <i class="fa fa-heart"></i>
                         <span id="favorite-text-{{ $producto->guid }}">
-                            {{ $productoFavorito ? 'Eliminar a Favoritos' : 'Añadir a Favoritos' }}
+                            {{ $productoFavorito ? 'Eliminar de Favoritos' : 'Añadir a Favoritos' }}
                         </span>
                     </a>
                 @endif
@@ -259,8 +287,74 @@
         }
     }
 
+    async function toggleFavorite(productoGuid, userId) {
+        const textElement = document.getElementById(`favorite-text-${productoGuid}`);
+        const isFavorite = textElement.textContent.trim() === "Eliminar de Favoritos";
+        const route = isFavorite ? "{{ route('favorito.eliminar') }}" : "{{ route('favorito.añadir') }}";
+        const method = isFavorite ? "DELETE" : "POST";
+
+        try {
+            let response = await fetch(route, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                },
+                body: JSON.stringify({ productoGuid, userId })
+            });
+
+            let data = await response.json();
+
+            if (data.status === 200) {
+                textElement.textContent = isFavorite ? "Añadir a Favoritos" : "Eliminar de Favoritos";
+
+                if (isFavorite) {
+                    showFailureNotification();
+                } else {
+                    showSuccessNotification();
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     function showNotification() {
         let toast = document.getElementById('toast-success');
+
+        toast.classList.remove("hidden");
+        toast.classList.remove("opacity-0");
+        toast.classList.add("opacity-100");
+
+        setTimeout(() => {
+            toast.classList.remove("opacity-100");
+            toast.classList.add("opacity-0");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 500);
+        }, 3000)
+    }
+
+    function showSuccessNotification() {
+        let toast = document.getElementById('toast-success-fav');
+
+        toast.classList.remove("hidden");
+        toast.classList.remove("opacity-0");
+        toast.classList.add("opacity-100");
+
+        setTimeout(() => {
+            toast.classList.remove("opacity-100");
+            toast.classList.add("opacity-0");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 500);
+        }, 3000)
+    }
+
+    function showFailureNotification() {
+        let toast = document.getElementById('toast-failure-fav');
 
         toast.classList.remove("hidden");
         toast.classList.remove("opacity-0");
