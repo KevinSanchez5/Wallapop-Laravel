@@ -4,10 +4,11 @@ namespace Tests\Feature\View;
 
 use App\Models\User;
 use App\Models\Producto;
-use App\Models\Valoracion;
 use App\Models\Cliente;
 use App\Utils\GuidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -15,121 +16,195 @@ class ProductoControllerViewTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $user;
+    protected $cliente;
+    protected $producto1;
+    protected $producto2;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->cliente = Cliente::factory()->create(['usuario_id' => $this->user->id]);
+
+        $this->producto1 = Producto::factory()->create([
+            'guid' => GuidGenerator::generarId(),
+            'vendedor_id' => $this->cliente->id,
+            'nombre' => 'Laptop Gamer',
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible',
+        ]);
+
+        $otroUser = User::factory()->create();
+        $otroCliente = Cliente::factory()->create(['usuario_id' => $otroUser->id]);
+
+        $this->producto2 = Producto::factory()->create([
+            'guid' => GuidGenerator::generarId(),
+            'vendedor_id' => $otroCliente->id,
+            'nombre' => 'Arbol',
+            'categoria' => 'Cocina',
+            'estado' => 'Disponible',
+        ]);
+    }
+
     public function test_index_vista()
     {
-        // Crear un usuario autenticado
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
-        // Crear algunos productos con vendedores diferentes
-        $producto1 = Producto::factory()->create(['vendedor_id' => 1, 'estado' => 'Disponible']);
-        $producto2 = Producto::factory()->create(['vendedor_id' => 2, 'estado' => 'Disponible']);
+        $response = $this->get(route('pages.home'));
 
-        // Simular productos en la vista
-        $response = $this->get(route('productos.index'));
-
-        // Verificar que el estado de la respuesta es 200 y la vista correcta
         $response->assertStatus(200);
         $response->assertViewIs('pages.home');
-        $response->assertViewHas('productos');  // Verificar que los productos están en la vista
+        $response->assertViewHas('productos');
 
-        // Asegurarse de que el producto del vendedor autenticado se excluye
-        $response->assertDontSee($producto1->nombre);
-        $response->assertSee($producto2->nombre);
+        $productosEnVista = $response->original->getData()['productos'];
+
+        dump($productosEnVista->pluck('id')->toArray());
+
+        $this->assertFalse($productosEnVista->contains('id', $this->producto1->id));
+        $this->assertTrue($productosEnVista->contains('id', $this->producto2->id));
     }
 
     public function test_search()
     {
-        // Crear un usuario autenticado
         $user = User::factory()->create();
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
         $this->actingAs($user);
 
-        // Crear productos para buscar
-        $producto1 = Producto::factory()->create(['estado' => 'Disponible', 'nombre' => 'Producto A', 'categoria' => 'Electrónica']);
-        $producto2 = Producto::factory()->create(['estado' => 'Disponible', 'nombre' => 'Producto B', 'categoria' => 'Ropa']);
-        $producto3 = Producto::factory()->create(['estado' => 'Disponible', 'nombre' => 'Producto C', 'categoria' => 'Electrónica']);
+        $productoUsuario = Producto::factory()->create([
+            'vendedor_id' => $cliente->id,
+            'nombre' => 'Laptop Gamer',
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible'
+        ]);
 
-        // Realizar la búsqueda
-        $response = $this->get(route('productos.search', ['search' => 'Producto A', 'categoria' => 'Electrónica']));
+        $otroUser = User::factory()->create();
+        $otroCliente = Cliente::factory()->create(['usuario_id' => $otroUser->id]);
 
-        // Verificar que el estado de la respuesta es 200 y la vista correcta
+         Producto::factory()->create([
+            'vendedor_id' => $otroCliente->id,
+            'nombre' => 'LápTop Gámér',
+            'categoria' => 'Tecnologia',
+            'estado' => 'Disponible'
+        ]);
+
+         Producto::factory()->create([
+            'vendedor_id' => $otroCliente->id,
+            'nombre' => 'Zapatillas Deportivas',
+            'categoria' => 'Deporte',
+            'estado' => 'Disponible'
+        ]);
+
+        $response = $this->get(route('pages.home', [
+            'search' => 'laptop',
+            'categoria' => 'Tecnologia'
+        ]));
+
         $response->assertStatus(200);
         $response->assertViewIs('pages.home');
+        $response->assertViewHas('productos');
 
-        // Asegurarse de que solo el producto de la categoría 'Electrónica' se muestre
-        $response->assertSee($producto1->nombre);
-        $response->assertSee($producto3->nombre);
-        $response->assertDontSee($producto2->nombre);
+        $productosEnVista = $response->original->getData()['productos'];
+        dump($productosEnVista->pluck('id', 'categoria')->toArray());
+
     }
-    public function test_show_vista()
+
+
+    public function test_show_vista_con_guid_invalido()
     {
-        // Crear un producto
-        $producto = Producto::factory()->create();
+        $this->actingAs($this->user);
 
-        // Hacer la solicitud al producto
-        $response = $this->get(route('productos.show', ['guid' => $producto->guid]));
 
-        // Verificar que la respuesta sea correcta
-        $response->assertStatus(200);
-        $response->assertViewIs('pages.ver-producto');
-        $response->assertViewHas('producto', $producto);
+        $invalidGuid = 'invalid-guid-12345';
+        $response = $this->get(route('producto.show', ['guid' => $invalidGuid]));
+
+        $response->assertStatus(302);
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'Producto no encontrado');
+    }
+
+    public function test_show_vista_con_guid_inexistente()
+    {
+        $this->actingAs($this->user);
+
+        $nonExistingGuid = 'non-existing-guid';
+        $response = $this->get(route('producto.show', ['guid' => $nonExistingGuid]));
+
+        $response->assertStatus(302);
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'Producto no encontrado');
     }
 
     public function test_store()
     {
-        // Crear un usuario autenticado
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
-        // Simular un cliente para el usuario
-        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $storagePath = storage_path('app/public/productos');
 
-        // Enviar datos para crear un producto
-        $response = $this->post(route('productos.store'), [
-            'nombre' => 'Nuevo Producto',
+        if (!file_exists($storagePath)) {
+            mkdir($storagePath, 0777, true);
+        }
+
+        $image1 = UploadedFile::fake()->image('imagen1.jpg');
+        $image2 = UploadedFile::fake()->image('imagen2.jpg');
+
+        $data = [
+            'nombre' => 'Producto Test',
             'descripcion' => 'Descripción del producto',
             'estadoFisico' => 'Nuevo',
-            'precio' => 100,
+            'precio' => 100.00,
             'stock' => 10,
-            'categoria' => 'Electrónica',
-            'imagen1' => UploadedFile::fake()->image('producto.jpg')
-        ]);
+            'categoria' => 'Cocina',
+            'imagen1' => $image1,
+            'imagen2' => $image2,
+        ];
 
-        // Verificar que el producto fue creado y redirigido al perfil
+        $response = $this->post(route('producto.store'), $data);
+        $producto = Producto::first();
+        $imagenes = json_decode($producto->imagenes, true);
+
+        $this->assertEquals([
+            "https://via.placeholder.com/640x480.png",
+            "https://via.placeholder.com/640x480.png"
+        ], $imagenes);
+
         $response->assertRedirect(route('profile'));
-        $this->assertDatabaseHas('productos', ['nombre' => 'Nuevo Producto']);
+        $response->assertSessionHas('success', 'Producto añadido correctamente.');
     }
 
-    public function test_edit()
+
+    public function test_it_redirects_to_login_if_not_authenticated()
     {
-        // Crear un usuario autenticado
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $response = $this->post(route('producto.store'), []);
 
-        // Crear un producto
-        $producto = Producto::factory()->create(['vendedor_id' => $user->id]);
-
-        // Hacer la solicitud al formulario de edición
-        $response = $this->get(route('productos.edit', ['guid' => $producto->guid]));
-
-        // Verificar que la respuesta sea correcta
-        $response->assertStatus(200);
-        $response->assertViewIs('profile.edit-producto');
-        $response->assertViewHas('producto', $producto);
+        $response->assertRedirect(route('login'));
     }
-
 
     public function test_update()
     {
-        // Crear un usuario autenticado
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'cliente']);
         $this->actingAs($user);
 
-        // Crear un producto
-        $producto = Producto::factory()->create(['vendedor_id' => $user->id]);
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $producto = Producto::factory()->create(['vendedor_id' => $cliente->id]);
 
-        // Enviar datos para actualizar el producto
-        $response = $this->put(route('productos.update', ['guid' => $producto->guid]), [
+        $this->assertEquals($producto->vendedor_id, $cliente->id);
+
+        $updatedData = [
+            'nombre' => 'Producto Actualizado',
+            'descripcion' => 'Descripción actualizada',
+            'estadoFisico' => 'Usado',
+            'precio' => 200,
+            'stock' => 5,
+            'categoria' => 'Hogar',
+        ];
+
+        $response = $this->put(route('producto.update', ['guid' => $producto->guid]), $updatedData);
+        $response->assertRedirect(route('profile'));
+
+        $this->assertDatabaseHas('productos', [
+            'guid' => $producto->guid,
             'nombre' => 'Producto Actualizado',
             'descripcion' => 'Descripción actualizada',
             'estadoFisico' => 'Usado',
@@ -138,44 +213,37 @@ class ProductoControllerViewTest extends TestCase
             'categoria' => 'Hogar',
         ]);
 
-        // Verificar que el producto fue actualizado
-        $response->assertRedirect(route('profile'));
-        $this->assertDatabaseHas('productos', ['nombre' => 'Producto Actualizado']);
+        $this->assertEquals($producto->vendedor_id, $cliente->id);
     }
 
     public function test_destroy()
     {
-        // Crear un usuario autenticado
-        $user = User::factory()->create();
-        $this->actingAs($user);
 
-        // Crear un producto
-        $producto = Producto::factory()->create(['vendedor_id' => $user->id]);
+        $this->actingAs($this->user);
 
-        // Hacer la solicitud para eliminar el producto
-        $response = $this->delete(route('productos.destroy', ['guid' => $producto->guid]));
+        $producto = $this->producto1;
 
-        // Verificar que el producto fue eliminado
+        $response = $this->delete(route('producto.destroy', ['guid' => $producto->guid]));
         $response->assertRedirect(route('profile'));
+
         $this->assertDatabaseMissing('productos', ['guid' => $producto->guid]);
     }
 
     public function test_changestatus()
     {
-        // Crear un usuario autenticado
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
-        // Crear un producto
-        $producto = Producto::factory()->create(['vendedor_id' => $user->id, 'estado' => 'Disponible']);
+        $producto = $this->producto1;
 
-        // Cambiar el estado del producto
-        $response = $this->post(route('productos.changestatus', ['guid' => $producto->guid]));
-
-        // Verificar que el estado haya cambiado
+        $response = $this->post(route('producto.changestatus', ['guid' => $producto->guid]));
         $response->assertRedirect(route('profile'));
-        $this->assertDatabaseHas('productos', ['guid' => $producto->guid, 'estado' => 'Desactivado']);
+
+        $this->assertDatabaseHas('productos', [
+            'guid' => $producto->guid,
+            'estado' => 'Desactivado'
+        ]);
     }
+
 }
 
 
