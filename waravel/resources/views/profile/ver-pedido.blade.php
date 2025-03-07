@@ -210,6 +210,34 @@
                         </tbody>
                     </table>
                 </div>
+                        @if($valoracion != null)
+                            <h2 class="mt-4 text-xl font-semibold text-gray-900 transition-all duration-300 sm:text-2xl dark:text-white">Tu valoración</h2>
+                            <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 mt-2 px-6 py-2">
+                                <div class="py-4">
+                                    <div class="flex items-center mb-1">
+                                        <span class="text-yellow-500">{{ str_repeat('⭐', $valoracion->puntuacion) }}</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-400">{{ $valoracion->comentario }}</p>
+                                    <p class="text-gray-500 text-sm mt-1">
+                                        📅 {{ $valoracion->created_at->format('d/m/Y') }}
+                                    </p>
+                                </div>
+                            </div>
+                        @else
+                            @if($pedido->estado == 'Entregado')
+                                <h2 class="mt-4 text-xl font-semibold text-gray-900 transition-all duration-300 sm:text-2xl dark:text-white">Tu valoración</h2>
+                                <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 mt-4 px-6 py-2">
+                                    <div class="py-4 flex justify-between items-center">
+                                        <p class="text-gray-500 text-sm">
+                                            Este pedido no tiene valoraciones
+                                        </p>
+                                        <a href="{{ route('write.review', $pedido->guid)}}" class="w-10 h-10 bg-[#BFF205] text-white dark:text-gray-800 flex justify-center items-center rounded-full text-xl hover:bg-[#9cc100] hover:scale-110 transition-all">
+                                            +
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
             </div>
         </section>
     </div>

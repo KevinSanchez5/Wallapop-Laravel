@@ -85,8 +85,9 @@
                     updateCartLogo(data.itemAmount);
                     addOneToTheCounter(productId);
                     updateCurrentLineaPrice(data.lineaPrice, productId)
-                } else {
-                    console.warn("Failed to update cart:", data);
+                } else if (data.status === 404 || data.status === 400) {
+                    const errorMessage = data.message;
+                    showErrorNotification(errorMessage);
                 }
             })
             .catch(error => {
@@ -184,10 +185,47 @@
             const priceElement = document.getElementById(productId + '_total');
             priceElement.innerHTML = newPrice + " €";
         }
+
+        function showErrorNotification(message) {
+            let toast = document.getElementById('toast-error');
+
+            const messageContainer = document.getElementById('errorMessage');
+            messageContainer.innerHTML = message;
+
+            toast.classList.remove("hidden");
+            toast.classList.remove("opacity-0");
+            toast.classList.add("opacity-100");
+
+            setTimeout(() => {
+                toast.classList.remove("opacity-100");
+                toast.classList.add("opacity-0");
+
+                setTimeout(() => {
+                    toast.classList.add("hidden");
+                }, 500);
+            }, 3000)
+        }
+
     </script>
 
     <x-header />
     <div class="container mx-auto pt-2 min-h-screen">
+
+        <!-- Notificación error -->
+        <div id="toast-error"
+             class="opacity-0 hidden flex items-center w-full max-w-md p-4 mb-4 text-white bg-red-600 transition-opacity ease-in-out duration-700 shadow-sm"
+             role="alert"
+             style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+            <div class="inline-flex items-center justify-center shrink-0 w-10 h-10">
+                <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                     viewBox="0 0 24 24">
+                    <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.66 15.66a1.5 1.5 0 0 1-2.12 2.12L12 14.12l-3.54 3.66a1.5 1.5 0 1 1-2.12-2.12L9.88 12l-3.66-3.54a1.5 1.5 0 1 1 2.12-2.12L12 9.88l3.54-3.66a1.5 1.5 0 0 1 2.12 2.12L14.12 12l3.66 3.54z"/>
+                </svg>
+                <span class="sr-only">Error icon</span>
+            </div>
+            <div id="errorMessage" class="ms-4 text-md font-normal">Error placeholder.</div>
+        </div>
+
         <!-- Linea de venta -->
         <section class=" py-8 antialiased">
             <div class="mx-auto px-6">
@@ -195,6 +233,14 @@
 
                 <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
                     <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300">
+                        @if (session('error'))
+                            <div class="p-4" style="padding-bottom: 0">
+                                <div class="mx-auto w-full flex-none rounded-lg bg-red-100 border-2 border-red-600 text-red-600 shadow-lg transition-all duration-300 lg:max-w-2xl xl:max-w-4xl dark:bg-red-950 dark:border-red-700 dark:text-red-400">
+                                    <p class="p-4">{{ session('error') }}</p>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="space-y-0">
                             @forelse($cart->lineasCarrito as $linea)
                                 <div id="linea-{{$linea->producto->guid}}" class="rounded-lg p-4 md:p-6">
@@ -211,7 +257,7 @@
                                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h16" />
                                                     </svg>
                                                 </button>
-                                                <input disabled id="amount_of_items_for_{{ $linea->producto->guid }}" type="text" data-input-counter class="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white" placeholder="" value="{{ $linea->cantidad }}" required />
+                                                <input disabled id="amount_of_items_for_{{ $linea->producto->guid }}" type="text" data-input-counter class="w-12 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white" placeholder="" value="{{ $linea->cantidad }}" required />
                                                 <div id="spinner_{{ $linea->producto->guid }}" class="hidden inset-0 flex items-center justify-center" style="margin-left: 0.75rem; margin-right: 0.75rem">
                                                     <svg class="h-4 w-4 animate-spin text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <circle cx="12" cy="12" r="10" stroke="#111827" stroke-width="4"></circle>
