@@ -35,7 +35,11 @@ class CarritoControllerView extends Controller
 
         if ($validator->fails()) {
             Log::warning('No se han proporcionado los campos necesarios');
-            return response()->json($validator->errors(), 400);
+            return response()->json
+            ([
+                "message" => "No se han proporcionado los campos necesarios",
+                "status" => 400
+            ]);
         }
 
         $productId = $request->input('productId');
@@ -46,11 +50,6 @@ class CarritoControllerView extends Controller
             'precioTotal' => 0,
             'itemAmount' => 0
         ]));
-
-        if ($cart->lineasCarrito == null) {
-            Log::warning("No hay productos en el carrito");
-            return response()->json($validator->errors(), 404);
-        }
 
         $lineas = $cart->lineasCarrito;
         $found = false;
@@ -79,7 +78,11 @@ class CarritoControllerView extends Controller
         }
 
         Log::warning("No se ha podido eliminar el producto del carrito");
-        return response()->json("Error", 404);
+        return response()->json([
+            "message" => "No se ha podido eliminar el producto del carrito",
+            "status" => 404
+            ]
+        );
     }
 
     public function deleteOneFromCart(Request $request)
@@ -90,7 +93,11 @@ class CarritoControllerView extends Controller
 
         if ($validator->fails()) {
             Log::warning('No se han proporcionado los campos necesarios');
-            return response()->json($validator->errors(), 400);
+            return response()->json
+            ([
+                "message" => "No se han proporcionado los campos necesarios",
+                "status" => 400
+            ]);
         }
 
         $productId = $request->input('productId');
@@ -98,13 +105,9 @@ class CarritoControllerView extends Controller
         Log::info('Buscando el carrito en la sesión');
         $cart = session()->get('carrito', new Carrito([
             'lineasCarrito' => [],
-            'precioTotal' => 0
+            'precioTotal' => 0,
+            'itemAmount' => 0
         ]));
-
-        if ($cart->lineasCarrito == null) {
-            Log::warning("No hay productos en el carrito");
-            return response()->json($validator->errors(), 404);
-        }
 
         $lineas = $cart->lineasCarrito;
         $found = false;
@@ -149,7 +152,11 @@ class CarritoControllerView extends Controller
         }
 
         Log::warning("No se ha podido eliminar el producto del carrito");
-        return response()->json("Error", 404);
+        return response()->json([
+            "message" => "No se ha encontrado el producto en el carrito, por favor recargue la página",
+            "status" => 404
+            ]
+        );
     }
 
     public function addOneToCart(Request $request){
@@ -159,7 +166,10 @@ class CarritoControllerView extends Controller
 
         if ($validator->fails()) {
             Log::warning('No se han proporcionado los campos necesarios');
-            return response()->json($validator->errors(), 400);
+            return response()->json([
+                "message" => "No se han proporcionado los campos necesarios",
+                "status" => 400
+            ]);
         }
 
         $productId = $request->input('productId');
@@ -171,11 +181,7 @@ class CarritoControllerView extends Controller
             'itemAmount' => 0
         ]));
 
-        if ($cart->lineasCarrito == null) {
-            $lineas = [];
-        }else{
-            $lineas = $cart->lineasCarrito;
-        }
+        $lineas = $cart->lineasCarrito;
 
         $found = false;
         $lineaPrice = 0;
@@ -214,9 +220,10 @@ class CarritoControllerView extends Controller
 
         Log::warning("No se ha podido eliminar el producto del carrito");
         return response()->json([
-            "status" => 400,
-            "message" => "Error al intentar modificar el producto en el carrito"
-        ]);
+                "message" => "No se ha encontrado el producto en el carrito, por favor recargue la página",
+                "status" => 404
+            ]
+        );
     }
 
 
@@ -230,7 +237,10 @@ class CarritoControllerView extends Controller
 
         if ($validator->fails()) {
             Log::warning('No se han proporcionado los campos necesarios');
-            return response()->json($validator->errors(), 400);
+            return response()->json([
+                "message" => "No se han proporcionado los campos necesarios",
+                "status" => 400
+            ]);
         }
 
         Log::info('Buscando el carrito en la sesión');
@@ -248,21 +258,29 @@ class CarritoControllerView extends Controller
         $productId = $request->get('productId');
         $amount = $request->get('amount');
 
-        $possibleError = $this->verifyProductDoesntBelongToCurrentUser($productId);
-
-        if ($possibleError ) {
-            Log::info($possibleError);
-            return $possibleError;
-        };
-
         Log::info('Buscando el producto en la BBDD');
         $producto = Producto::where('guid', $productId)->first();
 
         if ($producto == null) {
             Log::warning("Producto no encontrado en la BBDD");
             return response()->json([
-                "message" => "No se ha encontrado el producto, por favor recarge la página",
+                "message" => "No se ha encontrado el producto, por favor recargue la página",
                 "status" => 404
+            ]);
+        }
+
+        $possibleError = $this->verifyProductDoesntBelongToCurrentUser($producto);
+
+        if ($possibleError ) {
+            return $possibleError;
+        };
+
+        Log::info('Verificando que el producto tiene suficiente stock');
+        if ($amount > $producto->stock) {
+            Log::warning("El producto no tiene stock suficiente para agregar más");
+            return response()->json([
+                "message" => "No hay stock suficiente para agregar más productos",
+                "status" => 400
             ]);
         }
 
@@ -331,14 +349,14 @@ class CarritoControllerView extends Controller
 
         if ($cliente == null) {
             Log::warning("El cliente no se ha encontrado en la base de datos");
-            return redirect()->route('home')->with('error', 'No se ha encontrado un cliente asociado al usuario');
+            return redirect()->route('carrito')->with('error', 'No se ha encontrado un cliente asociado al usuario');
         }
 
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));
     }
 
-    public function verifyProductDoesntBelongToCurrentUser($productoId){
+    public function verifyProductDoesntBelongToCurrentUser($producto){
         Log::info('Verificando el producto no le pertence al cliente que ha iniciado sesión');
 
         $user = Auth::user();
@@ -347,16 +365,8 @@ class CarritoControllerView extends Controller
             return false;
         }else  $cliente = Cliente::where('usuario_id', $user->id)->first();
 
-        $product = Producto::where('guid', $productoId)->first();
-
-        if ($product == null) {
-            return response()->json([
-               'message' => 'Producto no encontrado',
-               'status' => 404
-            ]);
-        }
-
-        if ($cliente->id == $product->vendedor_id) {
+        if ($cliente->id == $producto->vendedor_id) {
+            Log::warning('El producto le pertenece al cliente que ha iniciado sesión');
             return response()->json([
                'message' => 'No puedes añadir tus propios productos al carrito',
                'status' => 400

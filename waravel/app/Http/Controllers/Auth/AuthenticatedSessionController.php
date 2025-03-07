@@ -75,6 +75,7 @@ class AuthenticatedSessionController extends Controller
         foreach ($cart->lineasCarrito as $key => &$linea) {
             if ($linea->producto->vendedor_id === $cliente->id) {
                 Log::info('Eliminando producto ' . $linea->producto->nombre);
+                $cart->precioTotal -= $linea->precioTotal;
                 unset($cart->lineasCarrito[$key]);
             } else {
                 $newItemAmount += $linea->cantidad;
