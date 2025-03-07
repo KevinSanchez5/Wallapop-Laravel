@@ -15,6 +15,7 @@ return [
                     base_path('vendor'),
                     base_path('node_modules'),
                 ],
+                'relative_path' => '',
             ],
             'databases' => [
                 'pgsql'
