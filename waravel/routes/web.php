@@ -17,6 +17,8 @@ Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('pages.home
 
 // Rutas para clientes y valoraciones
 Route::get('/cliente/{guid}', [ClienteControllerView::class, 'mostrarCliente'])->name('cliente.ver');
+Route::post('/cliente/addFavorite', [ClienteControllerView::class, 'añadirFavorito'])->name('favorito.añadir');
+Route::delete('/cliente/removeFavorite', [ClienteControllerView::class, 'eliminarFavorito'])->name('favorito.eliminar');
 Route::get('/clientes/{guid}/valoraciones', [ValoracionesControllerView::class, 'index'])->name('cliente.valoraciones');
 Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'promedio'])->name('cliente.puntuacion');
 
@@ -28,6 +30,10 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile/myReviews', [ProfileControllerView::class,'showReviews'])->name('profile.reviews');
     Route::get('/profile/myOrders', [ProfileControllerView::class, 'showOrders'])->name('profile.orders');
     Route::get('/profile/mySales', [ProfileControllerView::class, 'showSales'])->name('profile.sales');
+    Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
+    Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('order.detail');
+    Route::get('/profile/mySales/{guid}', [ProfileControllerView::class, 'showSale'])->name('sale.detail');
+    Route::get('/profile/myFavorites', [ProfileControllerView::class, 'showFavorites'])->name('profile.favorites');
     Route::get('/profile/edit', [ProfileControllerView::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileControllerView::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');

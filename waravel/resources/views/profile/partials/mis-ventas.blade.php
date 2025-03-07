@@ -21,6 +21,10 @@
                     class="px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
                 <b>Mis ventas</b>
             </button>
+            <button onclick="window.location.href='{{ route('profile.favorites') }}'"
+                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
+                <b>Favoritos</b>
+            </button>
         </div>
         <div id="ventas" class="seccion">
             <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">

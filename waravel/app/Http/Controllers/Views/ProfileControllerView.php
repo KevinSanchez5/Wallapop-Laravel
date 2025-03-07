@@ -298,6 +298,30 @@ class ProfileControllerView extends Controller
         return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario'));
     }
 
+    public function showFavorites() {
+        Log::info('Accediendo a la página de mis favoritos');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus favoritos.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo favoritos');
+        $productosFavoritos = $cliente->favoritos()->paginate(6);
+
+        Log::info('Favoritos obtenidos correctamente, mostrando la vista de mis favoritos');
+        return view('profile.partials.mis-favoritos', compact('cliente','productosFavoritos'));
+    }
+
     public function edit(Request $request)
     {
         Log::info('Accediendo a la página de edición del perfil');
