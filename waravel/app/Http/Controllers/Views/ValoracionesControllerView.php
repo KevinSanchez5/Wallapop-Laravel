@@ -289,6 +289,6 @@ class ValoracionesControllerView extends Controller
         }
 
         Log::info('Valoración creada exitosamente');
-        return redirect()->back();
+        return redirect()->route('order.detail', $pedido->guid);
     }
 }

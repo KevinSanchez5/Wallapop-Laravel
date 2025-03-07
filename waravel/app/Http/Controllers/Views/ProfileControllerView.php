@@ -293,9 +293,12 @@ class ProfileControllerView extends Controller
             return redirect()->route('profile')->with('error', 'No tienes permisos para ver este pedido.');
         }
 
+        Log::info('Buscando la valoración para este pedido');
+        $valoracion = Valoracion::where('venta_id', $pedido->id)->first();
+
         Log::info('Pedido válido y pertenece al cliente, mostrando la vista de detalle del pedido');
 
-        return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario'));
+        return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario', 'valoracion'));
     }
 
     public function edit(Request $request)
