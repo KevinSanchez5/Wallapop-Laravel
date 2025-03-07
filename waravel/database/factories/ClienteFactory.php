@@ -3,9 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Cliente;
-use App\Models\Direccion;
 use App\Models\User;
-use App\Utils\GuidGenerator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ClienteFactory extends Factory
@@ -15,20 +13,22 @@ class ClienteFactory extends Factory
     public function definition()
     {
         return [
-            'guid' => GuidGenerator::generarId(),
+            'guid' => $this->faker->bothify('?#?#?#?#?#?'),
             'nombre' => $this->faker->firstName,
             'apellido' => $this->faker->lastName,
-            'avatar' => $this->faker->imageUrl(),
-            'telefono' => $this->faker->phoneNumber,
+            'avatar' => 'clientes/avatar.png',
+            'telefono' => '612345678',
             'direccion' => [
-                'calle' => $this->faker->streetAddress,
-                'numero' => $this->faker->numberBetween(100, 999),
-                'piso' => $this->faker->numberBetween(-1, 20),
-                'letra' => $this->faker->randomElement(['A', 'B', 'C', 'D']),
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
                 'codigoPostal' => 28001
             ],
-            'activo' => $this->faker->boolean,
+            'activo' => 'true',
             'usuario_id' => User::factory(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

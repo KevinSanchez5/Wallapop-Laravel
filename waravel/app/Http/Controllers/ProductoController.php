@@ -194,7 +194,6 @@ class ProductoController extends Controller
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
 
-
     public function addListingPhoto(Request $request, $guid) {
         Log::info('Buscando producto de la cache en Redis');
         $product = Redis::get('producto_' . $guid);

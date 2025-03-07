@@ -65,28 +65,31 @@
                     </div>
                 @endif
 
-                <!-- Botón de Editar Perfil -->
-                <div class="mt-8 mb-2 text-center">
-                    <a href="{{ route('profile.edit') }}" class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
-                        <b>Editar perfil</b>
+                <div class="flex flex-col items-center gap-4 mt-8">
+                    <!-- Botón de Editar Perfil -->
+                    <a href="{{ route('profile.edit') }}"
+                       class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300 font-bold text-center w-full max-w-xs">
+                        Editar perfil
                     </a>
-                </div>
 
-                <!-- Botón de Cambiar Contraseña -->
-                <div class="mt-8 mb-2 text-center">
-                    <button onclick="openModal()" class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
-                        <b>Cambiar Contraseña</b>
+                    <!-- Botón de Cambiar Contraseña -->
+                    <button onclick="openModal()"
+                            class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300 font-bold text-center w-full max-w-xs">
+                        Cambiar Contraseña
                     </button>
+
+                    <!-- Botón de Eliminar Perfil -->
+                    <form action="{{ route('profile.destroy.profile') }}" method="POST"
+                          onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu perfil?')"
+                          class="w-full max-w-xs">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                                class="px-6 py-3 rounded-lg text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 font-bold w-full">
+                            Eliminar perfil
+                        </button>
+                    </form>
                 </div>
-
-                <form action="{{ route('profile.destroy.profile') }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu perfil?')"  class="mt-8 mb-2 text-center">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="px-6 py-3 rounded-lg text-gray-800 bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-[#dc2626] transition duration-300">
-                        <b>Eliminar perfil</b>
-                    </button>
-                </form>
-
 
                 <!-- Modal -->
                 <div id="modalChangePassword" class="fixed inset-0 hidden flex justify-center items-center bg-black bg-opacity-50 z-50">
@@ -146,7 +149,7 @@
         </div>
 
         <!-- Toast de Confirmación para Eliminar Producto -->
-        <div id="toast-confirm-delete" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div id="toast-confirm-delete" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
                 <span class="sr-only">Check icon</span>
             </div>
@@ -156,7 +159,7 @@
         </div>
 
         <!-- Toast de Confirmación para Desactivar Producto -->
-        <div id="toast-confirm-deactivate" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div id="toast-confirm-deactivate" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
                 <span class="sr-only">Check icon</span>
             </div>
