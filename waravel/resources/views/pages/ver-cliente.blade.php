@@ -154,7 +154,6 @@
                         @empty
                             <li class="text-gray-500 dark:text-gray-400">No hay productos en venta.</li>
                         @endforelse
-                    @endisset
                 </ul>
 
                 <!-- Paginación de productos -->
