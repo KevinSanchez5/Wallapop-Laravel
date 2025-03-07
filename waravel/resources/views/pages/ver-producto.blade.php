@@ -66,25 +66,32 @@
             </div>
 
             <!-- Contenido del producto debajo del carrusel -->
-            <h3 class="font-semibold text-2xl text-gray-800 dark:text-white text-center md:text-left">
+            <h3 class="font-bold text-3xl text-gray-900 dark:text-white">
                 {{ $producto->nombre }}
             </h3>
-            <p class="text-gray-500 dark:text-gray-300 text-sm text-center md:text-left">
+            <p class="text-gray-500 dark:text-gray-300 text-lg mt-1">
                 {{ $producto->categoria }}
             </p>
-            <div class="mt-6 text-center md:text-left flex">
-                <p class="text-gray-600 dark:text-gray-400 text-sm"><b>Vendido por:&nbsp;</b></p>
+
+            <div class="mt-4 flex md:justify-start">
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Vendido por:</p>
                 <a href="{{ route('cliente.ver', $producto->vendedor->guid) }}"
-                   class="text-blue-500 dark:text-blue-400 font-semibold hover:underline">
+                   class="text-blue-500 dark:text-blue-400 font-semibold hover:underline ml-2">
                     {{ $producto->vendedor->nombre }} {{ $producto->vendedor->apellido }}
                 </a>
             </div>
-            <p class="text-gray-700 dark:text-gray-200 text-base mt-4 text-center md:text-left">
+
+            <p class="text-gray-700 dark:text-gray-200 text-lg mt-4 leading-relaxed">
                 {{ $producto->descripcion }}
             </p>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-2 text-center md:text-left">
-                Estado: {{ $producto->estadoFisico }}
-            </p>
+
+            <div class="flex items-center md:justify-start mt-3">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
+                <span class="ml-2 px-3 py-1 rounded-md text-sm font-medium
+                    {{ $producto->estadoFisico === 'Nuevo' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                    {{ $producto->estadoFisico }}
+                </span>
+            </div>
 
             @if(auth()->guest() || auth()->user()->role === 'cliente')
                 <p class="text-black dark:text-white text-base mt-4 text-center md:text-left">
@@ -113,11 +120,10 @@
                         </svg>
                     </button>
                 </div>
-
-                <p class="text-gray-900 dark:text-gray-100 font-semibold text-xl mt-4 text-center md:text-left">
-                    {{ $producto->precio }} €
-                </p>
             @endif
+            <p class="text-gray-900 dark:text-gray-100 font-semibold text-xl mt-4 text-center md:text-left">
+                {{ $producto->precio }} €
+            </p>
 
             @if(isset($producto->vendedor->direccion->codigoPostal))
                 <div class="mt-4">
