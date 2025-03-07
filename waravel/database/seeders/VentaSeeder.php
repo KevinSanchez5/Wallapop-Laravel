@@ -14,7 +14,7 @@ class VentaSeeder extends Seeder
     {
         Venta::create([
             'guid'=>'kY8XqT5L9v3',
-            'estado' =>'Procesando',
+            'estado' =>'Pendiente',
             'comprador' => [
                 'guid'=>'DU6jCZtareb',
                 'id' => 2,
@@ -435,7 +435,7 @@ class VentaSeeder extends Seeder
         ]);
         Venta::create([
             'guid' => 'QX9T7LK5VY3',
-            'estado' => 'Enviado',
+            'estado' => 'Entregado',
             'comprador' => [
                 'guid' => 'DU6jCZtareb',
                 'id' => 2,
