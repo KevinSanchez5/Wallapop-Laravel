@@ -31,6 +31,10 @@ notificaciones y un sistema de comentarios y valoraciones.
  
    Es un framework de testing end-to-end (E2E) diseñado para automatizar pruebas en aplicaciones web. Sus tests permiten simular la interacción de un usuario con la aplicación, verificando que los flujos de trabajo, la navegación y la lógica de negocio funcionen correctamente en un entorno realista.
 
+ - PHPUnit
+
+   PHPUnit es un framework de pruebas unitarias para aplicaciones PHP. Se utiliza para realizar pruebas automáticas de unidades de código individuales, asegurando que cada función o clase en la aplicación se comporte de manera esperada. Su integración permite detectar errores de forma temprana, lo que facilita la mejora continua y el mantenimiento del software.
+
 ## Enlace al video
 
 
