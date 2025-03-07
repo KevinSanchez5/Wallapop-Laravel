@@ -13,18 +13,22 @@ class ClienteFactory extends Factory
     public function definition()
     {
         return [
-            'guid' => $this->faker->uuid,
+            'guid' => $this->faker->bothify('?#?#?#?#?#?'),
             'nombre' => $this->faker->firstName,
             'apellido' => $this->faker->lastName,
-            'avatar' => $this->faker->imageUrl(),
-            'telefono' => $this->faker->phoneNumber,
-            'direccion' => json_encode([
-                'calle' => $this->faker->streetAddress,
-                'ciudad' => $this->faker->city,
-                'pais' => $this->faker->country,
-            ]),
-            'activo' => $this->faker->boolean,
+            'avatar' => 'clientes/avatar.png',
+            'telefono' => '612345678',
+            'direccion' => [
+                'calle' => 'Avenida Siempre Viva',
+                'numero' => 742,
+                'piso' => 1,
+                'letra' => 'A',
+                'codigoPostal' => 28001
+            ],
+            'activo' => 'true',
             'usuario_id' => User::factory(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

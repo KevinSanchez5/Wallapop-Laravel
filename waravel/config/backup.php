@@ -6,11 +6,6 @@ return [
 
         'database' => 'pgsql',
 
-        'compression_method' => 'gzip',
-        'compression_level' => 5,
-        'filename_prefix' => 'backup-',
-        'name' => 'backup-name',
-
         'source' => [
             'files' => [
                 'include' => [
@@ -21,7 +16,6 @@ return [
                     base_path('node_modules'),
                 ],
             ],
-
             'databases' => [
                 'pgsql'
             ],
@@ -31,6 +25,9 @@ return [
             'disks' => [
                 'local',
             ],
+            'compression_method' => '1',
+            'compression_level' => 5,
+            'filename_prefix' => 'backup-',
         ],
 
         'notifications' => [
