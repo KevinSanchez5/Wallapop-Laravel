@@ -50,27 +50,33 @@ class ProductoControllerView extends Controller
             $query->where('vendedor_id', '!=', $clienteId);
         }
 
-        if (request()->has('search') && request('search') !== '') {
-            $search = request('search');
-
+        // Búsqueda por nombre
+        $search = request('search', '');
+        if ($search !== '') {
             $normalizedSearch = Str::lower(Str::replace(
                 ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'],
                 ['a', 'e', 'i', 'o', 'u', 'a', 'e', 'i', 'o', 'u'],
                 $search
             ));
-
             Log::info('Realizando búsqueda con término normalizado', ['search' => $normalizedSearch]);
-
             $query->whereRaw("LOWER(REPLACE(nombre, 'á', 'a')) LIKE ?", ["%{$normalizedSearch}%"]);
         }
 
-        if (request()->has('categoria') && request('categoria') !== 'todos') {
-            $query->where('categoria', request('categoria'));
-            Log::info('Filtro por categoría aplicado', ['categoria' => request('categoria')]);
+        // Filtro por categoría (por defecto "todos")
+        $categoria = request('categoria', 'todos');
+        if ($categoria !== 'todos') {
+            $query->where('categoria', $categoria);
+            Log::info('Filtro por categoría aplicado', ['categoria' => $categoria]);
         }
 
-        $productos = $query->orderBy('updated_at', 'desc')->paginate(15);
+        // Filtro por precio con valores predeterminados
+        $precioMin = request('precio_min', 0);
+        $precioMax = request('precio_max', 999999);
+        $query->whereBetween('precio', [$precioMin, $precioMax]);
+        Log::info('Filtro por rango de precios aplicado', ['precio_min' => $precioMin, 'precio_max' => $precioMax]);
 
+        // Obtener productos y paginar
+        $productos = $query->orderBy('updated_at', 'desc')->paginate(15);
         Log::info('Productos cargados después de la búsqueda', ['total_productos' => $productos->count()]);
 
         return view('pages.home', compact('productos'));
