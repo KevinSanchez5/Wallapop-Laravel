@@ -327,8 +327,12 @@ class CarritoControllerView extends Controller
 
 
         Log::info('Buscando el perfil del cliente en la base de datos');
-        $cliente = $usuario->cliente;
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
+        if ($cliente == null) {
+            Log::warning("El cliente no se ha encontrado en la base de datos");
+            return redirect()->route('home')->with('error', 'No se ha encontrado un cliente asociado al usuario');
+        }
 
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));

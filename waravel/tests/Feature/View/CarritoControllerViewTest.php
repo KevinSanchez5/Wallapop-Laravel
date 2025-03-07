@@ -2,12 +2,15 @@
 
 namespace Tests\Feature\View;
 
+use App\Models\Carrito;
+use App\Models\Cliente;
+use App\Models\LineaCarrito;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use App\Models\Producto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Auth;
 
 class CarritoControllerViewTest extends TestCase
 {
@@ -15,7 +18,7 @@ class CarritoControllerViewTest extends TestCase
 
     public function test_show_cart()
     {
-        $response = $this->get(route('cart.show'));
+        $response = $this->get(route('carrito'));
         $response->assertStatus(200);
         $response->assertViewIs('pages.shoppingCart');
     }
@@ -24,90 +27,109 @@ class CarritoControllerViewTest extends TestCase
     {
         $producto = Producto::factory()->create();
 
-        Session::put('carrito', [
-            'lineasCarrito' => [[
+        Session::put('carrito',  new Carrito([
+            'lineasCarrito' => [ new LineaCarrito([
                 'producto' => $producto,
-                'cantidad' => 1,
-                'precioTotal' => $producto->precio,
-            ]],
-            'precioTotal' => $producto->precio,
-            'itemAmount' => 1
-        ]);
+                'cantidad' => 2,
+                'precioTotal' => $producto->precio * 2,
+            ])],
+            'precioTotal' => $producto->precio * 2,
+            'itemAmount' => 2
+        ]));
 
-        $response = $this->delete(route('cart.remove'), ['productId' => $producto->guid]);
+        $response = $this->delete(route('carrito.remove'), ['productId' => $producto->guid]);
 
-        $response->assertStatus(200);
-        $this->assertEquals(0, session('carrito')['precioTotal']);
+        $response->assertJson(['status' => 200]);
+        $this->assertEquals(0, session('carrito')->precioTotal);
     }
 
     public function test_delete_one_from_cart()
     {
         $producto = Producto::factory()->create();
 
-        Session::put('carrito', [
-            'lineasCarrito' => [[
+        Session::put('carrito', new Carrito([
+            'lineasCarrito' => [new LineaCarrito([
                 'producto' => $producto,
                 'cantidad' => 2,
                 'precioTotal' => $producto->precio * 2,
-            ]],
+            ])],
             'precioTotal' => $producto->precio * 2,
             'itemAmount' => 2
-        ]);
+        ]));
 
-        $response = $this->delete(route('cart.deleteOne'), ['productId' => $producto->guid]);
+        $response = $this->put(route('carrito.removeOne'), ['productId' => $producto->guid]);
 
-        $response->assertStatus(200);
-        $this->assertEquals($producto->precio, session('carrito')['precioTotal']);
+        $response->assertJson(['status' => 200]);
+        $this->assertEquals($producto->precio, session('carrito')->precioTotal);
     }
 
     public function test_add_one_to_cart()
     {
         $producto = Producto::factory()->create();
 
-        Session::put('carrito', [
-            'lineasCarrito' => [[
+        Session::put('carrito', new Carrito([
+            'lineasCarrito' => [new LineaCarrito([
                 'producto' => $producto,
                 'cantidad' => 1,
                 'precioTotal' => $producto->precio,
-            ]],
+            ])],
             'precioTotal' => $producto->precio,
             'itemAmount' => 1
-        ]);
+        ]));
 
-        $response = $this->post(route('cart.addOne'), ['productId' => $producto->guid]);
+        $response = $this->put(route('carrito.addOne'), ['productId' => $producto->guid]);
 
-        $response->assertStatus(200);
-        $this->assertEquals($producto->precio * 2, session('carrito')['precioTotal']);
+        $response->assertJson(['status' => 200]);
+        $this->assertEquals($producto->precio * 2, session('carrito')->precioTotal);
     }
 
     public function test_add_to_cart_or_edit()
     {
         $producto = Producto::factory()->create();
 
-        Session::put('carrito', [
+        Session::put('carrito', new Carrito([
             'lineasCarrito' => [],
             'precioTotal' => 0,
             'itemAmount' => 0
-        ]);
+        ]));
 
-        $response = $this->post(route('cart.addOrEdit'), ['productId' => $producto->guid, 'amount' => 2]);
+        $response = $this->post(route('carrito.add'), ['productId' => $producto->guid, 'amount' => 2]);
 
-        $response->assertStatus(200);
-        $this->assertEquals($producto->precio * 2, session('carrito')['precioTotal']);
+        $response->assertJson(['status' => 200]);
+        $this->assertEquals($producto->precio * 2, session('carrito')->precioTotal);
     }
 
     public function test_show_order()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(
+
+        );
+        $user->role = 'cliente';
         $this->actingAs($user);
 
-        Session::put('carrito', [
-            'lineasCarrito' => [],
-            'precioTotal' => 0
-        ]);
+        $client = Cliente::factory()->create(
+            [
+                'usuario_id' => $user->id
+            ]
+        );
 
-        $response = $this->get(route('cart.order'));
-        $response->assertStatus(200);
+        $producto = Producto::factory()->create(
+            [
+                'vendedor_id' => $client->id
+            ]
+        );
+
+        Session::put('carrito', new Carrito([
+            'lineasCarrito' => [new LineaCarrito([
+                'producto' => $producto,
+                'cantidad' => 1,
+                'precioTotal' => $producto->precio,
+            ])],
+            'precioTotal' => $producto->precio,
+            'itemAmount' => 1
+        ]));
+
+        $response = $this->get(route('carrito.checkout'));
         $response->assertViewIs('pages.orderSummary');
     }
 }
