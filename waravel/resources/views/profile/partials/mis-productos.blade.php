@@ -6,7 +6,7 @@
     <section>
         <div class="flex flex-wrap justify-center gap-4 mb-4">
             <button onclick="window.location.href='{{ route('profile.products') }}'"
-                    class="px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                    class="px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500] border border-black dark:border-white">
                 <b>Productos</b>
             </button>
             <button onclick="window.location.href='{{ route('profile.reviews') }}'"
@@ -21,7 +21,7 @@
                     class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
                 <b>Mis ventas</b>
             </button>
-            <button onclick="window.location.href='{{ route('profile.sales') }}'"
+            <button onclick="window.location.href='{{ route('profile.favorites') }}'"
                     class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
                 <b>Favoritos</b>
             </button>
