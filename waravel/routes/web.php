@@ -8,7 +8,6 @@ use App\Http\Controllers\Views\ProductoControllerView;
 use App\Http\Controllers\Views\ProfileControllerView;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\Views\ValoracionesControllerView;
-use App\Http\Controllers\Views\VentaControllerView;
 use App\Http\Middleware\AdminRoleAuth;
 use App\Http\Middleware\UserRoleAuth;
 use Illuminate\Support\Facades\Route;
