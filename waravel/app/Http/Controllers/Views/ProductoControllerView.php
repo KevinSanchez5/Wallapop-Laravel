@@ -98,7 +98,14 @@ class ProductoControllerView extends Controller
 
         Log::info('Producto encontrado', ['producto_id' => $producto->id]);
 
-        return view('pages.ver-producto', compact('producto'));
+        if (auth()->check()) {
+            $clienteAuth = auth()->user()->cliente;
+            $productoFavorito = $clienteAuth ? $clienteAuth->favoritos()->where('productos.id', $producto->id)->exists() : false;
+        } else {
+            $productoFavorito = false;
+        }
+
+        return view('pages.ver-producto', compact('producto', 'productoFavorito'));
     }
 
     public function store(Request $request)
