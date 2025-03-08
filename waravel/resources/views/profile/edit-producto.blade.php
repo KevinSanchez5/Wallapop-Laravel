@@ -133,11 +133,11 @@
     <x-footer />
 
     <!-- Toast de Confirmación -->
-    <div id="toast-confirm" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+    <div id="toast-confirm" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 12px; z-index: 9999">
         <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
             <span class="sr-only">Check icon</span>
         </div>
-        <div class="ms-3 text-md font-normal ml-5">¿Estás seguro de actualizar el producto?</div>
+        <div class="ms-3 text-md font-bold ml-5">¿Estás seguro de actualizar el producto?</div>
         <button type="button" onclick="submitForm()" class="ml-4 bg-[#A0D500] text-black px-3 py-1 rounded-md">Sí</button>
         <button type="button" onclick="hideToast()" class="ml-2 bg-gray-300 text-black px-3 py-1 rounded-md">No</button>
     </div>
