@@ -3,10 +3,10 @@ import 'cypress-file-upload';
 describe('Test de crear producto', () => {
     it('Debería crear un producto', () => {
         cy.visit('http://localhost');
-        cy.contains('Account').click();
+        cy.get('a[href="http://localhost/login"]').click();
         cy.url().should('include', '/login');
         cy.wait(1000);
-        cy.contains('Iniciar Sesión').should('be.visible');        
+        cy.contains('Iniciar Sesión').should('be.visible');
         cy.url().should('include', '/login');
         cy.get('input[name="email"]').type('juan@example.com');
         cy.get('input[name="password"]').type('Password123?');
@@ -23,7 +23,7 @@ describe('Test de crear producto', () => {
         // Llenar formulario
         cy.get('input[name="nombre"]').type('Producto de Prueba');
         cy.get('textarea[name="descripcion"]').type('Descripción del producto de prueba');
-        cy.contains('Nuevo').click(); 
+        cy.contains('Nuevo').click();
         cy.get('input[name="stock"]').type('100');
         cy.get('input[name="precio"]').type('10.5');
 

@@ -40,7 +40,7 @@
 
                     <div class="space-y-2">
                         <dl class="flex items-center justify-between gap-4">
-                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">Iva</dt>
+                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">IVA</dt>
                             <dd id="totalPrice" class="text-xl font-bold text-gray-500 dark:text-gray-400">{{ number_format($pedido->precioTotal - ($pedido->precioTotal / 1.21), 2) }} €</dd>
                         </dl>
                     </div>

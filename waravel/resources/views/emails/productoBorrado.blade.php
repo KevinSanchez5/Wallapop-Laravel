@@ -49,8 +49,8 @@
         <h2>Producto Baneado</h2>
     </div>
     <div class="content">
-        <p>Hola, <strong>{{ $usuario }}</strong>,</p>
-        <p>Te informamos que tu producto <strong>{{ $producto }}</strong> ha sido baneado de Waravel debido a un incumplimiento de nuestras normas.</p>
+        <p>Hola, <strong>{{ $usuario->name }}</strong>,</p>
+        <p>Te informamos que tu producto <strong>{{ $producto->nombre }}</strong> ha sido baneado de Waravel debido a un incumplimiento de nuestras normas.</p>
         <p>Si crees que esto ha sido un error o deseas más información, por favor, contáctanos.</p>
         <p>Gracias por tu comprensión.</p>
     </div>
