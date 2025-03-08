@@ -25,7 +25,11 @@ use Illuminate\Support\Facades\Validator;
 class ProfileControllerView extends Controller
 {
 
-    // Perfil por defecto con productos
+    /**
+     * Muestra el perfil del usuario con los productos asociados.
+     *
+     * @return \Illuminate\View\View
+     */
 
     public function show()
     {
@@ -50,7 +54,11 @@ class ProfileControllerView extends Controller
         return view('profile.partials.mis-productos', compact('cliente', 'productos'));
     }
 
-    // Valoraciones
+    /**
+     * Muestra las valoraciones realizadas sobre el perfil del usuario.
+     *
+     * @return \Illuminate\View\View
+     */
 
     public function showReviews(){
         Log::info('Accediendo a la página de valoraciones');
@@ -74,7 +82,11 @@ class ProfileControllerView extends Controller
         return view('profile.partials.valoraciones', compact('cliente', 'valoraciones'));
     }
 
-    // Mis Pedidos
+    /**
+     * Muestra los pedidos realizados por el usuario.
+     *
+     * @return \Illuminate\View\View
+     */
 
     public function showOrders(){
         Log::info('Accediendo a la página de pedidos');
@@ -97,6 +109,12 @@ class ProfileControllerView extends Controller
         Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
         return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
     }
+
+    /**
+     * Muestra los pedidos realizados por el usuario, filtrados por estado.
+     *
+     * @return \Illuminate\View\View
+     */
 
     public function showFilteredOrders(){
         Log::info('Accediendo a la página de pedidos');
@@ -125,7 +143,11 @@ class ProfileControllerView extends Controller
         return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
     }
 
-    // Mis ventas
+    /**
+     * Muestra las ventas realizadas por el usuario.
+     *
+     * @return \Illuminate\View\View
+     */
 
     public function showSales(){
         Log::info('Accediendo a la página de mis ventas');
@@ -148,6 +170,12 @@ class ProfileControllerView extends Controller
         Log::info('Ventas obtenidas correctamente, mostrando la vista de mis ventas');
         return view('profile.partials.mis-ventas', compact('cliente','ventas'));
     }
+
+    /**
+     * Muestra las ventas realizadas por el usuario, filtradas por estado.
+     *
+     * @return \Illuminate\View\View
+     */
 
     function showFilteredSales()
     {
@@ -176,6 +204,13 @@ class ProfileControllerView extends Controller
         Log::info('Ventas obtenidas correctamente, mostrando la vista de mis ventas filtradas');
         return view('profile.partials.mis-ventas', compact('cliente','ventas'));
     }
+
+    /**
+     * Muestra los detalles de una venta específica.
+     *
+     * @param string $guid El GUID de la venta.
+     * @return \Illuminate\View\View
+     */
 
     public function showSale($guid){
         Log::info('Accediendo a la página de detalle de una venta');
@@ -244,7 +279,18 @@ class ProfileControllerView extends Controller
         return view('profile.ver-venta', compact('venta', 'cliente', 'usuario', 'vendedor'));
     }
 
-    // Temporal
+    /**
+     * Muestra el detalle de un pedido específico.
+     *
+     * Esta función obtiene el perfil del cliente, busca un pedido en función
+     * del identificador GUID y verifica que el pedido le pertenezca al cliente
+     * antes de mostrar la vista correspondiente con la información del pedido.
+     *
+     * @param string $guid El identificador único del pedido.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @throws \Illuminate\Validation\ValidationException Si no se valida correctamente la entrada.
+     */
     public function showOrder($guid) {
         Log::info('Accediendo a la página de detalle del pedido');
 
@@ -280,6 +326,14 @@ class ProfileControllerView extends Controller
         return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario', 'valoracion'));
     }
 
+    /**
+     * Muestra los productos favoritos de un cliente autenticado.
+     *
+     * Esta función obtiene los productos favoritos del cliente y los muestra en la vista.
+     * Si el usuario no está autenticado, se redirige a la página de inicio de sesión.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
     public function showFavorites() {
         Log::info('Accediendo a la página de mis favoritos');
 
@@ -304,6 +358,15 @@ class ProfileControllerView extends Controller
         return view('profile.partials.mis-favoritos', compact('cliente','productosFavoritos'));
     }
 
+    /**
+     * Muestra la página de edición del perfil del cliente.
+     *
+     * Esta función busca el perfil del cliente y lo pasa a la vista de edición del perfil.
+     *
+     * @param \Illuminate\Http\Request $request La solicitud HTTP.
+     *
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
     public function edit(Request $request)
     {
         Log::info('Accediendo a la página de edición del perfil');
@@ -317,7 +380,17 @@ class ProfileControllerView extends Controller
 
         return view('profile.edit', compact('cliente'));
     }
-
+  
+    /**
+     * Actualiza el perfil del cliente en función de los datos proporcionados.
+     *
+     * Valida los datos del formulario y actualiza la información del usuario
+     * y del cliente. Si hay una imagen de avatar, también se sube y se asocia.
+     *
+     * @param \Illuminate\Http\Request $request Los datos de la solicitud.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request)
     {
         Log::info('Iniciando actualización del perfil del usuario');
@@ -380,6 +453,50 @@ class ProfileControllerView extends Controller
         return redirect()->route('profile')->with('success', 'Perfil actualizado correctamente.');
     }
 
+    /**
+     * Elimina la cuenta de un usuario después de verificar la contraseña.
+     *
+     * Este método realiza la validación de la contraseña del usuario y, si es válida,
+     * elimina la cuenta del usuario y cierra la sesión.
+     *
+     * @param Request $request Los datos de la solicitud.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirige al usuario a la página principal después de eliminar su cuenta.
+     */
+    public function destroy(Request $request)
+    {
+        Log::info('Iniciando proceso de eliminación de la cuenta');
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+        Log::info('Contraseña validada correctamente para la eliminación de la cuenta');
+
+        $user = $request->user();
+
+        Log::info('Desconectando al usuario');
+        Auth::logout();
+
+        Log::info('Eliminando la cuenta del usuario');
+        $user->delete();
+
+        Log::info('Cuenta de usuario eliminada de la base de datos');
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+
+    /**
+     * Cambia la contraseña del usuario autenticado.
+     *
+     * Este método valida la contraseña actual del usuario, y si es válida,
+     * actualiza la contraseña con una nueva proporcionada por el usuario.
+     *
+     * @param Request $request Los datos de la solicitud, incluidos el correo electrónico y las contraseñas.
+     *
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON indicando el resultado del cambio de contraseña.
+     */
     public function cambioContrasenya(Request $request)
     {
         Log::info('Iniciando cambio de contraseña');
@@ -443,6 +560,15 @@ class ProfileControllerView extends Controller
         return response()->json($response);
     }
 
+    /**
+     * Elimina el perfil de un usuario.
+     *
+     * Este método desconecta al usuario, envía un correo de eliminación y finalmente elimina el perfil.
+     *
+     * @param Request $request Los datos de la solicitud.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirige al usuario a la página principal después de eliminar su perfil.
+     */
     public function eliminarPerfil(Request $request)
     {
         Log::info('Iniciando proceso de eliminación del perfil');
@@ -466,7 +592,15 @@ class ProfileControllerView extends Controller
         return Redirect::to('/');
     }
 
-
+    /**
+     * Envía un correo de eliminación del perfil de usuario.
+     *
+     * Este método envía un correo electrónico al usuario notificando que su perfil será eliminado.
+     *
+     * @param Request $request Los datos de la solicitud.
+     *
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON indicando el éxito o error al enviar el correo.
+     */
     public function enviarCorreoEliminarPerfil(Request $request)
     {
         $user = $request->user();
@@ -493,7 +627,15 @@ class ProfileControllerView extends Controller
         ], 200);
     }
 
-
+    /**
+     * Busca un usuario por su correo electrónico.
+     *
+     * Este método busca un usuario en la base de datos usando su correo electrónico.
+     *
+     * @param string $email El correo electrónico del usuario a buscar.
+     *
+     * @return User|null El usuario encontrado o null si no se encuentra.
+     */
     public function findUserByEmail($email)
     {
         Log::info("Buscando usuario por email", ['email' => $email]);

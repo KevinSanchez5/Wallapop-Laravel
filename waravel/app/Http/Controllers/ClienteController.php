@@ -11,7 +11,11 @@ use Illuminate\Support\Facades\Redis;
 
 class ClienteController extends Controller
 {
-    // Mostrar todos los clientes
+    /**
+     * Muestra todos los clientes paginados.
+     *
+     * @return \Illuminate\Http\JsonResponse Lista de clientes con paginación.
+     */
     public function index()
     {
         $query = Cliente::orderBy('id', 'asc');
@@ -49,7 +53,12 @@ class ClienteController extends Controller
         return response()->json($customResponse);
     }
 
-    // Mostrar un cliente específico
+    /**
+     * Muestra un cliente específico por su GUID.
+     *
+     * @param string $guid GUID del cliente.
+     * @return \Illuminate\Http\JsonResponse Cliente encontrado o mensaje de error.
+     */
     public function show($guid)
     {
         Log::info('Buscando cliente de la cache en Redis');
@@ -72,7 +81,12 @@ class ClienteController extends Controller
         return response()->json($cliente);
     }
 
-    // Crear un nuevo cliente
+    /**
+     * Crea un nuevo cliente en la base de datos.
+     *
+     * @param Request $request Datos del cliente.
+     * @return \Illuminate\Http\JsonResponse Cliente creado o errores de validación.
+     */
     public function store(Request $request)
     {
         Log::info('Validando cliente');
@@ -105,7 +119,13 @@ class ClienteController extends Controller
         return response()->json($cliente, 201);
     }
 
-    // Actualizar un cliente existente
+    /**
+     * Actualiza los datos de un cliente específico.
+     *
+     * @param Request $request Datos a actualizar.
+     * @param string $guid GUID del cliente.
+     * @return \Illuminate\Http\JsonResponse Cliente actualizado o mensaje de error.
+     */
     public function update(Request $request, $guid)
     {
 
@@ -159,7 +179,12 @@ class ClienteController extends Controller
         return response()->json($clienteModel);
     }
 
-    // Eliminar un cliente
+    /**
+     * Elimina un cliente de la base de datos.
+     *
+     * @param string $guid GUID del cliente.
+     * @return \Illuminate\Http\JsonResponse Mensaje de éxito o error.
+     */
     public function destroy($guid)
     {
         Log::info('Buscando cliente en la caché de Redis');
@@ -194,7 +219,12 @@ class ClienteController extends Controller
         return response()->json(['message' => 'Cliente eliminado correctamente']);
     }
 
-    // Buscar favoritos
+    /**
+     * Busca los productos favoritos de un cliente.
+     *
+     * @param string $guid GUID del cliente.
+     * @return \Illuminate\Http\JsonResponse Lista de productos favoritos.
+     */
     public function searchFavorites($guid)
     {
         Log::info("Buscando favoritos para el cliente con Guid: {$guid}");
@@ -211,7 +241,13 @@ class ClienteController extends Controller
         return response()->json($favoritos);
     }
 
-    // Agregar un producto a favoritos
+    /**
+     * Agrega un producto a la lista de favoritos del cliente.
+     *
+     * @param Request $request Datos del producto.
+     * @param string $guid GUID del cliente.
+     * @return \Illuminate\Http\JsonResponse Mensaje de éxito o error.
+     */
     public function addToFavorites(Request $request, $guid)
     {
         Log::info("Intentando agregar un producto a favoritos para el cliente con Guid: {$guid}");
@@ -237,7 +273,13 @@ class ClienteController extends Controller
     }
 
 
-    // Quitar un producto de favoritos
+    /**
+     * Elimina un producto de la lista de favoritos del cliente.
+     *
+     * @param Request $request Datos del producto.
+     * @param string $guid GUID del cliente.
+     * @return \Illuminate\Http\JsonResponse Mensaje de éxito o error.
+     */
     public function removeFromFavorites(Request $request, $guid)
     {
         Log::info("Intentando eliminar un producto de favoritos para el cliente con Guid: {$guid}");
@@ -261,6 +303,14 @@ class ClienteController extends Controller
 
         return response()->json(['message' => 'Producto eliminado de favoritos']);
     }
+
+    /**
+     * Actualiza la foto de perfil de un cliente.
+     *
+     * @param Request $request Archivo de imagen.
+     * @param string $guid GUID del cliente.
+     * @return \Illuminate\Http\JsonResponse Mensaje de éxito o error.
+     */
 
     public function updateProfilePhoto(Request $request, $guid) {
         Log::info("Intentando actualizar la foto de perfil para el cliente con guid: {$guid}");

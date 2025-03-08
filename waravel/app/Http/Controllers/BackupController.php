@@ -10,7 +10,16 @@ use Illuminate\Support\Facades\File;
 
 class BackupController extends Controller
 {
+
+    /**
+     * @var string Directorio donde se almacenan los backups.
+     */
     private $backupPath = 'backups/';
+
+    /**
+     * Constructor de la clase BackupController.
+     * Verifica la existencia del directorio de backups y lo crea si no existe.
+     */
 
     public function __construct()
     {
@@ -23,6 +32,12 @@ class BackupController extends Controller
         }
     }
 
+    /**
+     * Obtiene una lista de todos los backups disponibles en el sistema.
+     *
+     * @return \Illuminate\Http\JsonResponse Lista de archivos de backup en formato JSON.
+     */
+
     public function getAllBackups()
     {
         Log::info('Buscando todos los archivos de copia de seguridad');
@@ -31,6 +46,12 @@ class BackupController extends Controller
         $backups = array_filter($files, fn($file) => !in_array($file, ['.', '..']) && is_file($directory . DIRECTORY_SEPARATOR . $file));
         return response()->json(array_values($backups));
     }
+
+    /**
+     * Crea una copia de seguridad de la base de datos y los archivos de almacenamiento.
+     *
+     * @return \Illuminate\Http\JsonResponse Respuesta indicando el éxito o error en la creación del backup.
+     */
 
     public function createBackup()
     {
@@ -62,6 +83,8 @@ class BackupController extends Controller
             return response()->json(['error' => 'Error al crear el backup de la base de datos'], 500);
         }
 
+        // Crear el archivo ZIP con el SQL y los archivos de almacenamiento
+
         $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
             $zip->addFile($sqlPath, $sqlFilename);
@@ -89,6 +112,13 @@ class BackupController extends Controller
         return response()->json(['message' => 'Backup creado', 'filename' => $zipFilename]);
     }
 
+    /**
+     * Elimina un archivo de backup específico.
+     *
+     * @param string $filename Nombre del archivo de backup a eliminar.
+     * @return \Illuminate\Http\JsonResponse Respuesta indicando el éxito o error en la eliminación.
+     */
+
     public function deleteBackup($filename)
     {
         Log::info('Borrando copia de seguridad: ' . $filename);
@@ -109,6 +139,12 @@ class BackupController extends Controller
 
         return response()->json(['error' => 'Backup no encontrado'], 404);
     }
+
+    /**
+     * Elimina todos los archivos de backup almacenados.
+     *
+     * @return \Illuminate\Http\JsonResponse Respuesta indicando el éxito o error en la eliminación de los backups.
+     */
 
 
     public function deleteAllBackups()
@@ -147,6 +183,13 @@ class BackupController extends Controller
 
         return response()->json(['error' => 'Algunos backups no se pudieron eliminar', 'details' => $errors], 500);
     }
+
+    /**
+     * Restaura un backup específico de la base de datos y archivos de almacenamiento.
+     *
+     * @param string $filename Nombre del archivo de backup a restaurar.
+     * @return \Illuminate\Http\JsonResponse Respuesta indicando el éxito o error en la restauración del backup.
+     */
 
     public function restoreBackup($filename)
     {

@@ -17,6 +17,12 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
+
+    /**
+     * Obtiene todos los usuarios paginados.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         $query = User::orderBy('id', 'asc');
@@ -48,6 +54,15 @@ class UserController extends Controller
         return response()->json($customResponse);
     }
 
+    /**
+     * Muestra los detalles de un usuario mediante su GUID.
+     * Si el usuario se encuentra en Redis, lo devuelve desde ahí.
+     * Si no, lo busca en la base de datos y lo almacena en Redis.
+     *
+     * @param string $guid
+     * @return \Illuminate\Http\JsonResponse
+     */
+
     public function show($guid)
     {
         Log::info("Buscando usuario con guid: {$guid}");
@@ -69,6 +84,14 @@ class UserController extends Controller
         return response()->json($user);
     }
 
+    /**
+     * Crea un nuevo usuario.
+     * Valida los datos de entrada y guarda el nuevo usuario en la base de datos.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+
     public function store(Request $request)
     {
         Log::info("Intentando crear un nuevo usuario");
@@ -86,6 +109,16 @@ class UserController extends Controller
         Log::info("Usuario creado exitosamente");
         return response()->json($user, 201);
     }
+
+    /**
+     * Actualiza los datos de un usuario existente.
+     * Si el usuario se encuentra en Redis, lo actualiza desde ahí.
+     * Si no, lo busca en la base de datos.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $guid
+     * @return \Illuminate\Http\JsonResponse
+     */
 
     public function update(Request $request, $guid)
     {
@@ -133,6 +166,14 @@ class UserController extends Controller
         return response()->json($userModel);
     }
 
+    /**
+     * Elimina un usuario de la base de datos.
+     * Si el usuario se encuentra en Redis, lo elimina desde ahí también.
+     *
+     * @param string $guid
+     * @return \Illuminate\Http\JsonResponse
+     */
+
     public function destroy($guid)
     {
         Log::info("Intentando eliminar usuario con ID: {$guid}");
@@ -164,6 +205,13 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User eliminado correctamente']);
     }
+
+    /**
+     * Envia un correo de recuperación de contraseña a un usuario.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
 
     public function enviarCorreoRecuperarContrasenya(Request $request)
     {
@@ -207,6 +255,13 @@ class UserController extends Controller
         ], 200);
     }
 
+    /**
+     * Verifica si el código ingresado para recuperar la contraseña es válido.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+
     public function verificarCodigoCambiarContrasenya(Request $request)
     {
         Log::info('Verificando código para cambiar la contraseña');
@@ -235,12 +290,28 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'Codigo verificado'], 200);
     }
 
+    /**
+     * Valida si un usuario existe por correo electrónico.
+     *
+     * @param string $email
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+
+
     public function validarEmail($request)
     {
         $user = $this->findUserByEmail($request);
 
         return response()->json(['exists' => $user !== null]);
     }
+
+    /**
+     * Busca un usuario por su correo electrónico.
+     *
+     * @param string $email
+     * @return User|null
+     */
 
     public function findUserByEmail($email)
     {
@@ -256,6 +327,16 @@ class UserController extends Controller
         Log::info("Usuario encontrado", ['email' => $email, 'user_id' => $user->id]);
         return $user;
     }
+
+    /**
+     * Cambia la contraseña del usuario.
+     *
+     * Este método valida la solicitud de cambio de contraseña, asegurando que el usuario exista y que las contraseñas nuevas coincidan.
+     * Si es exitoso, actualiza la contraseña en la base de datos.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
 
     public function cambioContrasenya(Request $request)
     {
@@ -313,6 +394,16 @@ class UserController extends Controller
         return response()->json($response);
     }
 
+    /**
+     * Inicia el proceso de eliminación del perfil del usuario.
+     *
+     * Este método envía un correo de eliminación de la cuenta, cierra la sesión del usuario,
+     * elimina el perfil de la base de datos y invalida la sesión.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+
     public function eliminarPerfil(Request $request)
     {
         Log::info('Iniciando proceso de eliminación del perfil');
@@ -336,6 +427,12 @@ class UserController extends Controller
         return response()->json($request);
     }
 
+    /**
+     * Envía un correo al usuario notificándole sobre la eliminación de su perfil.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function enviarCorreoEliminarPerfil(Request $request)
     {
         $user = $request->user();

@@ -13,6 +13,18 @@ use Illuminate\Support\Facades\Validator;
 
 class ValoracionesControllerView extends Controller
 {
+
+    /**
+     * Muestra la página para escribir una valoración de un pedido.
+     *
+     * Este método verifica que el cliente haya realizado el pedido, que el pedido
+     * esté entregado y que aún no haya realizado una valoración.
+     *
+     * @param string $guid El identificador único del pedido.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View Redirige a la página de escritura de la valoración
+     * o muestra un error si el cliente no cumple con los requisitos.
+     */
     public function writeReview($guid){
         Log::info('Accediendo a la página de detalle del pedido');
 
@@ -52,6 +64,18 @@ class ValoracionesControllerView extends Controller
 
         return view('pages.write-review', compact('cliente', 'usuario', 'pedido'));
     }
+
+    /**
+     * Almacena una nueva valoración para un pedido.
+     *
+     * Este método valida los datos de la valoración y guarda la valoración para cada
+     * vendedor del pedido realizado por el cliente.
+     *
+     * @param Request $request Los datos de la solicitud (comentario y calificación).
+     * @param string $guid El identificador único del pedido.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirige al detalle del pedido con la nueva valoración.
+     */
 
     public function storeReview(Request $request, $guid){
         Log::info('Intentando crear una nueva valoración');
