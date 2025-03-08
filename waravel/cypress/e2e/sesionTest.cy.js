@@ -30,6 +30,6 @@ describe('Usuario ya tiene cuenta', () => {
         cy.contains('Ver más').first().click();
 
         cy.url().should('include', '/producto');
-        cy.contains('Portátil Gamer');
+        cy.contains('Producto de Prueba');
     })
 });

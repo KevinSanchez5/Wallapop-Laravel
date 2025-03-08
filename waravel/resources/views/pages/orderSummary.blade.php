@@ -78,7 +78,7 @@
 
                     <div class="space-y-2 mb-4">
                         <dl class="flex items-center justify-between gap-4">
-                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">Iva (21%)</dt>
+                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">IVA (21%)</dt>
                             <dd id="ivaAmount" class="text-xl font-normal text-gray-500 dark:text-gray-400">
                                 {{ number_format($cart->precioTotal - ($cart->precioTotal / 1.21), 2) }} €
                             </dd>

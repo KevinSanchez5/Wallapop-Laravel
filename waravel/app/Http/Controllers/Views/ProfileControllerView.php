@@ -264,10 +264,6 @@ class ProfileControllerView extends Controller
     public function showOrder($guid) {
         Log::info('Accediendo a la página de detalle del pedido');
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus pedidos.');
-        }
-
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
@@ -295,7 +291,7 @@ class ProfileControllerView extends Controller
 
         Log::info('Pedido válido y pertenece al cliente, mostrando la vista de detalle del pedido');
 
-        $valoracion = $pedido->valoracion;
+        $valoracion = Valoracion::where('venta_id', $pedido->id)->first();
 
         return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario', 'valoracion'));
     }
