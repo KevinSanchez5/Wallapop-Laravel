@@ -295,7 +295,9 @@ class ProfileControllerView extends Controller
 
         Log::info('Pedido válido y pertenece al cliente, mostrando la vista de detalle del pedido');
 
-        return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario'));
+        $valoracion = $pedido->valoracion;
+
+        return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario', 'valoracion'));
     }
 
     public function showFavorites() {
