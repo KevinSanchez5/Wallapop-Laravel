@@ -37,6 +37,7 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
     Route::patch('/profile/changePassword', [ProfileControllerView::class, 'cambioContrasenya'])->name('profile.change.password');
     Route::delete('/profile', [ProfileControllerView::class, 'eliminarPerfil'])->name('profile.destroy.profile');
+    Route::get('/profile/find-user/{email}', [ProfileControllerView::class, 'findUserByEmail'])->name('profile.find-user');
 
     // Gestión de productos
     Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');

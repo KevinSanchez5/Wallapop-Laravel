@@ -260,6 +260,17 @@ class ProfileControllerView extends Controller
         Log::info('El cliente es válido, buscando su usuario');
         $usuario = User::find($cliente->usuario_id);
 
+        $found = false;
+        $lineaVentas = json_decode($venta->lineaVentas, true);
+
+        foreach ($lineaVentas as $lineaVenta) {
+            if (isset($lineaVenta['vendedor']['id']) && $lineaVenta['vendedor']['id'] === $vendedor->id) {
+                Log::info('La línea de venta pertenece al vendedor');
+                $found = true;
+                break;
+            }
+        }
+
         if (!$found) {
             Log::error('La venta no le pertenece al cliente.');
             return redirect()->route('profile')->with('error', 'No tienes permisos para ver esta venta.');
@@ -323,7 +334,6 @@ class ProfileControllerView extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-
     public function showFavorites() {
         Log::info('Accediendo a la página de mis favoritos');
 
@@ -357,7 +367,6 @@ class ProfileControllerView extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-
     public function edit(Request $request)
     {
         Log::info('Accediendo a la página de edición del perfil');
@@ -371,6 +380,7 @@ class ProfileControllerView extends Controller
 
         return view('profile.edit', compact('cliente'));
     }
+  
     /**
      * Actualiza el perfil del cliente en función de los datos proporcionados.
      *
@@ -381,8 +391,6 @@ class ProfileControllerView extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-
-
     public function update(Request $request)
     {
         Log::info('Iniciando actualización del perfil del usuario');
@@ -455,7 +463,6 @@ class ProfileControllerView extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse Redirige al usuario a la página principal después de eliminar su cuenta.
      */
-
     public function destroy(Request $request)
     {
         Log::info('Iniciando proceso de eliminación de la cuenta');
@@ -490,7 +497,6 @@ class ProfileControllerView extends Controller
      *
      * @return \Illuminate\Http\JsonResponse Respuesta JSON indicando el resultado del cambio de contraseña.
      */
-
     public function cambioContrasenya(Request $request)
     {
         Log::info('Iniciando cambio de contraseña');
@@ -563,7 +569,6 @@ class ProfileControllerView extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse Redirige al usuario a la página principal después de eliminar su perfil.
      */
-
     public function eliminarPerfil(Request $request)
     {
         Log::info('Iniciando proceso de eliminación del perfil');
@@ -596,8 +601,6 @@ class ProfileControllerView extends Controller
      *
      * @return \Illuminate\Http\JsonResponse Respuesta JSON indicando el éxito o error al enviar el correo.
      */
-
-
     public function enviarCorreoEliminarPerfil(Request $request)
     {
         $user = $request->user();
@@ -633,8 +636,6 @@ class ProfileControllerView extends Controller
      *
      * @return User|null El usuario encontrado o null si no se encuentra.
      */
-
-
     public function findUserByEmail($email)
     {
         Log::info("Buscando usuario por email", ['email' => $email]);

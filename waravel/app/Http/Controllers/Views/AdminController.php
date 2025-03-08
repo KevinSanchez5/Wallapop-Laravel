@@ -84,10 +84,6 @@ class AdminController extends Controller
         $resultCode = null;
         exec($command, $output, $resultCode);
 
-        if ($resultCode !== 0) {
-            return response()->json(['error' => 'Error al crear el backup de la base de datos'], 500);
-        }
-
         $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
             $zip->addFile($sqlPath, $sqlFilename);
@@ -124,7 +120,7 @@ class AdminController extends Controller
         $response = $this->createBackup();
 
         if ($response->status() !== 200) {
-            return redirect()->back()->with('error', 'Error al crear el backup.');
+            return redirect()->back()->with('error', 'Error al crear el backup de la base de datos');
         }
 
         $data = $response->getData();
@@ -143,7 +139,6 @@ class AdminController extends Controller
      *
      * @return \Illuminate\View\View Vista con la lista de clientes filtrada.
      */
-
     public function listClients()
     {
         Log::info('Obteniendo clientes cuyo usuario tiene el rol de cliente');
@@ -258,8 +253,6 @@ class AdminController extends Controller
             'role' => 'admin',
         ]);
 
-        Log::info("Administrador añadido correctamente: {$admin->email}");
-
         return response()->json(['message' => 'Administrador agregado con éxito.', 'admin' => $admin], 201);
     }
 
@@ -289,16 +282,9 @@ class AdminController extends Controller
         // Enviamos el email
         $user = User::find($producto->vendedor->usuario_id);
 
-        try {
-            Mail::to($user->email)->send(new EmailSender($user, null, $producto, 'productoBorrado'));
-            Log::info('Correo de aviso enviado', ['email' => $user->email]);
-        } catch(\Exception $e) {
-            Log::error('Error al enviar el correo de aviso', [
-                'email' => $user->email,
-                'exception' => $e->getMessage()
-            ]);
-            return response()->json(['error' => $e->getMessage()], 503);
-        }
+        Mail::to($user->email)->send(new EmailSender($user, null, $producto, 'productoBorrado'));
+        Log::info('Correo de aviso enviado', ['email' => $user->email]);
+
         // Retornar a la vista de productos con un mensaje de éxito
         Log::info("Redireccionando a la vista de productos");
         return redirect()->route('admin.products')->with('success', 'Producto baneado correctamente.');
@@ -377,8 +363,6 @@ class AdminController extends Controller
             $admin->delete();
             return redirect()->route('admin.dashboard')->with('success', 'Administrador eliminado.');
         } else {
-            Log::warning('Intento de eliminar un administrador que no existe. GUID: ' . $guid);
-
             return redirect()->route('admin.dashboard')->with('error', 'Administrador no encontrado.');
         }
     }
