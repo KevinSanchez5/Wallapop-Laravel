@@ -225,6 +225,17 @@ class ProfileControllerView extends Controller
         Log::info('El cliente es válido, buscando su usuario');
         $usuario = User::find($cliente->usuario_id);
 
+        $found = false;
+        $lineaVentas = json_decode($venta->lineaVentas, true);
+
+        foreach ($lineaVentas as $lineaVenta) {
+            if (isset($lineaVenta['vendedor']['id']) && $lineaVenta['vendedor']['id'] === $vendedor->id) {
+                Log::info('La línea de venta pertenece al vendedor');
+                $found = true;
+                break;
+            }
+        }
+
         if (!$found) {
             Log::error('La venta no le pertenece al cliente.');
             return redirect()->route('profile')->with('error', 'No tienes permisos para ver esta venta.');
@@ -367,30 +378,6 @@ class ProfileControllerView extends Controller
 
         Log::info('Perfil actualizado correctamente');
         return redirect()->route('profile')->with('success', 'Perfil actualizado correctamente.');
-    }
-
-    public function destroy(Request $request)
-    {
-        Log::info('Iniciando proceso de eliminación de la cuenta');
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-        Log::info('Contraseña validada correctamente para la eliminación de la cuenta');
-
-        $user = $request->user();
-
-        Log::info('Desconectando al usuario');
-        Auth::logout();
-
-        Log::info('Eliminando la cuenta del usuario');
-        $user->delete();
-
-        Log::info('Cuenta de usuario eliminada de la base de datos');
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
     }
 
     public function cambioContrasenya(Request $request)
