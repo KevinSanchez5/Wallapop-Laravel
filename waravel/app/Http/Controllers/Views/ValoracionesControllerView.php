@@ -26,10 +26,7 @@ class ValoracionesControllerView extends Controller
             return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
-        Log::info('Perfil del cliente encontrado, obteniendo pedidos');
-
         Log::info('Buscando la venta');
-
         $pedido = Venta::where('guid', $guid)->first();
 
         if (!$pedido) {
@@ -75,20 +72,21 @@ class ValoracionesControllerView extends Controller
             return redirect()->route('profile')->with('error', 'No se ha encontrado el pedido.');
         }
 
+        Log::info('Buscando la valoración del pedido');
         $valoracionExistente = Valoracion::where('venta_id', $pedido->id)->first();
 
         if ($valoracionExistente) {
-            return redirect()->back()->with('error', 'Ya has realizado una valoración en este pedido.');
+            return redirect(route('order.detail', $pedido->guid))->with('error', 'Ya has realizado una valoración en este pedido.');
+        }
+
+        if ($cliente->id !== $pedido->comprador->id) {
+            Log::error('El cliente no es el mismo que realizó el pedido.');
+            return redirect(route('profile'))->with('error', 'No tienes permisos para escribir una valoración en este pedido.');
         }
 
         if ($pedido->estado != 'Entregado'){
             Log::error('El pedido no está en estado entregado.');
-            return redirect()->back()->with('error', 'No puedes escribir una valoración en un pedido que no ha sido entregado.');
-        }
-
-        if ($cliente->id!== $pedido->comprador->id) {
-            Log::error('El cliente no es el mismo que realizó el pedido.');
-            return redirect()->back()->with('error', 'No tienes permisos para escribir una valoración en este pedido.');
+            return redirect(route('order.detail', $pedido->guid))->with('error', 'No puedes escribir una valoración en un pedido que no ha sido entregado.');
         }
 
         // Validación de los datos de la valoración
@@ -103,7 +101,7 @@ class ValoracionesControllerView extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator->errors())->withInput();
+            return redirect(route('write.review', $pedido->guid))->withErrors($validator->errors())->withInput();
         }
 
         $comment = $request->get('comment');

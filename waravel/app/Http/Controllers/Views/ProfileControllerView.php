@@ -30,9 +30,7 @@ class ProfileControllerView extends Controller
     public function show()
     {
         Log::info('Accediendo a la página de perfil');
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tu perfil.');
-        }
+
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
@@ -40,7 +38,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
         Log::info('Perfil del cliente encontrado, obteniendo productos');
         $query = Producto::where('vendedor_id', $cliente->id);
@@ -57,10 +55,6 @@ class ProfileControllerView extends Controller
     public function showReviews(){
         Log::info('Accediendo a la página de valoraciones');
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus valoraciones.');
-        }
-
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
@@ -68,7 +62,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo valoraciones');
@@ -85,10 +79,6 @@ class ProfileControllerView extends Controller
     public function showOrders(){
         Log::info('Accediendo a la página de pedidos');
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus pedidos.');
-        }
-
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
@@ -96,7 +86,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
@@ -111,10 +101,6 @@ class ProfileControllerView extends Controller
     public function showFilteredOrders(){
         Log::info('Accediendo a la página de pedidos');
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus pedidos.');
-        }
-
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
@@ -122,7 +108,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
@@ -144,10 +130,6 @@ class ProfileControllerView extends Controller
     public function showSales(){
         Log::info('Accediendo a la página de mis ventas');
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus ventas.');
-        }
-
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
@@ -155,7 +137,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo ventas');
@@ -174,10 +156,6 @@ class ProfileControllerView extends Controller
     {
         Log::info('Accediendo a la página de mis ventas filtradas');
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus ventas.');
-        }
-
         Log::info('Autenticando usuario');
         $usuario = Auth::user();
 
@@ -185,7 +163,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo ventas');
@@ -216,7 +194,7 @@ class ProfileControllerView extends Controller
         $vendedor = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$vendedor) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo ventas');
@@ -271,7 +249,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
@@ -310,7 +288,7 @@ class ProfileControllerView extends Controller
         $cliente = Cliente::where('usuario_id', $usuario->id)->first();
 
         if (!$cliente) {
-            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+            return redirect()->route('pages.home')->with('error', 'No se ha encontrado el perfil del cliente.');
         }
 
         Log::info('Perfil del cliente encontrado, obteniendo favoritos');

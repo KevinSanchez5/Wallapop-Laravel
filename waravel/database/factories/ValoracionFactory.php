@@ -2,23 +2,25 @@
 
 namespace Database\Factories;
 
-use App\Models\Producto;
-use App\Models\User;
+use App\Models\Cliente;
 use App\Models\Valoracion;
-use Faker\Factory;
+use App\Utils\GuidGenerator;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ValoracionFactory extends Factory
 {
     protected $model = Valoracion::class;
-    private $faker;
 
     public function definition()
     {
         return [
-            'producto_id' => Producto::factory(),
-            'user_id' => User::factory(),
-            'puntuacion' => $this->faker->numberBetween(1, 5),
+            'guid' => GuidGenerator::generarId(),
             'comentario' => $this->faker->sentence(),
+            'puntuacion' => $this->faker->numberBetween(1, 5),
+            'clienteValorado_id' => Cliente::factory()->create(),
+            'autor_id' => Cliente::factory()->create(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }
