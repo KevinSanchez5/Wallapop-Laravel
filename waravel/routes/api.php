@@ -56,7 +56,7 @@ Route::middleware('api')->group(function () {
     Route::post('/ventas', [VentaController::class, 'store']);
     Route::put('/ventas/{guid}', [VentaController::class, 'update']);
     Route::delete('/ventas/{guid}', [VentaController::class, 'destroy']);
-
+    Route::get('/venta/{guid}/pdf', [VentaController::class, 'generatePdf'])->name('pdf.venta');
 
     Route::get('/backups', [BackupController::class, 'getAllBackups']);
     Route::post('/backups/create', [BackupController::class, 'createBackup']);
