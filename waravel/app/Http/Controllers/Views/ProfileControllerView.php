@@ -92,7 +92,7 @@ class ProfileControllerView extends Controller
         Log::info('Perfil del cliente encontrado, obteniendo pedidos');
         $query = Venta::where('comprador->id',$cliente->id);
 
-        $pedidos = $query->orderBy('created_at', 'desc')->paginate(6);
+        $pedidos = $query->orderBy('created_at', 'desc')->paginate(7);
 
         Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
         return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
@@ -119,7 +119,7 @@ class ProfileControllerView extends Controller
             Log::info('Filtro por estado aplicado', ['estado' => request('estado')]);
         }
 
-        $pedidos = $query->orderBy('created_at', 'desc')->paginate(6);
+        $pedidos = $query->orderBy('created_at', 'desc')->paginate(7);
 
         Log::info('Pedidos obtenidos correctamente, mostrando la vista de pedidos');
         return view('profile.partials.mis-pedidos', compact('cliente', 'pedidos'));
@@ -143,7 +143,7 @@ class ProfileControllerView extends Controller
         Log::info('Perfil del cliente encontrado, obteniendo ventas');
         $query = Venta::whereJsonContains('lineaVentas', [['vendedor' => ['id' => $cliente->id]]]);
 
-        $ventas = $query->orderBy('created_at', 'desc')->paginate(6);
+        $ventas = $query->orderBy('created_at', 'desc')->paginate(7);
 
         Log::info('Ventas obtenidas correctamente, mostrando la vista de mis ventas');
         return view('profile.partials.mis-ventas', compact('cliente','ventas'));
@@ -171,7 +171,7 @@ class ProfileControllerView extends Controller
             Log::info('Filtro por estado aplicado', ['estado' => request('estado')]);
         }
 
-        $ventas = $query->orderBy('created_at', 'desc')->paginate(6);
+        $ventas = $query->orderBy('created_at', 'desc')->paginate(7);
 
         Log::info('Ventas obtenidas correctamente, mostrando la vista de mis ventas filtradas');
         return view('profile.partials.mis-ventas', compact('cliente','ventas'));
