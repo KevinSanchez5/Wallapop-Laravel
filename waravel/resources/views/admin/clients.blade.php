@@ -32,12 +32,13 @@
                     <td class="py-2 px-4 capitalize">{{ $cliente->usuario->role }}</td>
                     <td class="py-2 px-4">{{ $cliente->productos_count }}</td>
                     <td class="py-2 px-4">
-                        <form action="{{route('admin.delete.client', $cliente->guid)}}" method="POST">
+                        <button type="button" onclick="showDeleteToast('{{ $cliente->guid }}')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300">
+                            Eliminar
+                        </button>
+
+                        <form id="delete-form-{{ $cliente->guid }}" action="{{ route('admin.delete.client', $cliente->guid) }}" method="POST" class="hidden">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300">
-                                Eliminar
-                            </button>
                         </form>
                     </td>
                 </tr>
@@ -45,9 +46,43 @@
             </tbody>
         </table>
 
+        <!-- Toast de Confirmación para Eliminar Cliente -->
+        <div id="toast-confirm-delete" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-red-400 transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 12px; z-index: 9999">
+            <div class="ms-3 text-md font-bold ml-5">¿Estás seguro de eliminar este cliente?</div>
+            <button type="button" onclick="confirmDelete()" class="ml-4 bg-red-600 text-white px-3 py-1 rounded-md">Sí</button>
+            <button type="button" onclick="hideToast('toast-confirm-delete')" class="ml-2 bg-gray-300 text-black px-3 py-1 rounded-md">No</button>
+        </div>
+
         <!-- Paginación -->
         <div class="mt-6">
             {{ $clientes->links() }}
         </div>
     </div>
+    <script>
+        let clienteAEliminar = null;
+
+        function showDeleteToast(clienteId) {
+            clienteAEliminar = clienteId;
+            let toast = document.getElementById("toast-confirm-delete");
+            toast.classList.remove("hidden");
+            setTimeout(() => {
+                toast.classList.remove("opacity-0");
+            }, 100);
+        }
+
+        function confirmDelete() {
+            if (clienteAEliminar) {
+                document.getElementById(`delete-form-${clienteAEliminar}`).submit();
+            }
+        }
+
+        function hideToast(id) {
+            let toast = document.getElementById(id);
+            toast.classList.add("opacity-0");
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 500);
+        }
+    </script>
+
 @endsection
