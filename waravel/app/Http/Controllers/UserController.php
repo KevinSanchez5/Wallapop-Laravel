@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Mail\EmailSender;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -15,7 +17,8 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $query = User::orderBy('id', 'asc');
         $users = $query->paginate(5);
         Log::info("Obteniendo todos los usuarios desde la base de datos");
@@ -48,17 +51,19 @@ class UserController extends Controller
     public function show($guid)
     {
         Log::info("Buscando usuario con guid: {$guid}");
-        $userRedis = Redis::get('user_'.$guid);
-        if($userRedis) {
+        $userRedis = Redis::get('user_' . $guid);
+        if ($userRedis) {
             Log::info("Usuario obtenido desde Redis");
             return response()->json(json_decode($userRedis));
         }
         Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-        $user = User::where('guid', $guid)->firstOrFail();
+        $user = User::where('guid', $guid)->first();
 
-        if(!$user) {
+        if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
+
+        Redis::set('user_' . $guid, json_encode($user), 'EX', 1800);
 
         Log::info("Usuario encontrado", ['user_guid' => $guid]);
         return response()->json($user);
@@ -85,13 +90,13 @@ class UserController extends Controller
     public function update(Request $request, $guid)
     {
         Log::info("Intentando actualizar usuario con guid: {$guid}");
-        $user = Redis::get('user_'. $guid);
-        if(!$user) {
+        $user = Redis::get('user_' . $guid);
+        if (!$user) {
             Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-            $user = User::where('guid', $guid)->firstOrFail();
+            $user = User::where('guid', $guid)->first();
         }
 
-        if(!$user) {
+        if (!$user) {
             return response()->json(['message' => 'User no encontrado'], 404);
         }
 
@@ -112,7 +117,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             Log::info("Error de validación al actualizar usuario", ['errors' => $validator->errors()]);
             return response()->json([
-                'message'=> 'Error de validación',
+                'message' => 'Error de validación',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -120,8 +125,8 @@ class UserController extends Controller
         Log::info("Actualizando el usuario con guid: {$guid}");
 
         $userModel->update($request->all());
-        Redis::del('user_'. $guid);
-        Redis::set('user_'. $guid, json_encode($userModel), 'EX',1800);
+        Redis::del('user_' . $guid);
+        Redis::set('user_' . $guid, json_encode($userModel), 'EX', 1800);
 
         Log::info("Usuario actualizado exitosamente");
 
@@ -137,10 +142,10 @@ class UserController extends Controller
             Log::info("Usuario encontrado en Redis");
         } else {
             Log::info("Usuario no encontrado en Redis, buscando en la base de datos");
-            $user = User::where('guid',$guid)->firstOrFail();
+            $user = User::where('guid',$guid)->first();
         }
 
-        if(!$user) {
+        if (!$user) {
             return response()->json(['message' => 'User no encontrado'], 404);
         }
 
@@ -153,7 +158,7 @@ class UserController extends Controller
         Log::info("Eliminando el usuario con guid: {$guid}");
         $userModel->delete();
 
-        Redis::del('user_'. $guid);
+        Redis::del('user_' . $guid);
 
         Log::info("Usuario eliminado correctamente", ['user_guid' => $guid]);
 
@@ -173,6 +178,11 @@ class UserController extends Controller
         Log::info('Buscando usuario por email', ['email' => $email]);
         $user = $this->findUserByEmail($email);
 
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
         $codigo = strtoupper(Str::random(10));
         $user->password_reset_token = Hash::make($codigo);
         $user->password_reset_expires_at = now()->addMinutes(5);
@@ -183,12 +193,12 @@ class UserController extends Controller
         try {
             Mail::to($user->email)->send(new EmailSender($user, $codigo, null, 'recuperarContrasenya'));
             Log::info('Correo de recuperación enviado', ['email' => $user->email]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Error al enviar el correo de recuperación', [
                 'email' => $user->email,
                 'exception' => $e->getMessage()
             ]);
-            return response()->json(['error' => $e->getMessage()], 503);//fallo al enviar email
+            return response()->json(['error' => $e->getMessage()], 503);
         }
 
         return response()->json([
@@ -197,7 +207,8 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function verificarCodigoCambiarContrasenya(Request $request){
+    public function verificarCodigoCambiarContrasenya(Request $request)
+    {
         Log::info('Verificando código para cambiar la contraseña');
 
         $request->validate([
@@ -210,18 +221,18 @@ class UserController extends Controller
 
         $user = $this->findUserByEmail($email);
 
-        if(!Hash::check($codigo, $user->password_reset_token)){
+        if (!Hash::check($codigo, $user->password_reset_token)) {
             Log::warning('Codigo incorrecto ingresado');
-            return response()->json(['success'=>false, 'message' => 'Ha ingresado un codigo incorrecto'], 403);
+            return response()->json(['success' => false, 'message' => 'Ha ingresado un codigo incorrecto'], 403);
         }
 
-        if($user->password_reset_expires_at < now()){
+        if ($user->password_reset_expires_at < now()) {
             Log::warning('Codigo expirado');
-            return response()->json(['success'=>false, 'message' => 'Código para recuperar contraseña expirado'], 403);
+            return response()->json(['success' => false, 'message' => 'Código para recuperar contraseña expirado'], 403);
         }
 
         Log::info('Código de recuperación verificado correctamente', ['email' => $user->email]);
-        return response()->json(['success' => true, 'message'=>'Codigo verificado'], 200);
+        return response()->json(['success' => true, 'message' => 'Codigo verificado'], 200);
     }
 
     public function validarEmail($request)
@@ -239,10 +250,115 @@ class UserController extends Controller
 
         if (!$user) {
             Log::warning('Usuario no encontrado', ['email' => $email]);
-            return response()->json(['message' => 'User not found'], 404);
+            return null;
         }
 
         Log::info("Usuario encontrado", ['email' => $email, 'user_id' => $user->id]);
         return $user;
+    }
+
+    public function cambioContrasenya(Request $request)
+    {
+        Log::info('Iniciando cambio de contraseña');
+
+        Log::info('Validando cambio de contraseña');
+        Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255|exists:users,email',
+            'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+            'newPassword' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+            'confirmPassword' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+        ]);
+
+        Log::info('Validación completada con éxito');
+
+        $email = $request->email;
+        $password = $request->newPassword;
+
+        Log::info('Buscando usuario por email', ['email' => $email]);
+        $user = User::where('email', $email)->first();
+
+        $response = ['success' => false, 'message' => ''];
+
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            $response['message'] = 'Usuario no encontrado';
+            return response()->json($response, 404);
+        }
+
+        if ($request->newPassword !== $request->confirmPassword) {
+            Log::warning('Las contraseñas no coinciden', ['email' => $email]);
+            $response['message'] = 'Las contraseñas no coinciden';
+            return response()->json($response, 400);
+        }
+
+        Log::info('Actualizando la contraseña');
+        try {
+            $user->password = Hash::make($password);
+            $user->password_reset_token = null;
+            $user->password_reset_expires_at = null;
+            $user->updated_at = now();
+            $user->save();
+
+            Log::info('Contraseña actualizada exitosamente', ['email' => $user->email]);
+
+            $response['success'] = true;
+            $response['message'] = 'Contraseña cambiada con éxito';
+            $response['user'] = $user;
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar la contraseña', ['error' => $e->getMessage()]);
+            $response['message'] = 'Hubo un error al cambiar la contraseña';
+            return response()->json($response, 500);
+        }
+
+        return response()->json($response);
+    }
+
+    public function eliminarPerfil(Request $request)
+    {
+        Log::info('Iniciando proceso de eliminación del perfil');
+
+        $user = $request->user();
+
+        Log::info('Enviando correo de eliminación antes de cerrar sesión');
+        $this->enviarCorreoEliminarPerfil($request);
+
+        Log::info('Desconectando al usuario');
+        Auth::logout();
+
+        Log::info('Eliminando el perfil del usuario');
+        $user->delete();
+
+        Log::info('Perfil de usuario eliminado de la base de datos');
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json($request);
+    }
+
+    public function enviarCorreoEliminarPerfil(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            Log::warning('Usuario no autenticado');
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        try {
+            Mail::to($user->email)->send(new EmailSender($user, null, null, 'eliminarPerfil'));
+            Log::info('Correo de eliminación enviado', ['email' => $user->email]);
+        } catch (\Exception $e) {
+            Log::error('Error al enviar el correo de eliminación', [
+                'email' => $user->email,
+                'exception' => $e->getMessage()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 503);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo enviado correctamente',
+        ], 200);
     }
 }

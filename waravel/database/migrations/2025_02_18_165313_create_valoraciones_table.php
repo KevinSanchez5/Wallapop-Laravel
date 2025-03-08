@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('puntuacion');
             $table->foreignId('clienteValorado_id')->constrained('clientes')->onDelete('cascade');
             $table->foreignId('autor_id')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('venta_id')->nullable()->constrained('ventas')->onDelete('cascade');
             $table->timestamps();
         });
     }

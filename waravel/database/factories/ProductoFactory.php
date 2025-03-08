@@ -4,7 +4,10 @@ namespace Database\Factories;
 
 use App\Models\Cliente;
 use App\Models\Producto;
+use App\Models\User;
+use App\Utils\GuidGenerator;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ProductoFactory extends Factory
 {
@@ -12,18 +15,21 @@ class ProductoFactory extends Factory
 
     public function definition()
     {
-        $cliente = Cliente::factory()->create();
-
+        $vendedor = Cliente::factory()->create();
         return [
-            'guid' => $this->faker->uuid,
-            'vendedor_id' => $cliente->id,
-            'nombre' => $this->faker->word,
-            'descripcion' => $this->faker->sentence,
-            'estadoFisico' => $this->faker->randomElement(['Nuevo', 'Usado', 'Deteriorado']),
-            'precio' => $this->faker->randomFloat(2, 10, 1000),
-            'categoria' => $this->faker->randomElement(['Tecnologia', 'Ropa', 'Hogar', 'Coleccionismo', 'Vehiculos', 'Videojuegos', 'Musica', 'Deporte', 'Cine', 'Cocina']),
-            'estado' => $this->faker->randomElement(['Disponible', 'Vendido', 'Desactivado']),
-            'imagenes' => json_encode([$this->faker->imageUrl(), $this->faker->imageUrl()]),
+            'guid' => $this->faker->bothify('?#?#?#?#?#?'),
+            'vendedor_id' => $vendedor->id,
+            'nombre' => $this->faker->word(),
+            'descripcion' => $this->faker->sentence(),
+            'estadoFisico' => 'Nuevo',
+            'precio' => $this->faker->randomFloat(2, 10, 500),
+            'categoria' => 'Videojuegos',
+            'estado' => 'Disponible',
+            'stock' => $this->faker->numberBetween(1,100),
+            'imagenes' => json_encode([
+                'https://via.placeholder.com/640x480.png',
+                'https://via.placeholder.com/640x480.png'
+            ])
         ];
     }
 }

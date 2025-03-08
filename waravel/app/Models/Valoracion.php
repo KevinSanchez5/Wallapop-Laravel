@@ -12,7 +12,7 @@ class Valoracion extends Model
 
     protected $table = 'valoraciones';
 
-    protected $fillable = ['guid', 'comentario', 'puntuacion', 'clienteValorado_id', 'autor_id'];
+    protected $fillable = ['guid', 'comentario', 'puntuacion', 'clienteValorado_id', 'autor_id', 'venta_id'];
     protected static function boot()
     {
         parent::boot();
@@ -38,5 +38,13 @@ class Valoracion extends Model
     public function creador()
     {
         return $this->belongsTo(Cliente::class, 'autor_id');
+    }
+
+    /**
+     * Relación con la venta a la que pertenece la valoración.
+     */
+    public function venta()
+    {
+        return $this->belongsTo(Venta::class);
     }
 }

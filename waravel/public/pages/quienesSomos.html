@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiénes Somos - WARAVEL</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1444723121867-7a241cacace9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            max-width: 1100px;
+            width: 100%;
+            margin: 40px auto;
+            border: 1px solid #333;
+        }
+
+        h1, h2 {
+            color: #bff205;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #bff205;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .intro {
+            font-size: 1.1rem;
+            text-align: justify;
+            margin-bottom: 20px;
+            color: #c0c0c0;
+        }
+
+        .info-list {
+            padding-left: 20px;
+            color: #b0b0b0;
+        }
+
+        .info-list li {
+            margin-bottom: 10px;
+        }
+
+        .info-list strong {
+            color: #bff205;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-spacing: 15px;
+            margin-top: 30px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: top;
+            width: 14.28%;
+        }
+
+        td a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        td a:hover {
+            transform: translateY(-5px);
+        }
+
+        td img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 3px solid #bff205;
+            margin-bottom: 10px;
+            box-shadow: 0 0 15px rgba(191, 242, 5, 0.3);
+        }
+
+        td sub {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 5px;
+            color: #bff205;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            table {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 20px;
+            }
+
+            td {
+                width: 100%;
+                display: block;
+            }
+        }
+
+        strong {
+            color: #bff205;
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="container">
+        <h1>Quiénes Somos</h1>
+        <p class="intro">
+            Somos un grupo de estudiantes del segundo curso del ciclo formativo de Desarrollo de Aplicaciones Web (DAW). Este proyecto es el resultado de nuestro trabajo en equipo, titulado <strong>WARAVEL</strong>, una plataforma creada para facilitar la compra y venta de productos de segunda mano.
+        </p>
+        <p class="intro">
+            WARAVEL está desarrollado utilizando <strong>Laravel</strong>, un potente framework de PHP. Nuestro objetivo es ofrecer a los usuarios una plataforma robusta, segura y fácil de usar para realizar transacciones de productos de segunda mano.
+        </p>
+
+        <h2>Enfoque Tecnológico</h2>
+        <ul class="info-list">
+            <li><strong>Laravel</strong> para el desarrollo del backend.</li>
+            <li><strong>PHP</strong> como lenguaje de programación principal.</li>
+            <li><strong>Blade</strong> para la creación de vistas dinámicas.</li>
+            <li><strong>PostgreSQL</strong> para la gestión de bases de datos.</li>
+            <li><strong>Redis</strong> para optimización de rendimiento.</li>
+            <li><strong>Docker</strong> para la contenedorización y despliegue.</li>
+            <li><strong>Cypress</strong> para pruebas de calidad.</li>
+        </ul>
+
+        <h2>Autores del programa</h2>
+        <table>
+            <tr>
+                <td>
+                    <a href="https://github.com/ngalvez0910">
+                        <img src="https://avatars.githubusercontent.com/u/145333876" alt="Natalia González Álvarez"/>
+                        <sub><b>Natalia</b></sub>
+                    </a>
+                </td>
+                <td>
+                    <a href="https://github.com/jaimeleon10">
+                        <img src="https://avatars.githubusercontent.com/u/113149992" alt="Jaime León"/>
+                        <sub><b>Jaime</b></sub>
+                    </a>
+                </td>
+                <td>
+                    <a href="https://github.com/Alba448">
+                        <img src="https://avatars.githubusercontent.com/u/146001599" alt="Alba García"/>
+                        <sub><b>Alba</b></sub>
+                    </a>
+                </td>
+                <td>
+                    <a href="https://github.com/wolverine307mda">
+                        <img src="https://avatars.githubusercontent.com/u/146002100" alt="Mario de Domingo Alvarez"/>
+                        <sub><b>Mario</b></sub>
+                    </a>
+                </td>
+                <td>
+                    <a href="https://github.com/KevinSanchez5">
+                        <img src="https://avatars.githubusercontent.com/u/115721589?v=4" alt="Kelvin"/>
+                        <sub><b>Kelvin</b></sub>
+                    </a>
+                </td>
+                <td>
+                    <a href="https://github.com/diegonovi">
+                        <img src="https://github.com/diegonovi.png" alt="Diego Novillo"/>
+                        <sub><b>Diego</b></sub>
+                    </a>
+                </td>
+                <td>
+                    <a href="https://github.com/TomasVaquerin">
+                        <img src="https://github.com/TomasVaquerin.png" alt="Tomás Vaquerin"/>
+                        <sub><b>Tomás</b></sub>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

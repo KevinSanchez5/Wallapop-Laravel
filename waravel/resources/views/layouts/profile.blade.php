@@ -65,14 +65,83 @@
                     </div>
                 @endif
 
+                <div class="flex flex-col items-center gap-4 mt-8">
                     <!-- Botón de Editar Perfil -->
-                    <div class="mt-8 mb-2 text-center">
-                        <a href="{{ route('profile.edit') }}" class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
-                            <b>Editar perfil</b>
-                        </a>
-                    </div>
+                    <a href="{{ route('profile.edit') }}"
+                       class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300 font-bold text-center w-full max-w-xs">
+                        Editar perfil
+                    </a>
 
+                    <!-- Botón de Cambiar Contraseña -->
+                    <button onclick="openModal()"
+                            class="px-6 py-3 rounded-lg text-gray-800 bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300 font-bold text-center w-full max-w-xs">
+                        Cambiar Contraseña
+                    </button>
+
+                    <!-- Botón de Eliminar Perfil -->
+                    <form action="{{ route('profile.destroy.profile') }}" method="POST"
+                          onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu perfil?')"
+                          class="w-full max-w-xs">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                                class="px-6 py-3 rounded-lg text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 font-bold w-full">
+                            Eliminar perfil
+                        </button>
+                    </form>
                 </div>
+
+                <!-- Modal -->
+                <div id="modalChangePassword" class="fixed inset-0 hidden flex justify-center items-center bg-black bg-opacity-50 z-50">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white text-center mb-4">Cambiar Contraseña</h2>
+
+                        <!-- Formulario de cambio de contraseña -->
+                        <form id="changePasswordForm">
+                            @csrf
+                            @method('PATCH')
+
+                            <!-- Campo para la contraseña antigua -->
+                            <div class="mb-4">
+                                <input type="password" id="oldPassword" name="oldPassword" placeholder="Contraseña antigua" class="px-4 py-2 rounded-lg w-full text-gray-700" required />
+                            </div>
+
+                            <!-- Campo para nueva contraseña -->
+                            <div class="mb-4">
+                                <input type="password" id="newPassword" name="newPassword" placeholder="Nueva contraseña" class="px-4 py-2 rounded-lg w-full text-gray-700" required />
+                            </div>
+
+                            <!-- Campo para confirmar la nueva contraseña -->
+                            <div class="mb-4">
+                                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar nueva contraseña" class="px-4 py-2 rounded-lg w-full text-gray-700" required />
+                            </div>
+
+                            <!-- Botón de enviar -->
+                            <div class="text-center">
+                                <button type="submit" class="px-6 py-3 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500] focus:outline-none focus:ring-2 focus:ring-[#A0D500] transition duration-300">
+                                    <b>Guardar Cambios</b>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Botón de cerrar modal -->
+                        <div class="mt-4 text-center">
+                            <button onclick="closeModal()" class="px-4 py-2 text-white bg-gray-600 hover:bg-gray-700 rounded-lg">Cerrar</button>
+                        </div>
+
+                        <!-- Mensaje de éxito -->
+                        <div id="successMessage" class="text-center text-green-500 mt-4 hidden">
+                            <p><b>¡Contraseña cambiada con éxito!</b></p>
+                        </div>
+
+                        <!-- Mensaje de error -->
+                        <div id="errorMessage" class="text-center text-red-500 mt-4 hidden">
+                            <p><b>Hubo un problema al cambiar la contraseña. Intenta nuevamente.</b></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
             </div>
 
         <div class="w-full md:w-3/4 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
@@ -80,7 +149,7 @@
         </div>
 
         <!-- Toast de Confirmación para Eliminar Producto -->
-        <div id="toast-confirm-delete" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div id="toast-confirm-delete" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
                 <span class="sr-only">Check icon</span>
             </div>
@@ -90,7 +159,7 @@
         </div>
 
         <!-- Toast de Confirmación para Desactivar Producto -->
-        <div id="toast-confirm-deactivate" class="opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div id="toast-confirm-deactivate" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
                 <span class="sr-only">Check icon</span>
             </div>
@@ -133,5 +202,50 @@
             hideToast('toast-confirm-deactivate');
             document.getElementById('deactivateForm').submit();
         }
+
+        function openModal() {
+            document.getElementById('modalChangePassword').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalChangePassword').classList.add('hidden');
+        }
+
+        document.getElementById('changePasswordForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('Las contraseñas no coinciden.');
+                return;
+            }
+
+            axios.patch("{{ route('profile.change.password') }}", {
+                email: "{{ auth()->user()->email }}",
+                oldPassword: oldPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword
+            })
+                .then(response => {
+                    if (response.data.success) {
+                        document.getElementById('successMessage').classList.remove('hidden');
+                        document.getElementById('errorMessage').classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    if (error.response && error.response.data.message) {
+                        alert(error.response.data.message);
+                    } else {
+                        alert('Hubo un problema al cambiar la contraseña. Intenta nuevamente.');
+                    }
+
+                    document.getElementById('errorMessage').classList.remove('hidden');
+                    document.getElementById('successMessage').classList.add('hidden');
+                });
+        });
+
     </script>
 @endsection

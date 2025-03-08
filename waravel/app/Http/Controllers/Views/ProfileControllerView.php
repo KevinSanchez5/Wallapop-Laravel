@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Views;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailSender;
 use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
@@ -11,11 +12,15 @@ use App\Models\Venta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use function Laravel\Prompts\error;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileControllerView extends Controller
 {
@@ -293,6 +298,30 @@ class ProfileControllerView extends Controller
         return view('profile.ver-pedido', compact('pedido', 'cliente', 'usuario'));
     }
 
+    public function showFavorites() {
+        Log::info('Accediendo a la página de mis favoritos');
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para ver tus favoritos.');
+        }
+
+        Log::info('Autenticando usuario');
+        $usuario = Auth::user();
+
+        Log::info('Buscando el perfil del cliente en la base de datos');
+        $cliente = Cliente::where('usuario_id', $usuario->id)->first();
+
+        if (!$cliente) {
+            return redirect()->route('home')->with('error', 'No se ha encontrado el perfil del cliente.');
+        }
+
+        Log::info('Perfil del cliente encontrado, obteniendo favoritos');
+        $productosFavoritos = $cliente->favoritos()->paginate(6);
+
+        Log::info('Favoritos obtenidos correctamente, mostrando la vista de mis favoritos');
+        return view('profile.partials.mis-favoritos', compact('cliente','productosFavoritos'));
+    }
+
     public function edit(Request $request)
     {
         Log::info('Accediendo a la página de edición del perfil');
@@ -391,5 +420,134 @@ class ProfileControllerView extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function cambioContrasenya(Request $request)
+    {
+        Log::info('Iniciando cambio de contraseña');
+
+        Log::info('Validando cambio de contraseña');
+        Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255|exists:users,email',
+            'oldPassword' => ['required', 'string', 'min:8', 'max:20'],
+            'newPassword' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+            'confirmPassword' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/'],
+        ]);
+
+        Log::info('Validación completada con éxito');
+
+        $email = $request->email;
+        $oldPassword = $request->oldPassword;
+        $newPassword = $request->newPassword;
+
+        Log::info('Buscando usuario por email', ['email' => $email]);
+        $user = User::where('email', $email)->first();
+
+        $response = ['success' => false, 'message' => ''];
+
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            $response['message'] = 'Usuario no encontrado';
+            return response()->json($response, 404);
+        }
+
+        if (!Hash::check($oldPassword, $user->password)) {
+            Log::warning('Contraseña antigua incorrecta', ['email' => $email]);
+            $response['message'] = 'La contraseña antigua es incorrecta';
+            return response()->json($response, 400);
+        }
+
+        if ($newPassword !== $request->confirmPassword) {
+            Log::warning('Las contraseñas no coinciden', ['email' => $email]);
+            $response['message'] = 'Las contraseñas no coinciden';
+            return response()->json($response, 400);
+        }
+
+        Log::info('Actualizando la contraseña');
+        try {
+            $user->password = Hash::make($newPassword);
+            $user->password_reset_token = null;
+            $user->password_reset_expires_at = null;
+            $user->updated_at = now();
+            $user->save();
+
+            Log::info('Contraseña actualizada exitosamente', ['email' => $user->email]);
+
+            $response['success'] = true;
+            $response['message'] = 'Contraseña cambiada con éxito';
+            $response['user'] = $user;
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar la contraseña', ['error' => $e->getMessage()]);
+            $response['message'] = 'Hubo un error al cambiar la contraseña';
+            return response()->json($response, 500);
+        }
+
+        return response()->json($response);
+    }
+
+    public function eliminarPerfil(Request $request)
+    {
+        Log::info('Iniciando proceso de eliminación del perfil');
+
+        $user = $request->user();
+
+        Log::info('Enviando correo de eliminación antes de cerrar sesión');
+        $this->enviarCorreoEliminarPerfil($request);
+
+        Log::info('Desconectando al usuario');
+        Auth::logout();
+
+        Log::info('Eliminando el perfil del usuario');
+        $user->delete();
+
+        Log::info('Perfil de usuario eliminado de la base de datos');
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+
+
+    public function enviarCorreoEliminarPerfil(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            Log::warning('Usuario no autenticado');
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        try {
+            Mail::to($user->email)->send(new EmailSender($user, null, null, 'eliminarPerfil'));
+            Log::info('Correo de eliminación enviado', ['email' => $user->email]);
+        } catch (\Exception $e) {
+            Log::error('Error al enviar el correo de eliminación', [
+                'email' => $user->email,
+                'exception' => $e->getMessage()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 503);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo enviado correctamente',
+        ], 200);
+    }
+
+
+    public function findUserByEmail($email)
+    {
+        Log::info("Buscando usuario por email", ['email' => $email]);
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            Log::warning('Usuario no encontrado', ['email' => $email]);
+            return null;
+        }
+
+        Log::info("Usuario encontrado", ['email' => $email, 'user_id' => $user->id]);
+        return $user;
     }
 }
