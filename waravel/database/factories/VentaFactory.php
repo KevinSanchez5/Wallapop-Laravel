@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Producto;
 use App\Models\Venta;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class VentaFactory extends Factory
 {
@@ -25,13 +26,21 @@ class VentaFactory extends Factory
         }, 0);
 
         return [
-            'guid' => $this->faker->uuid,
+            'guid' => Str::random(11),
             'comprador' => json_encode([
                 'nombre' => $this->faker->name,
                 'email' => $this->faker->email,
             ]),
             'lineaVentas' => json_encode($lineaVentas),
             'precioTotal' => $precioTotal,
+            'estado' => $this->faker->randomElement([
+                'Pendiente',
+                'Procesando',
+                'Enviado',
+                'Entregado',
+                'Cancelado',
+                'Devuelto'
+            ]),
         ];
     }
 }
