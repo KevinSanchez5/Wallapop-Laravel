@@ -13,11 +13,22 @@ use Illuminate\Support\Str;
 
 class ProductoControllerView extends Controller
 {
+
+    /**
+     * Obtener el ID del cliente autenticado.
+     *
+     * @return int El ID del cliente.
+     */
     protected function getClienteId()
     {
         return Cliente::where('usuario_id', auth()->id())->value('id');
     }
 
+    /**
+     * Muestra la vista de productos disponibles.
+     *
+     * @return \Illuminate\View\View La vista con los productos disponibles.
+     */
     public function indexVista()
     {
         Log::info('Acceso a la vista de productos disponibles');
@@ -37,6 +48,12 @@ class ProductoControllerView extends Controller
 
         return view('pages.home', compact('productos'));
     }
+
+    /**
+     * Realiza una búsqueda de productos según los parámetros proporcionados.
+     *
+     * @return \Illuminate\View\View La vista con los productos encontrados.
+     */
 
     public function search()
     {
@@ -82,6 +99,14 @@ class ProductoControllerView extends Controller
         return view('pages.home', compact('productos'));
     }
 
+    /**
+     * Muestra la vista de un producto específico.
+     *
+     * @param string $guid El GUID del producto.
+     *
+     * @return \Illuminate\View\View|RedirectResponse Vista del producto o redirección si no se encuentra.
+     */
+
     public function showVista($guid)
     {
         Log::info('Acceso al producto con GUID: ' . $guid);
@@ -113,6 +138,14 @@ class ProductoControllerView extends Controller
 
         return view('pages.ver-producto', compact('producto', 'productoFavorito'));
     }
+
+    /**
+     * Crea un nuevo producto.
+     *
+     * @param \Illuminate\Http\Request $request Los datos del formulario para crear el producto.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección a la vista de perfil.
+     */
 
     public function store(Request $request)
     {
@@ -179,6 +212,13 @@ class ProductoControllerView extends Controller
         return redirect()->route('profile')->with('success', 'Producto añadido correctamente.');
     }
 
+    /**
+     * Muestra el formulario de edición de un producto.
+     *
+     * @param string $guid El GUID del producto a editar.
+     *
+     * @return \Illuminate\View\View|RedirectResponse La vista de edición del producto o redirección si no se encuentra.
+     */
     public function edit($guid)
     {
         Log::info('Acceso al formulario de edición del producto con GUID: ' . $guid);
@@ -205,6 +245,15 @@ class ProductoControllerView extends Controller
 
         return view('profile.edit-producto', compact('producto'));
     }
+
+    /**
+     * Actualiza la información de un producto.
+     *
+     * @param \Illuminate\Http\Request $request Los datos del formulario para actualizar el producto.
+     * @param string $guid El GUID del producto a actualizar.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección con mensaje de éxito o error.
+     */
 
     public function update(Request $request, $guid)
     {
@@ -278,12 +327,27 @@ class ProductoControllerView extends Controller
         return redirect()->route('profile')->with('success', 'Producto actualizado correctamente.');
     }
 
+    /**
+     * Muestra el formulario de creación de un producto.
+     *
+     * @return \Illuminate\View\View La vista para agregar un producto.
+     */
+
+
     public function showAddForm()
     {
         Log::info('Acceso al formulario de creación de producto');
         return view('profile.add-producto');
     }
 
+    /**
+     * Maneja la subida de imágenes para un producto.
+     *
+     * @param \Illuminate\Http\Request $request Los datos del formulario de la imagen.
+     * @param int $id El ID del producto para el que se está subiendo la imagen.
+     *
+     * @return string|\Illuminate\Http\JsonResponse La ruta de la imagen subida o un error en caso de fallo.
+     */
     public function addListingPhoto(Request $request, $id)
     {
         $product = Producto::find($id);
@@ -340,6 +404,14 @@ class ProductoControllerView extends Controller
         }
     }
 
+    /**
+     * Elimina un producto por su GUID.
+     *
+     * @param string $guid El GUID del producto a eliminar.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección con mensaje de éxito o error.
+     */
+
     public function destroy($guid)
     {
         Log::info('Eliminando producto con GUID: ' . $guid);
@@ -368,6 +440,14 @@ class ProductoControllerView extends Controller
 
         return redirect()->route('profile')->with('success', 'Producto eliminado correctamente.');
     }
+
+    /**
+     * Cambia el estado de un producto entre "Disponible" y "Desactivado".
+     *
+     * @param string $guid El GUID del producto.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección con mensaje de éxito o error.
+     */
 
     public function changestatus($guid)
     {
