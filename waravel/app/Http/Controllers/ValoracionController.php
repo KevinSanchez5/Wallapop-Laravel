@@ -10,7 +10,14 @@ use Illuminate\Support\Facades\Redis;
 
 class ValoracionController extends Controller
 {
-    // Mostrar todas las valoraciones
+    /**
+     * Muestra todas las valoraciones con paginación.
+     *
+     * Este método obtiene todas las valoraciones de la base de datos y las devuelve paginadas,
+     * además, transforma los datos para que contengan solo los campos relevantes.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         Log::info('Obteniendo todas las valoraciones');
@@ -45,7 +52,16 @@ class ValoracionController extends Controller
         return response()->json($customResponse);
     }
 
-    // Mostrar una valoración específica
+    /**
+     * Muestra una valoración específica.
+     *
+     * Este método intenta obtener una valoración específica por su GUID. Si la valoración
+     * está en la caché de Redis, se devuelve directamente desde allí. Si no está en caché,
+     * se busca en la base de datos, se guarda en Redis para futuras consultas, y luego se devuelve.
+     *
+     * @param string $guid
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($guid)
     {
         Log::info('Obteniendo valoración', ['id' => $guid]);
@@ -69,7 +85,16 @@ class ValoracionController extends Controller
         return response()->json($valoracion);
     }
 
-    // Crear una nueva valoración
+    /**
+     * Crea una nueva valoración.
+     *
+     * Este método valida los datos recibidos en la solicitud, como el comentario, puntuación,
+     * cliente valorado y autor de la valoración. Si los datos son válidos, crea una nueva
+     * valoración en la base de datos.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         Log::info('Intentando crear una nueva valoración', ['request' => $request->all()]);
@@ -91,7 +116,16 @@ class ValoracionController extends Controller
         return response()->json($valoracion, 201);
     }
 
-    // Eliminar una valoración
+    /**
+     * Elimina una valoración específica.
+     *
+     * Este método intenta eliminar una valoración especificada por su GUID. Primero, busca
+     * la valoración en Redis y, si no está allí, la busca en la base de datos. Luego,
+     * elimina la valoración y limpia la caché de Redis asociada a esa valoración.
+     *
+     * @param string $guid
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy($guid)
     {
         Log::info('Intentando eliminar valoración');

@@ -14,13 +14,32 @@ use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
+
+    /**
+     * Muestra el formulario de registro.
+     *
+     * Este método redirige al usuario a la vista de registro.
+     *
+     * @return \Illuminate\View\View Vista del formulario de registro.
+     */
     public function showRegistrationForm()
     {
         Log::info('Mostrando formulario de registro.');
         return view('auth.register');
     }
 
-// Registrar nuevo usuario
+    /**
+     * Registra un nuevo usuario en el sistema.
+     *
+     * Este método valida los datos proporcionados, crea un nuevo usuario en la base de datos,
+     * asocia el cliente con su respectiva dirección y lo loguea automáticamente. Si ocurre
+     * algún error durante el registro, se captura la excepción y se muestra un mensaje de error.
+     *
+     * @param Request $request Los datos enviados desde el formulario de registro.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirige al usuario al login si el registro es exitoso,
+     * o muestra un mensaje de error si ocurre un fallo en el proceso.
+     */
     public function register(Request $request)
     {
         Log::info('Intento de registro con email: ' . $request->email);

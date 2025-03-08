@@ -12,6 +12,17 @@ use Illuminate\Support\Facades\Validator;
 
 class ClienteControllerView extends Controller
 {
+
+    /**
+     * Muestra la información del cliente junto con sus productos y valoraciones.
+     *
+     * Este método busca al cliente por su GUID, obtiene sus productos disponibles y sus valoraciones.
+     * También calcula el promedio de las valoraciones y obtiene las estrellas llenas y vacías.
+     * Si el usuario está autenticado, se cargan sus productos favoritos.
+     *
+     * @param string $guid GUID del cliente a mostrar.
+     * @return \Illuminate\View\View Vista con la información del cliente, productos, valoraciones, y estrellas.
+     */
     public function mostrarCliente($guid)
     {
         $cliente = Cliente::where('guid', $guid)->firstOrFail();
@@ -47,7 +58,14 @@ class ClienteControllerView extends Controller
         ));
     }
 
-    // Buscar favoritos
+    /**
+     * Muestra los productos favoritos de un cliente.
+     *
+     * Este método obtiene los productos que el cliente ha marcado como favoritos y los devuelve en la vista.
+     *
+     * @param string $guid GUID del cliente cuyo favoritos se desean mostrar.
+     * @return \Illuminate\View\View Vista con los productos favoritos del cliente.
+     */
     public function mostrarFavoritos($guid)
     {
         Log::info("Buscando favoritos para el cliente con Guid: {$guid}");
@@ -64,7 +82,15 @@ class ClienteControllerView extends Controller
         return view('pages.ver-favoritos', compact('favoritos'));
     }
 
-    // Agregar un producto a favoritos
+    /**
+     * Añade un producto a los favoritos de un cliente.
+     *
+     * Este método valida que el producto y el cliente existan, luego agrega el producto a la lista de favoritos del cliente.
+     * Si el producto ya está en favoritos, se devuelve un mensaje indicando que ya está añadido.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud que incluyen el GUID del producto y el ID del usuario.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación.
+     */
     public function añadirFavorito(Request $request)
     {
         Log::info("Intentando agregar un producto a favoritos para el cliente logeado");
@@ -109,7 +135,14 @@ class ClienteControllerView extends Controller
     }
 
 
-    // Quitar un producto de favoritos
+    /**
+     * Elimina un producto de los favoritos de un cliente.
+     *
+     * Este método valida que el producto y el cliente existan, luego elimina el producto de la lista de favoritos del cliente.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud que incluyen el GUID del producto y el ID del usuario.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación.
+     */
     public function eliminarFavorito(Request $request)
     {
         Log::info("Intentando eliminar un producto de favoritos para el cliente logeado");

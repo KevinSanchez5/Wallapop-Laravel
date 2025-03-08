@@ -19,6 +19,12 @@ use Illuminate\Support\Str;
 class AdminController extends Controller
 {
 
+    /**
+     * Muestra el dashboard del administrador con estadísticas y datos relevantes.
+     *
+     * @return \Illuminate\View\View Vista del dashboard con estadísticas.
+     */
+
     public function dashboard()
     {
         $totalUsers = User::where('role', 'cliente')->count();
@@ -47,6 +53,11 @@ class AdminController extends Controller
 
     private $backupPath = 'backups/';
 
+    /**
+     * Crea una copia de seguridad de la base de datos y archivos importantes.
+     *
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación.
+     */
     public function createBackup()
     {
         Log::info('Creando copia de seguridad');
@@ -104,7 +115,9 @@ class AdminController extends Controller
     }
 
     /**
-     * Realiza un respaldo de la base de datos y lo almacena en el servidor.
+     * Respalda la base de datos y descarga el archivo resultante.
+     *
+     * @return \Illuminate\Http\Response Archivo comprimido para la descarga.
      */
     public function backupDatabase()
     {
@@ -125,19 +138,19 @@ class AdminController extends Controller
         return response()->download($filePath);
     }
 
-
+    /**
+     * Muestra la lista de clientes con la opción de filtrado por nombre o email.
+     *
+     * @return \Illuminate\View\View Vista con la lista de clientes filtrada.
+     */
 
     public function listClients()
     {
         Log::info('Obteniendo clientes cuyo usuario tiene el rol de cliente');
 
-        // Crea la consulta sin obtener los resultados todavía y agrega el conteo de productos
         $query = Cliente::orderBy('updated_at', 'desc')->withCount('productos');
-
-        // Obtén los usuarios con el rol de 'cliente'
         $users = User::where('role', 'cliente')->get();
 
-        // Si hay búsqueda, aplica el filtro
         if (request()->has('search') && request('search') !== '') {
             $search = request('search');
             Log::info('Búsqueda: ' . $search);
@@ -148,12 +161,16 @@ class AdminController extends Controller
             });
         }
 
-        // Aplica paginación a la consulta antes de obtener los resultados
         $clientes = $query->paginate(10);
 
         return view('admin.clients', compact('clientes', 'users'));
     }
 
+    /**
+     * Muestra la lista de valoraciones con la opción de filtrado por cliente o comentario.
+     *
+     * @return \Illuminate\View\View Vista con la lista de valoraciones filtradas.
+     */
     public function listReviews()
     {
         Log::info('Obteniendo valoraciones');
@@ -175,6 +192,12 @@ class AdminController extends Controller
 
         return view('admin.reviews', compact('valoraciones'));
     }
+
+    /**
+     * Muestra la lista de productos con la opción de filtrado por nombre.
+     *
+     * @return \Illuminate\View\View Vista con la lista de productos filtrada.
+     */
 
     public function listProducts()
     {
@@ -205,6 +228,13 @@ class AdminController extends Controller
         return view('admin.products', compact('productos'));
     }
 
+    /**
+     * Crea un nuevo administrador si no hay más de 10 administradores.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse Respuesta con el estado de la operación.
+     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -232,6 +262,13 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Administrador agregado con éxito.', 'admin' => $admin], 201);
     }
+
+    /**
+     * Cambia el estado de un producto a "Baneado" o "Disponible".
+     *
+     * @param  string  $guid
+     * @return \Illuminate\Http\RedirectResponse Redirección a la lista de productos.
+     */
 
     public function banProduct($guid)
     {
@@ -271,6 +308,13 @@ class AdminController extends Controller
         return redirect()->route('admin.products')->with('success', 'Estado del producto actualizado correctamente.');
     }
 
+    /**
+     * Elimina una valoración por GUID.
+     *
+     * @param  string  $guid
+     * @return \Illuminate\Http\RedirectResponse Redirección a la lista de valoraciones.
+     */
+
     public function deleteReview($guid)
     {
         $valoracion = Valoracion::where('guid', $guid)->first();
@@ -285,6 +329,13 @@ class AdminController extends Controller
 
         return redirect()->route('admin.reviews')->with('success', 'Valoración eliminada correctamente.');
     }
+
+    /**
+     * Elimina un cliente por GUID.
+     *
+     * @param  string  $guid
+     * @return \Illuminate\Http\RedirectResponse Redirección a la lista de clientes.
+     */
 
 
     public function deleteClient($guid)
@@ -304,6 +355,17 @@ class AdminController extends Controller
         Log::info("Redireccionando a ..........");
         return redirect()->route('admin.clients')->with('success', 'Cliente borrado correctamente.');
     }
+
+    /**
+     * Elimina un administrador de la base de datos por su GUID.
+     *
+     * Este método busca un administrador en la base de datos utilizando el GUID proporcionado.
+     * Si el administrador es encontrado, se elimina y se registra un mensaje de éxito.
+     * Si el administrador no es encontrado, se registra una advertencia y se devuelve un mensaje de error.
+     *
+     * @param  string  $guid El GUID del administrador que se desea eliminar.
+     * @return \Illuminate\Http\RedirectResponse Redirección al dashboard del administrador con un mensaje de éxito o error.
+     */
 
     public function deleteAdmin($guid)
     {
