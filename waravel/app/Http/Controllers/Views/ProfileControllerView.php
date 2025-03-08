@@ -143,9 +143,6 @@ class ProfileControllerView extends Controller
         Log::info('Perfil del cliente encontrado, obteniendo ventas');
         $query = Venta::whereJsonContains('lineaVentas', [['vendedor' => ['id' => $cliente->id]]]);
 
-        Log::info($query->get());
-        Log::info($cliente->id);
-
         $ventas = $query->orderBy('created_at', 'desc')->paginate(6);
 
         Log::info('Ventas obtenidas correctamente, mostrando la vista de mis ventas');
@@ -227,8 +224,6 @@ class ProfileControllerView extends Controller
 
         Log::info('El cliente es válido, buscando su usuario');
         $usuario = User::find($cliente->usuario_id);
-
-        Log::info($usuario);
 
         if (!$found) {
             Log::error('La venta no le pertenece al cliente.');
