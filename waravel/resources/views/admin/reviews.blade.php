@@ -45,16 +45,23 @@
                     </div>
 
                     <!-- Botón de eliminar -->
-                    <form action="{{ route('admin.delete.review', $valoracion->id) }}" method="POST" class="mt-4">
+                    <form onsubmit="event.preventDefault(); showToast('{{ route('admin.delete.review', $valoracion->guid) }}')" method="POST" class="mt-4">
                         @csrf
                         @method('DELETE')
-                        <button type="submit"
-                                class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300">
+                        <button type="submit" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300">
                             Eliminar
                         </button>
                     </form>
+
                 </div>
             @endforeach
+        </div>
+
+        <!-- Toast de Confirmación para Eliminar Valoración -->
+        <div id="toast-confirm-delete" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-red-400 transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 12px; z-index: 9999">
+            <div class="ms-3 text-md font-bold ml-5">¿Estás seguro de eliminar esta valoración?</div>
+            <button type="button" id="confirmDeleteBtn" class="ml-4 bg-red-600 text-white px-3 py-1 rounded-md">Sí</button>
+            <button type="button" onclick="hideToast('toast-confirm-delete')" class="ml-2 bg-gray-300 text-black px-3 py-1 rounded-md">No</button>
         </div>
 
         <!-- Paginación -->
@@ -62,4 +69,47 @@
             {{ $valoraciones->links() }}
         </div>
     </div>
+
+    <script>
+        function showToast(deleteUrl) {
+            const toast = document.getElementById('toast-confirm-delete');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+            // Mostrar el toast
+            toast.classList.remove('hidden');
+            toast.classList.add('opacity-100');
+
+            // Asignar la acción de eliminación al botón
+            confirmDeleteBtn.onclick = function() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = deleteUrl;
+
+                // Crear el campo _method para que Laravel reconozca que es una solicitud DELETE
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'DELETE';
+                form.appendChild(methodField);
+
+                // Crear el campo CSRF para la protección
+                const csrfField = document.createElement('input');
+                csrfField.type = 'hidden';
+                csrfField.name = '_token';
+                csrfField.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                form.appendChild(csrfField);
+
+                // Enviar el formulario
+                document.body.appendChild(form);
+                form.submit();
+            };
+        }
+
+        function hideToast(toastId) {
+            const toast = document.getElementById(toastId);
+            toast.classList.remove('opacity-100');
+            toast.classList.add('opacity-0');
+            setTimeout(() => toast.classList.add('hidden'), 700);
+        }
+    </script>
 @endsection

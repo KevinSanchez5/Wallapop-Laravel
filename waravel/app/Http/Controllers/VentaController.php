@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Producto;
 use App\Models\Venta;
 use App\Utils\GuidGenerator;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -479,5 +480,41 @@ class VentaController extends Controller
             Log::error("Error en reembolsarPago: " . $e->getMessage());
             return ['status' => 'error',  'message' => $e->getMessage()];
         }
+    }
+
+    public function generatePdf($guid)
+    {
+        Log::info('Generando PDF de la venta');
+        $ventaRedis = Redis::get('venta_'.$guid);
+
+        if ($ventaRedis) {
+            Log::info('Venta obtenida desde Redis');
+            $venta = json_decode($ventaRedis);
+        } else {
+            Log::info('Buscando venta de la base de datos');
+            $venta = Venta::where('guid', $guid)->first();
+
+            if (!$venta) {
+                return response()->json(['message' => 'Venta no encontrada'], 404);
+            }
+
+            $data = [
+                'id' => $venta->id,
+                'guid' => $venta->guid,
+                'estado' => $venta->estado,
+                'comprador' => $venta->comprador,
+                'lineaVentas' => $venta->lineaVentas,
+                'precioTotal' => $venta->precioTotal,
+                'created_at' => $venta->created_at->toDateTimeString(),
+                'updated_at' => $venta->updated_at->toDateTimeString(),
+            ];
+
+            Log::info('Guardando venta en cache redis');
+            Redis::set('venta_'. $guid, json_encode($data), 'EX',1800);
+        }
+
+        $pdf = Pdf::loadView('pdf.venta', compact('venta'));
+
+        return $pdf->stream('venta.pdf');
     }
 }
