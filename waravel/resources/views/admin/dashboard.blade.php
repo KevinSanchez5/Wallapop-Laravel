@@ -148,15 +148,29 @@
             </ul>
         </div>
 
-        <!-- Columna 2 (1/3 del ancho) -->
         <div class="w-full md:w-1/2 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 h-[375px] overflow-y-auto">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-200">
                 <i class="fas fa-money-bill text-[#BFF205]"></i> &nbsp;
-                Ultimas Ventas</h5>
-            <p class="text-gray-700 dark:text-gray-300">
-
-            </p>
+                Ultimas Ventas
+            </h5>
+            <ul class="space-y-3 overflow-y-auto pr-2" style="max-height: 290px;">
+                @foreach ($latestSales as $sale)
+                    <li class="p-3 rounded-lg flex justify-between items-center {{ $loop->iteration % 2 == 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gray-50 dark:bg-gray-800' }}">
+                        <div>
+                            <p class="font-semibold text-gray-900 dark:text-gray-200">Venta ID: {{ $sale->guid }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Comprador: {{ $sale->comprador->nombre }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Total: €{{ number_format($sale->precioTotal, 2) }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Estado: {{ $sale->estado }}</p>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300 flex items-center">
+                            <i class="far fa-calendar-alt mr-1"></i>&nbsp;
+                            {{ \Carbon\Carbon::parse($sale->created_at)->format('d M Y') }}
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
         </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

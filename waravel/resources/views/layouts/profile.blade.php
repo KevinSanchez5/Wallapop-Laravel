@@ -79,16 +79,11 @@
                     </button>
 
                     <!-- Botón de Eliminar Perfil -->
-                    <form action="{{ route('profile.destroy.profile') }}" method="POST"
-                          onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu perfil?')"
-                          class="w-full max-w-xs">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                                class="px-6 py-3 rounded-lg text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 font-bold w-full">
-                            Eliminar perfil
-                        </button>
-                    </form>
+                    <button type="button" onclick="showToast('toast-confirm-delete-profile')"
+                            class="px-6 py-3 rounded-lg text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 font-bold w-full">
+                        Eliminar perfil
+                    </button>
+
                 </div>
 
                 <!-- Modal -->
@@ -149,23 +144,37 @@
         </div>
 
         <!-- Toast de Confirmación para Eliminar Producto -->
-        <div id="toast-confirm-delete" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div id="toast-confirm-delete" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#f87171] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 12px; z-index: 9999">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
                 <span class="sr-only">Check icon</span>
             </div>
-            <div class="ms-3 text-md font-normal ml-5">¿Estás seguro de eliminar este producto?</div>
-            <button type="button" onclick="confirmDelete()" class="ml-4 bg-[#A0D500] text-black px-3 py-1 rounded-md">Sí</button>
+            <div class="ms-3 text-md font-bold ml-5">¿Estás seguro de eliminar este producto?</div>
+            <button type="button" onclick="confirmDelete()" class="ml-4 bg-red-600 text-white px-3 py-1 rounded-md">Sí</button>
             <button type="button" onclick="hideToast('toast-confirm-delete')" class="ml-2 bg-gray-300 text-black px-3 py-1 rounded-md">No</button>
         </div>
 
         <!-- Toast de Confirmación para Desactivar Producto -->
-        <div id="toast-confirm-deactivate" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#BFF205] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 20rem; z-index: 9999">
+        <div id="toast-confirm-deactivate" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-[#facc15] transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 12px; z-index: 9999">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
                 <span class="sr-only">Check icon</span>
             </div>
-            <div class="ms-3 text-md font-normal ml-5">¿Estás seguro de cambiar el estado de este producto?</div>
-            <button type="button" onclick="confirmDeactivate()" class="ml-4 bg-[#A0D500] text-black px-3 py-1 rounded-md">Sí</button>
+            <div class="ms-3 text-md font-bold ml-5">¿Estás seguro de cambiar el estado de este producto?</div>
+            <button type="button" onclick="confirmDeactivate()" class="ml-4 bg-orange-600 text-white px-3 py-1 rounded-md">Sí</button>
             <button type="button" onclick="hideToast('toast-confirm-deactivate')" class="ml-2 bg-gray-300 text-black px-3 py-1 rounded-md">No</button>
+        </div>
+
+        <!-- Toast de Confirmación para Eliminar Perfil -->
+        <div id="toast-confirm-delete-profile" class="border border-black opacity-0 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-800 bg-red-500 transition-opacity ease-in-out duration-700 shadow-sm" role="alert" style="position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); border-radius: 12px; z-index: 9999">
+            <div class="inline-flex items-center justify-center shrink-0 w-8 h-8">
+                <span class="sr-only">Check icon</span>
+            </div>
+            <div class="ms-3 text-md font-bold ml-5">¿Estás seguro de eliminar tu perfil?</div>
+            <form action="{{ route('profile.destroy.profile') }}" method="POST" id="deleteForm" class="flex items-center">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="ml-4 bg-red-600 text-white px-3 py-1 rounded-md">Sí</button>
+            </form>
+            <button type="button" onclick="hideToast('toast-confirm-delete-profile')" class="ml-2 bg-gray-300 text-black px-3 py-1 rounded-md">No</button>
         </div>
 
     </div>
