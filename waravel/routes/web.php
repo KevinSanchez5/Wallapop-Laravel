@@ -19,8 +19,6 @@ Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('pages.home
 Route::get('/cliente/{guid}', [ClienteControllerView::class, 'mostrarCliente'])->name('cliente.ver');
 Route::post('/cliente/addFavorite', [ClienteControllerView::class, 'añadirFavorito'])->name('favorito.añadir');
 Route::delete('/cliente/removeFavorite', [ClienteControllerView::class, 'eliminarFavorito'])->name('favorito.eliminar');
-Route::get('/clientes/{guid}/valoraciones', [ValoracionesControllerView::class, 'index'])->name('cliente.valoraciones');
-Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'promedio'])->name('cliente.puntuacion');
 
 // Rutas protegidas para clientes
 Route::middleware(['auth', UserRoleAuth::class])->group(function () {
