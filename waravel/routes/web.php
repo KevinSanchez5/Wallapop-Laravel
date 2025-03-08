@@ -28,6 +28,7 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile/myOrders', [ProfileControllerView::class, 'showOrders'])->name('profile.orders');
     Route::get('/profile/mySales', [ProfileControllerView::class, 'showSales'])->name('profile.sales');
     Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
+    Route::get('/profile/mySales/search', [ProfileControllerView::class, 'showFilteredSales'])->name('profile.sales.search');
     Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('order.detail');
     Route::get('/profile/mySales/{guid}', [ProfileControllerView::class, 'showSale'])->name('sale.detail');
     Route::get('/profile/myFavorites', [ProfileControllerView::class, 'showFavorites'])->name('profile.favorites');
@@ -36,12 +37,6 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
     Route::patch('/profile/changePassword', [ProfileControllerView::class, 'cambioContrasenya'])->name('profile.change.password');
     Route::delete('/profile', [ProfileControllerView::class, 'eliminarPerfil'])->name('profile.destroy.profile');
-
-    // Pedidos y ventas
-    Route::get('/profile/mySales/search', [ProfileControllerView::class, 'showFilteredSales'])->name('profile.sales.search');
-    Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
-    Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('order.detail');
-    Route::get('/profile/mySales/{guid}', [ProfileControllerView::class, 'showSale'])->name('sale.detail');
 
     // Gestión de productos
     Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
