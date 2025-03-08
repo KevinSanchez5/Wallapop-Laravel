@@ -57,12 +57,12 @@
                             <a href="#" class="bg-black text-white text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                                 Cancelar
                             </a>
-                            <a href="#" class="bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+                            <a href="{{ route('pdf.venta', ['guid' => $pedido->guid]) }}" class="bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                                 Ver Factura
                             </a>
                         </div>
                     @elseif(!($pedido->estado == 'Cancelado' || $pedido->estado == 'Devuelto'))
-                        <a href="#" class="mt-4 block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Ver factura</a>
+                        <a href="{{ route('pdf.venta', ['guid' => $pedido->guid]) }}" class="mt-4 block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Ver factura</a>
                     @endif
                 </div>
             </div>
