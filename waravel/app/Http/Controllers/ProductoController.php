@@ -15,7 +15,13 @@ use Illuminate\Support\Str;
 
 class ProductoController extends Controller
 {
-    // Mostrar todos los productos
+    /**
+     * Obtener todos los productos con paginación.
+     *
+     * Este método recupera todos los productos de la base de datos y los devuelve con paginación.
+     *
+     * @return \Illuminate\Http\JsonResponse Lista paginada de productos.
+     */
     public function index()
     {
         $query = Producto::orderBy('id', 'asc');
@@ -55,7 +61,16 @@ class ProductoController extends Controller
         return response()->json($customResponse);
     }
 
-    // Mostrar un producto específico
+    /**
+     * Obtener un producto específico por su GUID.
+     *
+     * Este método obtiene un producto específico por su GUID, buscando primero en la caché (Redis),
+     * y luego en la base de datos si es necesario.
+     *
+     * @param string $guid GUID del producto a buscar.
+     *
+     * @return \Illuminate\Http\JsonResponse Detalles del producto o mensaje de error.
+     */
     public function show($guid)
     {
         Log::info('Buscando producto de la cache en Redis');
@@ -79,7 +94,15 @@ class ProductoController extends Controller
         return response()->json($producto);
     }
 
-    // Crear un nuevo producto
+    /**
+     * Almacenar un nuevo producto en la base de datos.
+     *
+     * Este método valida los datos de la solicitud, luego crea y guarda un nuevo producto.
+     *
+     * @param \Illuminate\Http\Request $request La solicitud que contiene los datos del producto.
+     *
+     * @return \Illuminate\Http\JsonResponse El producto creado.
+     */
     public function store(Request $request)
     {
         Log::info('Validando producto');
@@ -106,7 +129,17 @@ class ProductoController extends Controller
         return response()->json($producto, 201);
     }
 
-    // Actualizar un producto existente
+    /**
+     * Actualizar un producto existente en la base de datos.
+     *
+     * Este método actualiza un producto existente por su GUID. Valida los datos de la solicitud,
+     * actualiza el registro en la base de datos y refresca la caché (Redis).
+     *
+     * @param \Illuminate\Http\Request $request La solicitud con los datos actualizados del producto.
+     * @param string $guid GUID del producto a actualizar.
+     *
+     * @return \Illuminate\Http\JsonResponse El producto actualizado.
+     */
     public function update(Request $request, $guid)
     {
         Log::info('Buscando producto de la cache en Redis');
@@ -161,7 +194,15 @@ class ProductoController extends Controller
         return response()->json($productoModel);
     }
 
-    // Eliminar un producto
+    /**
+     * Eliminar un producto por su GUID.
+     *
+     * Este método elimina un producto por su GUID tanto de la base de datos como de la caché (Redis).
+     *
+     * @param string $guid GUID del producto a eliminar.
+     *
+     * @return \Illuminate\Http\JsonResponse Mensaje de éxito o error.
+     */
     public function destroy($guid)
     {
         Log::info('Buscando producto de la cache en Redis');
@@ -193,6 +234,18 @@ class ProductoController extends Controller
         Log::info('Producto eliminado correctamente');
         return response()->json(['message' => 'Producto eliminado correctamente']);
     }
+
+    /**
+     * Añadir una foto a un producto en la lista.
+     *
+     * Este método permite añadir una imagen a la lista del producto, asegurando que no se exceda el límite
+     * de 5 fotos. La imagen se guarda en el almacenamiento y se actualiza la lista de imágenes del producto.
+     *
+     * @param \Illuminate\Http\Request $request La solicitud que contiene la imagen a añadir.
+     * @param string $guid GUID del producto al que se añadirá la imagen.
+     *
+     * @return \Illuminate\Http\JsonResponse Mensaje de éxito y producto actualizado.
+     */
 
     public function addListingPhoto(Request $request, $guid) {
         Log::info('Buscando producto de la cache en Redis');
@@ -239,6 +292,17 @@ class ProductoController extends Controller
         Log::info('Imagen guardada correctamente');
         return response()->json(['message' => 'Foto añadida', 'product' => $product]);
     }
+
+    /**
+     * Eliminar una foto de la lista de un producto.
+     *
+     * Este método elimina una foto específica de la lista del producto y también la elimina del almacenamiento.
+     *
+     * @param string $guid GUID del producto del cual se eliminará la foto.
+     * @param \Illuminate\Http\Request $request La solicitud que contiene la ruta de la foto a eliminar.
+     *
+     * @return \Illuminate\Http\JsonResponse Mensaje de éxito y producto actualizado.
+     */
 
     public function deleteListingPhoto($guid, Request $request) {
         $filePath = $request->input('image');
