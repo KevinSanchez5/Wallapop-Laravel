@@ -21,7 +21,7 @@ class UserRoleAuth
      * @return Response Permite continuar con la solicitud si el usuario tiene el rol de cliente,
      * o aborta la solicitud con un error 403 si no tiene el rol adecuado.
      */
-    
+
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check() && Auth::user()->role === 'cliente') {
