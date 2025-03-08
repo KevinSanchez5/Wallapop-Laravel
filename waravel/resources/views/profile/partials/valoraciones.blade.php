@@ -5,8 +5,8 @@
 @section('section')
     <section>
         <div class="flex flex-wrap justify-center gap-4 mb-4">
-            <button onclick="window.location.href='{{ route('profile.products') }}'"
-                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
+            <button onclick="window.location.href='{{ route('profile') }}'"
+                    class="px-4 py-2 rounded-lg text-black bg-[#82ae00] hover:bg-[#BFF205]">
                 <b>Productos</b>
             </button>
             <button onclick="window.location.href='{{ route('profile.reviews') }}'"
@@ -14,12 +14,16 @@
                 <b>Valoraciones</b>
             </button>
             <button onclick="window.location.href='{{ route('profile.orders') }}'"
-                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
+                    class="px-4 py-2 rounded-lg text-black bg-[#82ae00] hover:bg-[#BFF205]">
                 <b>Mis pedidos</b>
             </button>
             <button onclick="window.location.href='{{ route('profile.sales') }}'"
-                    class="px-4 py-2 rounded-lg text-black bg-[#A0D500] hover:bg-[#BFF205]">
+                    class="px-4 py-2 rounded-lg text-black bg-[#82ae00] hover:bg-[#BFF205]">
                 <b>Mis ventas</b>
+            </button>
+            <button onclick="window.location.href='{{ route('profile.favorites') }}'"
+                    class="px-4 py-2 rounded-lg text-black bg-[#82ae00] hover:bg-[#BFF205]">
+                <b>Favoritos</b>
             </button>
         </div>
         <!-- Valoraciones -->

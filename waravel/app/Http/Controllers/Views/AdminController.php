@@ -8,6 +8,7 @@ use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\User;
 use App\Models\Valoracion;
+use App\Models\Venta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -33,13 +34,15 @@ class AdminController extends Controller
         }
 
         $latestProducts = Producto::orderBy('updated_at', 'desc')->limit(10)->get();
-
         $latestClients = User::where('role', 'cliente')
             ->orderBy('updated_at', 'desc')
             ->limit(10)
             ->get();
 
-        return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'admins', 'latestProducts', 'latestClients'));
+        // Obtener las últimas 10 ventas
+        $latestSales = Venta::orderBy('created_at', 'desc')->limit(10)->get();
+
+        return view('admin.dashboard', compact('totalUsers', 'totalProducts', 'puntuaciones', 'admins', 'latestProducts', 'latestClients', 'latestSales'));
     }
 
     private $backupPath = 'backups/';
@@ -271,13 +274,18 @@ class AdminController extends Controller
     public function deleteReview($guid)
     {
         $valoracion = Valoracion::where('guid', $guid)->first();
-        //logers
+
+        if (!$valoracion) {
+            return redirect()->route('admin.reviews')->with('error', 'Valoración no encontrada.');
+        }
+
         Log::info("Eliminando valoración");
-        // Eliminar la valoración y retornar a la lista de valoraciones con un mensaje de éxito
         $valoracion->delete();
         Log::info("Valoración eliminada, Redireccionando a la lista de valoraciones");
+
         return redirect()->route('admin.reviews')->with('success', 'Valoración eliminada correctamente.');
     }
+
 
     public function deleteClient($guid)
     {

@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', "Perfil de {$cliente->nombre}")
 
@@ -75,12 +75,12 @@
         <!-- Sección de Productos y Valoraciones -->
         <div class="w-full md:w-3/4 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
             <div class="flex justify-center mb-4">
-                <button onclick="mostrarSeccion('productos')"
-                        class="px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                <button id="btn-productos" onclick="mostrarSeccion('productos')"
+                        class="px-4 py-2 rounded-lg text-black bg-[#82ae00] hover:bg-[#A0D500] active-tab">
                     <b>Productos</b>
                 </button>
-                <button onclick="mostrarSeccion('valoraciones')"
-                        class="ml-2 px-4 py-2 rounded-lg text-black bg-[#BFF205] hover:bg-[#A0D500]">
+                <button id="btn-valoraciones" onclick="mostrarSeccion('valoraciones')"
+                        class="ml-2 px-4 py-2 rounded-lg text-black bg-[#82ae00] hover:bg-[#A0D500]">
                     <b>Valoraciones</b>
                 </button>
             </div>
@@ -160,8 +160,15 @@
         function mostrarSeccion(seccion) {
             document.getElementById('productos').classList.add('hidden');
             document.getElementById('valoraciones').classList.add('hidden');
+
             document.getElementById(seccion).classList.remove('hidden');
+
+            document.getElementById('btn-productos').classList.remove('active-tab');
+            document.getElementById('btn-valoraciones').classList.remove('active-tab');
+
+            document.getElementById(`btn-${seccion}`).classList.add('active-tab');
         }
+
     </script>
 
     <style>
@@ -180,6 +187,12 @@
         }
         .animate-fadeIn {
             animation: fadeIn 0.5s ease-in-out;
+        }
+        .active-tab {
+            background-color: #BFF205 !important;
+            font-weight: bold;
+            transform: scale(1.05);
+            transition: transform 0.2s ease-in-out;
         }
     </style>
 @endsection
