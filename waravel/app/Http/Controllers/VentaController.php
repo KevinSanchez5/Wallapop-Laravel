@@ -22,6 +22,12 @@ use Stripe\Checkout\Session;
 
 class VentaController extends Controller
 {
+
+    /**
+     * Obtiene todas las ventas de la base de datos, con paginación.
+     *
+     * @return JsonResponse Respuesta JSON con las ventas y la información de paginación.
+     */
     public function index(){
         Log::info('Obteniendo todas las ventas');
 
@@ -55,6 +61,13 @@ class VentaController extends Controller
         Log::info('Ventas obtenidas de la base de datos correctamente');
         return response()->json($customResponse);
     }
+
+    /**
+     * Obtiene los detalles de una venta específica a partir de su GUID.
+     *
+     * @param string $guid El GUID de la venta.
+     * @return JsonResponse Respuesta JSON con los detalles de la venta.
+     */
 
     public function show($guid)
     {
@@ -91,6 +104,13 @@ class VentaController extends Controller
         return response()->json($data);
     }
 
+    /**
+     * Crea una nueva venta, validando los datos proporcionados.
+     *
+     * @param Request $request Los datos de la venta a crear.
+     * @return JsonResponse Respuesta JSON con los detalles de la venta creada o errores de validación.
+     */
+
     public function store(Request $request)
     {
         Log::info('Validando venta');
@@ -114,6 +134,14 @@ class VentaController extends Controller
         return response()->json($venta, 201);
     }
 
+    /**
+     * Elimina una venta de la base de datos, identificada por su GUID.
+     * También elimina la venta de la caché Redis si existe.
+     *
+     * @param string $guid El GUID de la venta a eliminar.
+     * @return JsonResponse Respuesta JSON indicando si la eliminación fue exitosa.
+     */
+
     public function destroy($guid)
     {
         Log::info('Intentando eliminar venta');
@@ -134,6 +162,12 @@ class VentaController extends Controller
 
         return response()->json(['message' => 'Venta eliminada correctamente']);
     }
+
+    /**
+     * Valida los datos del carrito del usuario y prepara la venta para su procesamiento.
+     *
+     * @return mixed Redirige en caso de error o retorna los datos de la venta para su pago.
+     */
 
     public function validandoVentaAPartirDeCarrito()
     {
@@ -218,6 +252,12 @@ class VentaController extends Controller
         return $venta;
     }
 
+    /**
+     * Procesa la compra, valida el carrito, crea el precio en Stripe y genera la sesión de pago.
+     *
+     * @return mixed Redirige al usuario a Stripe para procesar el pago o muestra errores si algo falla.
+     */
+
     public function procesarCompra(){
         Log::info('Iniciando proceso de compra');
 
@@ -240,6 +280,14 @@ class VentaController extends Controller
 
         return redirect()->away($checkoutSession->url);
     }
+    /**
+     * Guarda una venta en la base de datos.
+     *
+     * Este método recibe un arreglo con los datos de la venta y los guarda en la base de datos.
+     *
+     * @param array $venta Los datos de la venta a guardar.
+     * @return void
+     */
 
     public function guardarVenta(array $venta)
     {
@@ -248,6 +296,16 @@ class VentaController extends Controller
         $ventaModel->save();
         Log::info('Venta guardada correctamente');
     }
+
+    /**
+     * Procesa el pago exitoso de Stripe y guarda la venta en la base de datos.
+     *
+     * Este método se ejecuta después de que el pago haya sido completado con éxito en Stripe.
+     * Verifica el estado del pago, guarda la venta y limpia la sesión.
+     *
+     * @param Request $request La solicitud de pago con los datos necesarios.
+     * @return \Illuminate\Http\RedirectResponse Redirige al usuario según el resultado del pago.
+     */
 
     public function pagoSuccess(Request $request)
     {
@@ -266,21 +324,21 @@ class VentaController extends Controller
                 if(!$venta){
                     return redirect()-> route('pago.error')->with('error', 'Venta no encontrada');
                 }
-                //TODO nuevo campo en caso de reembolso
+
                 //$venta['payment_intent_id'] = $checkoutSession->payment_intent;
-                $venta['payment_intent_id'] = $checkoutSession->payment_intent; // Asignar el payment_intent
+                $venta['payment_intent_id'] = $checkoutSession->payment_intent;
 
                 $this->guardarVenta($venta);
 
-                session()->forget('carrito'); // Eliminar el carrito de la sesión
-                session()->forget('venta');   // Eliminar la venta de la sesión
+                session()->forget('carrito');
+                session()->forget('venta');
                 session()->forget('stripe_session_id');
 
-                return redirect()->route('payment.success'); // Ruta donde el usuario ve el mensaje de éxito
+                return redirect()->route('payment.success');
 
             } else {
 
-                return redirect()->route('payment.error'); // Ruta para error de pago
+                return redirect()->route('payment.error'); 
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
@@ -349,9 +407,15 @@ class VentaController extends Controller
         }
     }
 
+    /**
+     * Reembolsa un pago realizado a través de Stripe.
+     *
+     * Este método procesa un reembolso si el pago aún no ha sido procesado.
+     *
+     * @param string $paymentIntentId El ID del PaymentIntent que se desea reembolsar.
+     * @return \Illuminate\Http\JsonResponse El resultado del reembolso o un error si ocurre.
+     */
 
-    //TODO posible funcion para reembolsar el pago y cancelar la venta
-    // siempre y cuando no alcance un estado diferente a procesado
     public function reembolsarPago($paymentIntentId){
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -370,6 +434,15 @@ class VentaController extends Controller
             return response()-> json(['error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Genera un archivo PDF con los detalles de la venta.
+     *
+     * Este método obtiene los datos de la venta (desde Redis o la base de datos) y genera un PDF.
+     *
+     * @param string $guid El GUID de la venta para generar el PDF.
+     * @return \Illuminate\Http\Response El archivo PDF generado.
+     */
 
     public function generatePdf($guid)
     {
