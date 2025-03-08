@@ -338,7 +338,7 @@ class VentaController extends Controller
 
             } else {
 
-                return redirect()->route('payment.error'); 
+                return redirect()->route('payment.error');
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
