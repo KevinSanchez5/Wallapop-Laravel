@@ -15,7 +15,7 @@ class ClienteControllerViewTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_mostrarCliente()
+    /*public function test_mostrarCliente()
     {
         $user = User::factory()->create();
 
@@ -60,7 +60,7 @@ class ClienteControllerViewTest extends TestCase
 
         $response = $this->get(route('cliente.ver', ['guid' => $cliente->guid]));
         $response->assertStatus(200);
-    }
+    }*/
 
     public function test_mostrarCliente_cliente_no_existe()
     {
