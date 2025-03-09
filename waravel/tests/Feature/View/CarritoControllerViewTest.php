@@ -326,6 +326,27 @@ class CarritoControllerViewTest extends TestCase
         $response->assertViewIs('pages.orderSummary');
     }
 
+    public function test_show_order_with_empty_cart(){
+        $user = User::factory()->create();
+        $user->role = 'cliente';
+        Cliente::factory()->create(
+            [
+                'usuario_id' => $user->id
+            ]
+        );
+        $this->actingAs($user);
+
+        Session::put('carrito', new Carrito([
+            'lineasCarrito' => [],
+            'precioTotal' => 0,
+            'itemAmount' => 0
+        ]));
+
+        $response = $this->get(route('carrito.checkout'));
+        $response->assertRedirect(route('carrito'));
+        $response->assertSessionHas('error', 'Añada productos al carrito antes de realizar una compra');
+    }
+
     public function test_show_order_with_missing_client(){
         $user = User::factory()->create();
         $user->role = 'cliente';
