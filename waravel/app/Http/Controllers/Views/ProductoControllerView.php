@@ -149,14 +149,20 @@ class ProductoControllerView extends Controller
 
     public function store(Request $request)
     {
-        Log::info('Creando un nuevo producto');
-
+        // Verificar si el usuario está autenticado
         if (!auth()->check()) {
             return redirect()->route('login')->with('error', 'Debes estar logeado para crear un producto');
         }
 
+        // Obtener el ID del cliente autenticado
+        $clienteId = $this->getClienteId();
+        if (!$clienteId) {
+            return redirect()->route('profile')->with('error', 'No se pudo obtener el ID del cliente');
+        }
+
+        // Validar los datos del formulario
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => 'required|string|min:3|max:255',
             'descripcion' => 'required|string',
             'estadoFisico' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
@@ -169,8 +175,7 @@ class ProductoControllerView extends Controller
             'imagen5' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        $clienteId = $this->getClienteId();
-
+        // Crear el producto
         $producto = Producto::create([
             'vendedor_id' => $clienteId,
             'nombre' => $request->nombre,
@@ -180,35 +185,23 @@ class ProductoControllerView extends Controller
             'stock' => $request->stock,
             'categoria' => $request->categoria,
             'estado' => 'Disponible',
-            'imagenes' => [],  // Inicializar como array vacío
+            'imagenes' => [], // Inicializar como array vacío
         ]);
 
+        // Procesar y almacenar imágenes
         $imagenes = [];
-
         for ($i = 1; $i <= 5; $i++) {
             if ($request->hasFile("imagen$i")) {
-                $imagenRequest = Request::create('/', 'POST', [], [], ['image' => $request->file("imagen$i")], []);
-
-                if (!$imagenRequest->hasFile('image')) {
-                    Log::error("Error procesando imagen$i");
-                    return response()->json(['error' => "Error procesando imagen$i"], 400);
-                }
-
-                // Obtener solo la ruta de la imagen
-                $imagenUrl = $this->addListingPhoto($imagenRequest, $producto->id);
+                $imagenUrl = $request->file("imagen$i")->store('imagenes', 'public');
                 $imagenes[] = $imagenUrl;
             }
         }
 
-        // Guarda las rutas de las imágenes
+        // Guardar las rutas de las imágenes en el modelo
         $producto->imagenes = $imagenes;
         $producto->save();
 
-        // Guarda el producto en la caché con las imágenes correctamente guardadas
-        Cache::put("producto_{$producto->guid}", $producto->toArray(), now());
-
-        Log::info('Producto creado correctamente', ['producto' => $producto]);
-
+        // Redirigir con mensaje de éxito
         return redirect()->route('profile')->with('success', 'Producto añadido correctamente.');
     }
 
@@ -333,7 +326,6 @@ class ProductoControllerView extends Controller
      * @return \Illuminate\View\View La vista para agregar un producto.
      */
 
-
     public function showAddForm()
     {
         Log::info('Acceso al formulario de creación de producto');
@@ -451,7 +443,6 @@ class ProductoControllerView extends Controller
 
     public function changestatus($guid)
     {
-        // Verificar si el usuario está autenticado
         if (!auth()->check()) {
             return redirect()->route('login')->with('error', 'Debes estar logeado para cambiar el estado del producto');
         }
@@ -463,6 +454,7 @@ class ProductoControllerView extends Controller
             return redirect()->route('profile')->with('error', 'Producto no encontrado');
         }
 
+        // Obtener el ID del cliente autenticado
         $clienteId = $this->getClienteId();
 
         // Verificar si el cliente autenticado es el vendedor del producto
@@ -478,5 +470,4 @@ class ProductoControllerView extends Controller
         // Redirigir con mensaje de éxito
         return redirect()->route('profile')->with('success', 'Estado del producto actualizado correctamente.');
     }
-
 }

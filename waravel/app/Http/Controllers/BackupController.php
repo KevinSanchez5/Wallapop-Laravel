@@ -80,11 +80,11 @@ class BackupController extends Controller
         exec($command, $output, $resultCode);
 
         if ($resultCode !== 0) {
+            Log::error('Error al crear el backup de la base de datos', ['output' => $output]);
             return response()->json(['error' => 'Error al crear el backup de la base de datos'], 500);
         }
 
         // Crear el archivo ZIP con el SQL y los archivos de almacenamiento
-
         $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
             $zip->addFile($sqlPath, $sqlFilename);
@@ -106,6 +106,7 @@ class BackupController extends Controller
 
             unlink($sqlPath);
         } else {
+            Log::error('Error al crear el archivo ZIP');
             return response()->json(['error' => 'Error al crear el archivo ZIP'], 500);
         }
 

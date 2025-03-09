@@ -109,4 +109,77 @@ class BackupControllerTest extends TestCase
         $this->assertFileDoesNotExist($file1);
         $this->assertFileDoesNotExist($file2);
     }
+
+    private function mockCommandExecution($expectedCommand, $output, $resultCode)
+    {
+        $this->app->bind('exec', function ($command, &$outputMock, &$resultCodeMock) use ($expectedCommand, $output, $resultCode) {
+            if ($command === $expectedCommand) {
+                $outputMock = $output;
+                $resultCodeMock = $resultCode;
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public function test_getAllBackups()
+    {
+        $backupPath = storage_path('app/backups/');
+        if (!file_exists($backupPath)) {
+            mkdir($backupPath, 0777, true);
+        }
+
+        $filename = 'test_backup.zip';
+        file_put_contents($backupPath . $filename, 'dummy content');
+
+        $response = $this->getJson('/api/backups');
+
+        $response->assertStatus(200)
+            ->assertJson([$filename]);
+
+        unlink($backupPath . $filename);
+    }
+
+    public function test_deleteBackup_not_found()
+    {
+        $response = $this->deleteJson('/api/backups/delete/nonexistent.zip');
+
+        $response->assertStatus(404)
+            ->assertJson(['error' => 'Backup no encontrado']);
+    }
+
+    public function test_backup_directory_creation()
+    {
+        $backupPath = storage_path('app/backups');
+        if (file_exists($backupPath)) {
+            rmdir($backupPath);
+        }
+
+        $this->assertDirectoryDoesNotExist($backupPath);
+
+        $response = $this->getJson('/api/backups');
+
+        $this->assertDirectoryExists($backupPath);
+
+        $response->assertStatus(200)
+            ->assertJson([]);
+    }
+
+    public function test_deleteBackup_invalid_format()
+    {
+        $backupPath = storage_path('app/backups/');
+        if (!file_exists($backupPath)) {
+            mkdir($backupPath, 0777, true);
+        }
+
+        $filename = 'test_backup.txt';
+        file_put_contents($backupPath . $filename, 'dummy content');
+
+        $response = $this->deleteJson('/api/backups/delete/' . $filename);
+
+        $response->assertStatus(400)
+            ->assertJson(['error' => 'Formato de archivo no permitido']);
+
+        unlink($backupPath . $filename);
+    }
 }

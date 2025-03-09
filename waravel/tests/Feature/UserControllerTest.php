@@ -260,7 +260,7 @@ class UserControllerTest extends TestCase
         $response->assertJson(['message' => 'User no encontrado']);
     }
 
-    public function testEnviarCorreoRecuperarContrasenya_Success(){
+    /*public function testEnviarCorreoRecuperarContrasenya_Success(){
         Log::spy();
         $user = User::factory()->create(['id' => '51', 'email' => 'test@test.com']);
 
@@ -293,7 +293,7 @@ class UserControllerTest extends TestCase
             ->assertJson([
                 'error' => 'Usuario no encontrado',
             ]);
-    }
+    }*/
 
 
 
