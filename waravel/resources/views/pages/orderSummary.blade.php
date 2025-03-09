@@ -96,13 +96,14 @@
 
                     <form action="{{ route('pagarcarrito') }}" method="POST">
                         @csrf
-                        <button type="submit" class="block w-full bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+                        <button id="submit-button" type="submit" disabled
+                                class="block w-full bg-[#82ae00] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 opacity-50 pointer-events-none">
                             Continuar
                         </button>
                     </form>
                     <div class="flex items-center justify-end">
-                        <label for="terms-checkbox-2" class="ms-2 mt-2 text-sm font-medium text-gray-900 dark:text-gray-300"> Acepto los <a href="" title="" class="text-primary-700 underline hover:no-underline dark:text-[#BFF205]">Términos y Condiciones</a></label>
-                        <input id="terms-checkbox-2" type="checkbox" value="" class="h-4 w-4 ml-2 mt-2 rounded border-gray-300 bg-gray-100 text-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600" />
+                        <label for="terms-checkbox-2" class="ms-2 mt-2 text-sm font-medium text-gray-900 dark:text-gray-300"> Acepto los <a href="terminos.html" title="aceptar términos y condiciones" class="text-primary-700 underline hover:no-underline dark:text-[#BFF205]">Términos y Condiciones</a></label>
+                        <input onchange="toggleButton(this)" id="terms-checkbox-2" type="checkbox" value="" class="h-4 w-4 ml-2 mt-2 rounded border-gray-300 bg-gray-100 text-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600" />
                     </div>
                 </div>
             </div>
@@ -110,3 +111,14 @@
     </div>
     <x-footer />
 @endsection
+
+<script>
+    function toggleButton(checkbox) {
+        const button = document.getElementById("submit-button");
+        button.disabled = !checkbox.checked;
+        button.classList.toggle("opacity-50", !checkbox.checked);
+        button.classList.toggle("pointer-events-none", !checkbox.checked);
+        button.classList.toggle("bg-[#BFF205]", checkbox.checked);
+        button.classList.toggle("bg-[#82ae00]", !checkbox.checked);
+    }
+</script>
