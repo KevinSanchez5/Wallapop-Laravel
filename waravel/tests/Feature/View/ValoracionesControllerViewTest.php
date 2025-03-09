@@ -48,7 +48,39 @@ class ValoracionesControllerViewTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'cliente']);
         $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
-        $venta = Venta::factory()->create();
+        $venta = Venta::create([
+            'guid' => GuidGenerator::generarId(),
+            'comprador' => [
+                'guid'=>'DU6jCZtareb',
+                'id' => Cliente::factory()->create()->id,
+                'nombre' => 'John',
+                'apellido' => 'Doe'
+            ],
+            'estado' => 'Pendiente',
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => Cliente::factory()->create()->id,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'G4YXT9K5QLV',
+                        'id' => 1,
+                        'nombre' => 'Portatil Gamer',
+                        'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
+                        'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 800.00,
+                        'categoria' => 'Tecnologia'
+                    ],
+                    'precioTotal' => 2 * 800.00,
+                ]
+            ],
+            'precioTotal' => 1600.00,
+        ]);
         $this->actingAs($user);
 
         $response = $this->get(route('write.review',$venta->guid));

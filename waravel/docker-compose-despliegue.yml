@@ -1,0 +1,98 @@
+services:
+    app:
+        build:
+          context: ./
+          dockerfile: Despliegue.Dockerfile
+          args:
+            user: user
+            uid: 1000
+        image: 'waravel'
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+          - .:/var/www
+          - ./.env.production:/var/www/.env
+        networks:
+            - waravel
+        depends_on:
+            - pgsql
+            - redis
+        command: |
+          bash -c "
+            php artisan migrate:fresh --seed --force && \
+            npm install && \
+            npm run build && \
+            php artisan storage:link && \
+            php artisan test --coverage-html docs/coverage --debug || true && \
+            php artisan serve --host=0.0.0.0
+          "
+    pgsql:
+        image: 'postgres:17'
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-secret}'
+            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+        volumes:
+            - 'db-data:/var/lib/postgresql/data'
+            - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
+        networks:
+            - waravel
+        healthcheck:
+            test:
+                - CMD
+                - pg_isready
+                - '-q'
+                - '-d'
+                - '${DB_DATABASE}'
+                - '-U'
+                - '${DB_USERNAME}'
+            retries: 3
+            timeout: 5s
+
+    redis:
+        image: 'redis:7'
+        networks:
+            - waravel
+        volumes:
+            - 'redis-data:/data'
+
+    proxy:
+      image: ubuntu/nginx
+      container_name: proxy
+      ports:
+        - "80:80"
+        - "443:443"
+      restart: always
+      networks:
+        - waravel
+      depends_on:
+        - app
+        - coverage
+      volumes:
+        - ./despliegue/proxy/conf/nginx.conf:/etc/nginx/nginx.conf
+        - ./despliegue/proxy/certs:/etc/nginx/certs
+
+    coverage:
+      image: ubuntu/nginx
+      container_name: coverage
+      networks:
+        - waravel
+      restart: always
+      volumes:
+        - ./docs/coverage:/var/www/html/
+        - ./despliegue/coverage/sites-available:/etc/nginx/sites-available
+      depends_on:
+        - app
+
+networks:
+  waravel:
+      driver: bridge
+
+volumes:
+  db-data:
+    driver: local
+  redis-data:
+    driver: local
+  coverage-volume:
+    driver: local
