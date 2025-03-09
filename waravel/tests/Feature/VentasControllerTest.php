@@ -380,11 +380,41 @@ class VentasControllerTest extends TestCase
 
         $response = $this->postJson(route('pagarcarrito'));
 
-        $response->assertStatus(200);
+        $response->assertStatus(302);
         $this->assertNotEmpty(session('carrito')->lineasCarrito);
     }
 
-    public function testGuardarVenta()
+    public function testCrearVenta()
+    {
+        $cliente = Cliente::factory()->create();
+        $lineasVenta = [
+            [
+                'producto' => ['id' => 1, 'nombre' => 'Producto 1'],
+                'cantidad' => 2,
+                'precio' => 100
+            ],
+            [
+                'producto' => ['id' => 2, 'nombre' => 'Producto 2'],
+                'cantidad' => 1,
+                'precio' => 200
+            ]
+        ];
+        $precioDeTodo = 400;
+
+        $venta = $this->controller->crearVenta($cliente, $lineasVenta, $precioDeTodo);
+
+        // Verificar que la venta se haya creado correctamente
+        $this->assertEquals($cliente->usuario->id, $venta['comprador']['id']);
+        $this->assertEquals($cliente->usuario->guid, $venta['comprador']['guid']);
+        $this->assertEquals($cliente->nombre, $venta['comprador']['nombre']);
+        $this->assertEquals($cliente->apellido, $venta['comprador']['apellido']);
+        $this->assertEquals($lineasVenta, $venta['lineaVentas']);
+        $this->assertEquals($precioDeTodo, $venta['precioTotal']);
+        $this->assertEquals('Pendiente', $venta['estado']);
+        $this->assertNotNull($venta['created_at']);
+    }
+
+        public function testGuardarVenta()
     {
         $producto = Producto::factory()->create();
 
@@ -420,7 +450,7 @@ class VentasControllerTest extends TestCase
         $this->assertDatabaseCount('ventas', 1);
     }
 
-    public function testCrearSesionPagoExito()
+    public function testCrearSesionPagoSuccess()
     {
         $precioId = 'price_123';
         $expectedSessionId = 'session_123';
@@ -549,62 +579,179 @@ class VentasControllerTest extends TestCase
         $this->assertEquals('{"error":"Stripe error: No se pudo crear el producto"}', $response->content('error') );
     }
 
+    public function testReembolsarPagoSuccess()
+    {
+        $paymentIntentId = 'pi_123456';
+        $chargeId = 'ch_789012';
+        $coste = 20.00;
+        $refundId = 're_345678';
+
+        $paymentIntentMock = Mockery::mock('alias:' . PaymentIntent::class);
+        $paymentIntentMock->shouldReceive('retrieve')
+            ->once()
+            ->with($paymentIntentId)
+            ->andReturn((object)[
+                'latest_charge' => $chargeId,
+                'status' => 'succeeded'
+            ]);
+
+        $chargeMock = Mockery::mock('alias:' . Charge::class);
+        $chargeMock->shouldReceive('retrieve')
+            ->once()
+            ->with($chargeId)
+            ->andReturn((object)[
+                'refunded' => false
+            ]);
+
+        $refundMock = Mockery::mock('alias:' . Refund::class);
+        $refundMock->shouldReceive('create')
+            ->once()
+            ->with([
+                'charge' => $chargeId,
+                'amount' => $coste * 100,
+            ])
+            ->andReturn((object)['id' => $refundId]);
+
+        $response = $this->controller->reembolsarPago($paymentIntentId, $coste);
+
+        // Verificar que el reembolso fue exitoso
+        $this->assertEquals('success', $response['status']);
+        $this->assertEquals('Reembolso realizado', $response['message']);
+        $this->assertEquals($refundId, $response['reembolso']->id);
+    }
+
+    public function testReembolsarPagoPagoYaReembolsado()
+    {
+        $paymentIntentId = 'pi_123456';
+        $chargeId = 'ch_789012';
+        $coste = 20.00;
+
+        $paymentIntentMock = Mockery::mock('alias:' . PaymentIntent::class);
+        $paymentIntentMock->shouldReceive('retrieve')
+            ->once()
+            ->with($paymentIntentId)
+            ->andReturn((object)[
+                'latest_charge' => $chargeId,
+                'status' => 'succeeded'
+            ]);
+
+        $chargeMock = Mockery::mock('alias:' . Charge::class);
+        $chargeMock->shouldReceive('retrieve')
+            ->once()
+            ->with($chargeId)
+            ->andReturn((object)[
+                'refunded' => true
+            ]);
+
+        $response = $this->controller->reembolsarPago($paymentIntentId, $coste);
+
+        $this->assertEquals('error', $response['status']);
+        $this->assertEquals('Esa venta no ha sido pagada o ya ha sido reembolsada', $response['message']);
+    }
+
+    public function testReembolsarPagoLanzaExcepcion()
+    {
+        $paymentIntentId = 'pi_123456';
+        $coste = 20.00;
+
+        $paymentIntentMock = Mockery::mock('alias:' . PaymentIntent::class);
+        $paymentIntentMock->shouldReceive('retrieve')
+            ->once()
+            ->andThrow(new \Exception('Stripe error: No se pudo recuperar el pago'));
+
+        $response = $this->controller->reembolsarPago($paymentIntentId, $coste);
+
+        $this->assertEquals('error', $response['status']);
+        $this->assertEquals('Stripe error: No se pudo recuperar el pago', $response['message']);
+    }
 
 
-    /*
     public function testCancelarVentaVentaNoEncontrada()
     {
-        $response = $this->getJson('/ventas/cancelar/test-guid');
-        $response->assertRedirect(route('profile')->with('error', 'Venta no encontrada'));
+        $response = $this->put("api/ventas/cancelar/guid");
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'Venta no encontrada');
     }
 
     public function testCancelarVentaUsuarioNoAutorizado()
     {
-        $venta = Venta::factory()->make(['guid' => 'test-guid', 'comprador' => ['guid' => 'other-user-guid']]);
-        $user = User::factory()->make(['guid' => 'test-user-guid']);
-        Auth::login($user);
+        $user = User::factory()->create();
+        Auth::loginUsingId(1);
 
-        $response = $this->getJson('/ventas/cancelar/test-guid');
+        $venta = Venta::factory()->create(['guid' => GuidGenerator::generarId()]);
+
+        $response = $this->put("api/ventas/cancelar/{$venta->guid}");
         $response->assertRedirect(route('profile'));
         $response->assertSessionHas('error', 'No tienes permiso para cancelar esta venta');
     }
 
     public function testCancelarVentaEstadoNoPendiente()
     {
-        $venta = Venta::factory()->make(['guid' => 'test-guid', 'estado' => 'Entregado']);
 
-        // Hacer la solicitud y verificar la respuesta
-        $response = $this->getJson( '/ventas/cancelar/test-guid');
-        $response->assertRedirect(route('payment.error'));
+        $venta = Venta::factory()->create(['estado'=> 'Entregado']);
+
+        $response = $this->put( "api/ventas/cancelar/{$venta->guid}");
+        $response->assertRedirect(route('profile'));
         $response->assertSessionHas('error', 'No se puede cancelar la venta ya que el estado de su compra es: Entregado');
     }
 
     public function testCancelarVentaReembolsoFallido()
     {
-        $venta = Venta::factory()->make(['guid' => 'test-guid', 'estado' => 'Pendiente', 'payment_intent_id' => null]);
+        $venta = Venta::factory()->create();
 
+        $this->controller->reembolsarPago($venta->payment_intent_id, $venta->guid);
 
-        // Hacer la solicitud y verificar la respuesta
-        $response = $this->getJson( '/ventas/cancelar/test-guid');
+        $response = $this->controller->cancelarVenta($venta->guid);
         $response->assertRedirect(route('profile'));
         $response->assertSessionHas('error', 'No se pudo realizar el reembolso. La venta no ha sido cancelada.');
     }
 
-    public function testCancelarVentaExito()
+
+    public function testPagoSuccessSesionValida()
     {
-        $venta = Venta::factory()->create();
+        // Simular el Session de Stripe
+        $sessionMock = Mockery::mock('alias:' . StripeSession::class);
+        $sessionMock->shouldReceive('retrieve')->andReturn((object)[
+            'payment_intent' => 'pi_123456789'
+        ]);
 
+        // Simular el PaymentIntent de Stripe
+        $paymentIntentMock = Mockery::mock('alias:' .PaymentIntent::class);
+        $paymentIntentMock->shouldReceive('retrieve')->andReturn((object)[
+            'status' => 'succeeded'
+        ]);
 
-        $this->partialMock(VentaController::class, function ($mock) {
-            $mock->shouldReceive('reembolsarPago')
-                ->andReturn(['status' => 'success']);
-            $mock->shouldReceive('devolviendoProductos')
-                ->with(null);
-        });
+        // Simular la sesión de Laravel
+        session(['stripe_session_id' => 'sess_123', 'venta' => ['total' => 100]]);
 
-        // Hacer la solicitud y verificar la respuesta
-        $response = $this->getJson( '/ventas/cancelar/' . $venta->guid);
-        $response->assertRedirect(route('profile'));
-        $response->assertSessionHas('success', 'Venta Cancelada');
-    }*/
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        $response = $this->get('/pago/save');
+
+        // Verificar que la redirección fue exitosa
+        $response->assertRedirect(route('payment.success'));
+
+        // Verificar que la sesión se ha vaciado
+        $this->assertNull(session('venta'));
+        $this->assertNull(session('stripe_session_id'));
+    }
+
+    public function testPagoSuccessSinSession()
+    {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        $response = $this->get('/pago/save');
+
+        $response->assertRedirect(route('payment.error'));
+    }
+
+    public function testPagoSuccessPagoFallido()
+    {
+        Stripe::setApiKey('sk_false_123');
+
+        $response = $this->get('/pago/save');
+
+        $response->assertRedirect(route('payment.error'));
+    }
+
 }
