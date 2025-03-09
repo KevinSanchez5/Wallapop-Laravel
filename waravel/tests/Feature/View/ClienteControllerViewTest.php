@@ -164,4 +164,133 @@ class ClienteControllerViewTest extends TestCase
         $response = $this->get(route('cliente.ver', ['guid' => $cliente->guid]));
         $response->assertStatus(200);
     }
+
+    public function test_añadirFavorito()
+    {
+        $user = User::factory()->create();
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $producto = Producto::factory()->create();
+
+        $response = $this->actingAs($user)->postJson(route('favorito.añadir'), [
+            'productoGuid' => $producto->guid,
+            'userId' => $user->id,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 200, 'message' => 'Producto agregado a favoritos']);
+        $this->assertTrue($cliente->favoritos->contains($producto));
+    }
+
+    public function test_añadirFavorito_producto_ya_existe()
+    {
+        $user = User::factory()->create();
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $producto = Producto::factory()->create();
+        $cliente->favoritos()->attach($producto->id);
+
+        $response = $this->actingAs($user)->postJson(route('favorito.añadir'), [
+            'productoGuid' => $producto->guid,
+            'userId' => $user->id,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 200, 'message' => 'Producto ya añadido en favoritos']);
+    }
+
+    public function test_añadirFavorito_producto_no_existe()
+    {
+        $user = User::factory()->create();
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+
+        $response = $this->actingAs($user)->postJson(route('favorito.añadir'), [
+            'productoGuid' => 'guid-invalido',
+            'userId' => $user->id,
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Producto no encontrado']);
+    }
+
+    public function test_añadirFavorito_cliente_no_existe()
+    {
+        $user = User::factory()->create();
+        $producto = Producto::factory()->create();
+
+        $response = $this->actingAs($user)->postJson(route('favorito.añadir'), [
+            'productoGuid' => $producto->guid,
+            'userId' => 999, // ID de cliente que no existe
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Cliente no encontrado']);
+    }
+
+    public function test_añadirFavorito_no_autenticado()
+    {
+        $producto = Producto::factory()->create();
+
+        $response = $this->postJson(route('favorito.añadir'), [
+            'productoGuid' => $producto->guid,
+            'userId' => 1,
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_eliminarFavorito()
+    {
+        $user = User::factory()->create();
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $producto = Producto::factory()->create();
+        $cliente->favoritos()->attach($producto->id);
+
+        $response = $this->actingAs($user)->deleteJson(route('favorito.eliminar'), [
+            'productoGuid' => $producto->guid,
+            'userId' => $user->id,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 200, 'message' => 'Producto eliminado de favoritos']);
+        $this->assertFalse($cliente->favoritos->contains($producto));
+    }
+
+    public function test_eliminarFavorito_producto_no_existe()
+    {
+        $user = User::factory()->create();
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+
+        $response = $this->actingAs($user)->deleteJson(route('favorito.eliminar'), [
+            'productoGuid' => 'guid-invalido',
+            'userId' => $user->id,
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Producto no encontrado']);
+    }
+
+    public function test_eliminarFavorito_cliente_no_existe()
+    {
+        $user = User::factory()->create();
+        $producto = Producto::factory()->create();
+
+        $response = $this->actingAs($user)->deleteJson(route('favorito.eliminar'), [
+            'productoGuid' => $producto->guid,
+            'userId' => 999, // ID de cliente que no existe
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson(['message' => 'Cliente no encontrado']);
+    }
+
+    public function test_eliminarFavorito_no_autenticado()
+    {
+        $producto = Producto::factory()->create();
+
+        $response = $this->deleteJson(route('favorito.eliminar'), [
+            'productoGuid' => $producto->guid,
+            'userId' => 1,
+        ]);
+
+        $response->assertStatus(401);
+    }
 }
