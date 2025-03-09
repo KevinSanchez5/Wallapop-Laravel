@@ -100,10 +100,11 @@ class VentaController extends Controller
         Log::info('Validando venta');
 
         $validator = Validator::make($request->all(), [
-            'estado' =>'required|string|max:255',
             'comprador' => 'required|array',
             'lineaVentas' => 'required|array',
             'precioTotal' => 'required|numeric|min:0',
+            'estado' =>'required|string|in:Pendiente,Procesando,Enviado,Entregado,Cancelado',
+            'payment_intent_id' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
