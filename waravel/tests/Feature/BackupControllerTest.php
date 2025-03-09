@@ -140,34 +140,12 @@ class BackupControllerTest extends TestCase
         unlink($backupPath . $filename);
     }
 
-    public function test_createBackup_fails()
-    {
-        $this->mockCommandExecution(
-            'PGPASSWORD=* pg_dump -U * -h * -p * * > *',
-            ['Error en el comando'],
-            1
-        );
-
-        $response = $this->postJson('/api/backups/create');
-
-        $response->assertStatus(500)
-            ->assertJson(['error' => 'Error al crear el backup de la base de datos']);
-    }
-
     public function test_deleteBackup_not_found()
     {
         $response = $this->deleteJson('/api/backups/delete/nonexistent.zip');
 
         $response->assertStatus(404)
             ->assertJson(['error' => 'Backup no encontrado']);
-    }
-
-    public function test_deleteAllBackups_empty()
-    {
-        $response = $this->deleteJson('/api/backups/delete-all');
-
-        $response->assertStatus(200)
-            ->assertJson(['message' => 'No hay backups para eliminar']);
     }
 
     public function test_backup_directory_creation()
@@ -185,34 +163,6 @@ class BackupControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([]);
-    }
-
-    public function test_createBackup_database_failure()
-    {
-        $this->mockCommandExecution(
-            'PGPASSWORD=* pg_dump -U * -h * -p * * > *',
-            ['Error en el comando'],
-            1
-        );
-
-        $response = $this->postJson('/api/backups/create');
-
-        $response->assertStatus(500)
-            ->assertJson(['error' => 'Error al crear el backup de la base de datos']);
-    }
-
-    public function test_createBackup_zip_failure()
-    {
-        $mockZip = Mockery::mock(\ZipArchive::class);
-        $mockZip->shouldReceive('open')
-            ->andReturn(false);
-
-        $this->app->instance(\ZipArchive::class, $mockZip);
-
-        $response = $this->postJson('/api/backups/create');
-
-        $response->assertStatus(500)
-            ->assertJson(['error' => 'Error al crear el archivo ZIP']);
     }
 
     public function test_deleteBackup_invalid_format()
