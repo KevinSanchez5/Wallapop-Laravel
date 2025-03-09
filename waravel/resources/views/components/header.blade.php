@@ -32,7 +32,7 @@
                 <!-- Dropdown de usuario -->
                 <x-dropdown align="right" width="56" class="dropdown-menu">
                     <x-slot name="trigger">
-                        <button class="btn-mobile h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-all duration-300 ease-in-out bg-white hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white">
+                        <button class="btn-mobile h-10 flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-all duration-300 bg-opacity-75 dark:bg-opacity-75 ease-in-out bg-white hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white">
                             <img src="{{ asset('storage/' . (Auth::user()->avatar ?? 'clientes/avatar.png')) }}"
                                  alt="Avatar de {{ Auth::user()->name }}"
                                  class="w-8 h-8 rounded-full object-cover mr-2">
@@ -71,7 +71,7 @@
                 </x-dropdown>
             @else
                 <a href="{{ route('login') }}"
-                   class="h-10 flex items-center justify-center text-base font-extrabold tracking-wide bg-white text-black hover:text-white hover:bg-black dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black rounded-lg transition-all border-2 border-transparent shadow-md px-6 sm:px-3">
+                   class="h-10 flex items-center justify-center text-base font-extrabold tracking-wide bg-opacity-75 dark:bg-opacity-75 bg-white text-black hover:text-white hover:bg-black dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black rounded-lg transition-all border-2 border-transparent shadow-md px-6 sm:px-3">
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                          class="w-6 h-6 transition-colors duration-300">
                         <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -80,45 +80,8 @@
                 </a>
             @endauth
 
-            @if(auth()->check() && auth()->user()->role === 'cliente')
-                @php
-                    $notificaciones = auth()->user()->notificaciones_no_leidas ?? 0; // Ajusta esta variable con la consulta adecuada
-                @endphp
-
-                <div x-data="{ isOpen: false }" class="relative">
-                    <!-- Icono de notificación -->
-                    <button @click="isOpen = !isOpen"
-                            class="relative flex items-center justify-center w-10 h-10 rounded-full bg-white hover:text-white hover:bg-black  dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white transition text-sm transition-all duration-300">
-                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-
-
-                        <!-- Número de notificaciones -->
-                        @if($notificaciones > 0)
-                            <span class="absolute -top-1 -right-1 bg-white text-red-500 text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                {{ $notificaciones }}
-            </span>
-                        @endif
-                    </button>
-
-                    <!-- Menú desplegable de notificaciones -->
-                    <div x-show="isOpen" @click.away="isOpen = false"
-                         class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-2 z-50">
-                        <p class="text-gray-600 text-sm">
-                            @if($notificaciones > 0)
-                                Tienes {{ $notificaciones }} notificaciones nuevas.
-                            @else
-                                No tienes nuevas notificaciones.
-                            @endif
-                        </p>
-                    </div>
-                </div>
-            @endif
-
                 <!-- Modo oscuro -->
-            <button id="modoOscuroBtn" class="relative flex items-center justify-center w-10 h-10 rounded-full bg-white hover:text-white hover:bg-black  dark:hover:text-black dark:hover:bg-white dark:bg-black dark:text-white transition text-sm transition-all duration-300" aria-label="Cambiar modo de tema">
+                <button id="modoOscuroBtn" class="relative flex items-center justify-center w-10 h-10 rounded-full bg-white bg-opacity-75 backdrop-blur-md hover:bg-opacity-100 hover:text-white hover:bg-black dark:bg-black dark:bg-opacity-75 dark:text-white dark:hover:bg-white dark:hover:text-black transition text-sm transition-all duration-300" aria-label="Cambiar modo de tema">
                 <svg id="modoOscuroIconLuz" class="hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
