@@ -411,6 +411,10 @@ class CarritoControllerView extends Controller
             return redirect()->route('carrito')->with('error', 'No se ha encontrado un cliente asociado al usuario');
         }
 
+        if ($cart->lineasCarrito == []){
+            Log::warning('No hay productos en el carrito');
+            return redirect()->route('carrito')->with('error', 'Añada productos al carrito antes de realizar una compra');
+        }
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));
     }
