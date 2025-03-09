@@ -248,7 +248,7 @@ class VentaController extends Controller
         ];
     }
 
-    private function crearVenta($cliente, $lineasVenta, $precioDeTodo)
+    public function crearVenta($cliente, $lineasVenta, $precioDeTodo)
     {
         return [
             'guid' => GuidGenerator::generarId(),
@@ -416,7 +416,6 @@ class VentaController extends Controller
 
         if(!$venta){
             Log::warning('Venta no encontrada');
-            //Probablemente cambiar la ruta?
             return redirect()->route('profile')->with('error', 'Venta no encontrada');
         }
 
@@ -437,7 +436,6 @@ class VentaController extends Controller
             $this->devolviendoProductos($venta);
             $venta->update(['estado' => 'Cancelado']);
             $venta->save();
-            //Probablemente cambiar la ruta?
             return redirect()->route('profile')->with('success', 'Venta Cancelada');
         } else {
             Log::warning('No se puede cancelar la venta ya que su estado no es Pendiente');
