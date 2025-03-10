@@ -72,15 +72,15 @@
             <tbody>
             @foreach ($venta->lineaVentas as $linea)
                 @php
-                    $precioSinIva = $linea['producto']['precio'] / 1.21;
-                    $iva = $linea['producto']['precio'] - $precioSinIva;
+                    $precioSinIva = $linea->producto->precio / 1.21;
+                    $iva = $linea->producto->precio - $precioSinIva;
                 @endphp
                 <tr>
-                    <td>{{ $linea['producto']['nombre'] ?? 'N/A' }}</td>
-                    <td>{{ $linea['cantidad'] ?? 'N/A' }}</td>
+                    <td>{{ $linea->producto->nombre }}</td>
+                    <td>{{ $linea->cantidad }}</td>
                     <td>{{ number_format($precioSinIva, 2) }} €</td>
                     <td>{{ number_format($iva, 2) }} €</td>
-                    <td>{{ $linea['precioTotal'] ?? 'N/A' }} €</td>
+                    <td>{{ $linea->precioTotal }} €</td>
                 </tr>
             @endforeach
             </tbody>
