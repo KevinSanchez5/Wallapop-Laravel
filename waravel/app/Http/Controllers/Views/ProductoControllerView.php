@@ -280,7 +280,6 @@ class ProductoControllerView extends Controller
             'imagen5' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        // Actualizar los campos del producto
         $producto->update([
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
@@ -303,11 +302,7 @@ class ProductoControllerView extends Controller
 
                 $imagenUrl = $this->addListingPhoto($imagenRequest, $producto->id);
 
-                if (isset($imagenes[$i - 1])) {
-                    $imagenes[$i - 1] = $imagenUrl;
-                } else {
-                    $imagenes[] = $imagenUrl;
-                }
+                $imagenes[$i - 1] = $imagenUrl;
             }
         }
 
