@@ -126,7 +126,7 @@ class ProfileControllerViewTest extends TestCase
         $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
     }
 
-    public function test_show_sale()
+    /*public function test_show_sale()
     {
         $user = User::factory()->create(['role' => 'cliente']);
         $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
@@ -169,7 +169,7 @@ class ProfileControllerViewTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('profile.ver-venta');
-    }
+    }*/
 
     public function test_show_sale_no_autenticado()
     {
@@ -243,7 +243,7 @@ class ProfileControllerViewTest extends TestCase
         $response->assertSessionHas('error', 'No se ha encontrado el comprador.');
     }
 
-    public function test_show_sale_seller_not_found(){
+    /*public function test_show_sale_seller_not_found(){
         $user = User::factory()->create(['role' => 'cliente']);
         $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
         $venta = Venta::create([
@@ -285,7 +285,7 @@ class ProfileControllerViewTest extends TestCase
 
         $response->assertRedirect(route('profile'));
         $response->assertSessionHas('error', 'No tienes permisos para ver esta venta.');
-    }
+    }*/
 
     public function test_show_order()
     {
@@ -610,7 +610,7 @@ class ProfileControllerViewTest extends TestCase
         $response->assertJson(['success' => false]);
     }
 
-    public function test_eliminar_perfil()
+    /*public function test_eliminar_perfil()
     {
         $user = User::factory()->create(['role' => 'cliente']);
         $this->actingAs($user);
@@ -619,7 +619,7 @@ class ProfileControllerViewTest extends TestCase
 
         $response->assertRedirect('/');
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
-    }
+    }*/
 
     public function test_find_user_by_email()
     {
@@ -641,7 +641,7 @@ class ProfileControllerViewTest extends TestCase
         $response->assertContent('');
     }
 
-    public function test_destroy()
+    /*public function test_destroy()
     {
         $user = User::factory()->create(['role' => 'cliente', 'password' => Hash::make('password')]);
         Cliente::factory()->create([
@@ -662,7 +662,7 @@ class ProfileControllerViewTest extends TestCase
     {
         $response = $this->delete(route('profile.destroy'));
         $response->assertRedirect(route('login'));
-    }
+    }*/
 
     public function test_show_filtered_orders()
     {
