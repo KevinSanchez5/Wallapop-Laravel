@@ -7,7 +7,7 @@
 
         <!-- Filtro de Búsqueda -->
         <form method="GET" action="{{ route('admin.sells') }}" class="mb-6 flex justify-center">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar ventas por estado o precio..." class="w-1/2 p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar ventas por estado, nombre o id de comprador..." class="w-1/2 p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <button type="submit" class="ml-2 p-2 bg-[bff205] text-black rounded-md bg-[#BFF205] hover:bg-[#96bf03] rounded-md hover:bg-[96bf03]">Buscar</button>
         </form>
 
@@ -46,6 +46,7 @@
                             <button type="submit" class="ml-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-700">Actualizar Estado</button>
                         </form>
 
+                        @if($venta->estado !=='Cancelado')
                         <!-- Botón para eliminar la venta -->
                         <button type="button" onclick="showDeleteConfirmationToast('{{ $venta->guid }}')" class="ml-2 p-2 bg-red-500 text-white rounded-md hover:bg-red-700">
                             Reembolsar y Cancelar
@@ -56,6 +57,7 @@
                             @csrf
                             @method('DELETE')
                         </form>
+                        @endif
                     </td>
                 </tr>
             @endforeach

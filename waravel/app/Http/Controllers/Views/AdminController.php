@@ -233,15 +233,15 @@ class AdminController extends Controller
 
         // Filtro de búsqueda
         if (request()->has('search') && request('search') !== '') {
-            $search = request('search');
+            $search = strtolower(request('search')); // Convertimos el término de búsqueda a minúsculas
 
-            $query->where(function ($query) {
-                $query->whereRaw("LOWER(guid) LIKE ?")
-                    ->orWhereRaw("LOWER(estado) LIKE ?")
-                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.guid')) LIKE ?")
-                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.nombre')) LIKE ?")
-                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.apellido')) LIKE ?")
-                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.id')) LIKE ?");
+            $query->where(function ($query) use ($search) {
+                $query->whereRaw("LOWER(guid) LIKE ?", ["%{$search}%"])  // Filtrar por 'guid'
+                ->orWhereRaw("LOWER(estado) LIKE ?", ["%{$search}%"]) // Filtrar por 'estado'
+                ->orWhereRaw("LOWER(comprador->>'guid') LIKE ?", ["%{$search}%"]) // Filtrar por 'comprador.guid' en PostgreSQL
+                ->orWhereRaw("LOWER(comprador->>'nombre') LIKE ?", ["%{$search}%"]) // Filtrar por 'comprador.nombre' en PostgreSQL
+                ->orWhereRaw("LOWER(comprador->>'apellido') LIKE ?", ["%{$search}%"]) // Filtrar por 'comprador.apellido' en PostgreSQL
+                ->orWhereRaw("LOWER(CAST(comprador->>'id' AS TEXT)) LIKE ?", ["%{$search}%"]); // Filtrar por 'comprador.id' en PostgreSQL
             });
         }
         $ventas = $query->orderBy('updated_at', 'desc')->paginate(10);
