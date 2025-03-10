@@ -623,8 +623,7 @@ class VentaController extends Controller
         // Generar el PDF
         $pdf = Pdf::loadView('pdf.venta', compact('venta'));
 
-        $userController = new UserController();
-        $compradorEmail = $userController->getEmail($venta->comprador->id);
+        $compradorEmail = Cliente::getUserEmailByClientGuid($venta->comprador->guid);
         Log::info('Email del comprador:', ['email' => $compradorEmail]);
 
         try {
@@ -643,6 +642,4 @@ class VentaController extends Controller
             'message' => 'Correo enviado correctamente',
         ], 200);
     }
-
-
 }
