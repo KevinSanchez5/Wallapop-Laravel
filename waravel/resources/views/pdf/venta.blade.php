@@ -65,39 +65,23 @@
                 <th>Producto</th>
                 <th>Cantidad</th>
                 <th>Precio</th>
-                <th>IVA</th>
                 <th>Total</th>
             </tr>
             </thead>
             <tbody>
             @foreach ($venta->lineaVentas as $linea)
-                @php
-                    $precioSinIva = $linea['producto']['precio'] / 1.21;
-                    $iva = $linea['producto']['precio'] - $precioSinIva;
-                @endphp
                 <tr>
-                    <td>{{ $linea['producto']['nombre'] ?? 'N/A' }}</td>
-                    <td>{{ $linea['cantidad'] ?? 'N/A' }}</td>
-                    <td>{{ number_format($precioSinIva, 2) }} €</td>
-                    <td>{{ number_format($iva, 2) }} €</td>
-                    <td>{{ $linea['precioTotal'] ?? 'N/A' }} €</td>
+                    <td>{{ $linea->producto->nombre }}</td>
+                    <td>{{ $linea->cantidad }}</td>
+                    <td>{{ $linea->producto->precio }} €</td>
+                    <td>{{ $linea->precioTotal }} €</td>
                 </tr>
             @endforeach
             </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="2"><strong>Total con IVA</strong></td>
-                <td>{{number_format($venta->precioTotal / 1.21, 2) }} €</td>
-                <td>{{$venta->precioTotal - number_format($venta->precioTotal / 1.21, 2) }} €</td>
-                <td>{{ number_format($venta->precioTotal)}} €</td>
-            </tr>
-            </tfoot>
         </table>
 
         <h2>Total de la Compra</h2>
-        <p><strong>Subtotal:</strong> {{number_format($venta->precioTotal / 1.21, 2) }} €</p>
-        <p><strong>IVA (21%):</strong> {{$venta->precioTotal - number_format($venta->precioTotal / 1.21, 2) }} €</p>
-        <p><strong>Total con IVA:</strong> {{ number_format($venta->precioTotal)}} €</p>
+        <p><strong>Precio Total:</strong> {{ $venta->precioTotal }} €</p>
     </div>
     <div class="footer">
         <p>Gracias por su compra</p>
