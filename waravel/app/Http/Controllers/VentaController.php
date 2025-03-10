@@ -593,5 +593,33 @@ class VentaController extends Controller
         return $pdf->stream('venta.pdf');
     }
 
+    public function updateVentaEstado(Request $request, $guid)
+    {
+        // Validar que el estado es uno de los válidos
+        $request->validate([
+            'estado' => 'required|in:Pendiente,Procesando,Enviado,Entregado,Cancelado'
+        ]);
+
+        $venta = Venta::where('guid', $guid)->firstOrFail();
+
+        $venta->estado = $request->estado;
+        $venta->save();
+
+        return redirect()->route('admin.sells')->with('success', 'Estado de la venta actualizado con éxito');
+    }
+
+    public function deleteVentaAdmin($guid)
+    {
+        // Buscar la venta por su GUID
+        $venta = Venta::where('guid', $guid)->firstOrFail();
+
+        $this->reembolsarPago($venta->payment_intent_id, $venta->precioTotal);
+        // Eliminar la venta
+        $venta->estado = 'Cancelado';
+        $venta->save();
+
+        // Redirigir con un mensaje de éxito
+        return redirect()->route('admin.sells')->with('success', 'Venta eliminada con éxito');
+    }
 
 }
