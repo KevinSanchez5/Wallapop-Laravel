@@ -28,11 +28,6 @@
                         <p class="text-base font-normal text-gray-500 dark:text-gray-400">Calle:</p>
                         <h3 class="text-md font-normal text-gray-900 transition-all duration-300 sm:text-xl dark:text-white"> {{ $cliente->direccion->calle }}, {{ $cliente->direccion->numero }}, {{ $cliente->direccion->piso }}º{{ $cliente->direccion->letra }}, {{ $cliente->direccion->codigoPostal }}</h3>
                     </div>
-
-                    @if($venta->estado == 'Pendiente' || $venta->estado == 'Procesando')
-                        <hr class="bottomLine my-4 border-t border-gray-200 dark:border-gray-700" style="margin-left: 1.5rem; width: calc(100% - 3rem)" />
-                        <a href="#" class="mt-4 block w-full text-white bg-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">Cancelar</a>
-                    @endif
                 </div>
             </div>
 

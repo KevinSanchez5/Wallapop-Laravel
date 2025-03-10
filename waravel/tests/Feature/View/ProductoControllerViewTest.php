@@ -25,7 +25,7 @@ class ProductoControllerViewTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create(['role' => 'cliente'] );
         $this->cliente = Cliente::factory()->create(['usuario_id' => $this->user->id]);
 
         $this->producto1 = Producto::factory()->create([
@@ -195,7 +195,6 @@ class ProductoControllerViewTest extends TestCase
 
         $response = $this->post(route('producto.store'), $data);
 
-        $response->assertStatus(403);
         $response->assertRedirect(route('profile'));
         $response->assertSessionHas('success', 'Producto añadido correctamente.');
     }
@@ -244,7 +243,6 @@ class ProductoControllerViewTest extends TestCase
 
     public function test_destroy()
     {
-
         $this->actingAs($this->user);
 
         $producto = $this->producto1;
@@ -263,7 +261,6 @@ class ProductoControllerViewTest extends TestCase
 
         $response = $this->post(route('producto.changestatus', ['guid' => $producto->guid]));
 
-        $response->assertStatus(403);
         $response->assertRedirect(route('profile'));
         $response->assertSessionHas('success', 'Estado del producto actualizado correctamente.');
     }
@@ -372,16 +369,6 @@ class ProductoControllerViewTest extends TestCase
         $response->assertSessionHasErrors(['imagen1']);
     }
 
-    public function test_edit_usuario_no_autorizado()
-    {
-        $otroUser = User::factory()->create();
-        $this->actingAs($otroUser);
-
-        $response = $this->get(route('producto.edit', ['guid' => $this->producto1->guid]));
-
-        $response->assertStatus(302);
-    }
-
     public function test_update_validacion_fallida()
     {
         $this->actingAs($this->user);
@@ -402,7 +389,7 @@ class ProductoControllerViewTest extends TestCase
 
     public function test_changestatus_usuario_no_autorizado()
     {
-        $otroUser = User::factory()->create();
+        $otroUser = User::factory()->create(['role' => 'cliente']);
         $this->actingAs($otroUser);
 
         $vendedor = Cliente::factory()->create(['usuario_id' => User::factory()->create()->id]);
@@ -412,12 +399,13 @@ class ProductoControllerViewTest extends TestCase
 
         $response = $this->post(route('producto.changestatus', ['guid' => $producto->guid]));
 
-        $response->assertStatus(403);
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No tienes permiso para cambiar el estado de este producto');
     }
 
     public function test_edit_usuario_autorizado()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'cliente']);
         $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
         $producto = Producto::factory()->create(['vendedor_id' => $cliente->id]);
 
@@ -432,7 +420,7 @@ class ProductoControllerViewTest extends TestCase
 
     public function test_edit_usuario_no_autorizado_()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'cliente']);
         $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
 
         $otroUser = User::factory()->create();
@@ -443,7 +431,8 @@ class ProductoControllerViewTest extends TestCase
 
         $response = $this->get(route('producto.edit', ['guid' => $producto->guid]));
 
-        $response->assertStatus(302);
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No tienes permiso para editar este producto');
     }
 
     public function test_edit_usuario_no_autenticado()
@@ -458,7 +447,7 @@ class ProductoControllerViewTest extends TestCase
     public function test_edit_producto_no_encontrado()
     {
         // Crear un usuario y autenticarlo
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'cliente']);
         $this->actingAs($user);
 
         // Hacer la solicitud al método edit con un GUID inexistente
@@ -471,7 +460,7 @@ class ProductoControllerViewTest extends TestCase
 
     public function test_show_add_form_usuario_autenticado()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'cliente']);
         $this->actingAs($user);
 
         $response = $this->get(route('producto.add'));
