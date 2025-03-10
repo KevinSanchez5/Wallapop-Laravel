@@ -847,4 +847,76 @@ class VentasControllerTest extends TestCase
         $this->assertEquals('Producto válido', $result['lineaVenta']['producto']['nombre']);
     }
 */
+
+    public function testUpdateVentaEstadoSuccess()
+    {
+        // Crear una venta
+        $venta = Venta::create([
+            'guid' => 'VYQ8gfpe3ti',
+            'estado' => 'Pendiente',
+            'comprador' => json_encode(['guid' => 'buyer_guid', 'nombre' => 'Pedro', 'apellido' => 'Martinez']),
+            'precioTotal' => 100,
+            'payment_intent_id' => 'payment_intent_test'
+        ]);
+
+        // Realizar la solicitud para actualizar el estado de la venta
+        $response = $this->post(route('venta.update.estado', $venta->guid), [
+            'estado' => 'Enviado',
+        ]);
+
+        // Verificar que la respuesta redirige correctamente
+        $response->assertRedirect(route('admin.sells'));
+        $response->assertSessionHas('success', 'Estado de la venta actualizado con éxito');
+
+        // Verificar que el estado de la venta se haya actualizado correctamente
+        $venta->refresh();
+        $this->assertEquals('Enviado', $venta->estado);
+    }
+
+    public function testUpdateVentaEstadoErrors()
+    {
+        // Crear una venta
+        $venta = Venta::create([
+            'guid' => 'VYQ8gfpe3ti',
+            'estado' => 'Pendiente',
+            'comprador' => json_encode(['guid' => 'buyer_guid', 'nombre' => 'Pedro', 'apellido' => 'Martinez']),
+            'precioTotal' => 100,
+            'payment_intent_id' => 'payment_intent_test'
+        ]);
+
+        // Realizar la solicitud con un estado no válido
+        $response = $this->post(route('venta.update.estado', $venta->guid), [
+            'estado' => 'InvalidoEstado',
+        ]);
+
+        // Verificar que la validación de estado falla
+        $response->assertSessionHasErrors('estado');
+    }
+
+    public function testDeleteVentaSuccess()
+    {
+        // Crear una venta
+        $venta = Venta::create([
+            'guid' => 'VYQ8gfpe3ti',
+            'estado' => 'Pendiente',
+            'comprador' => json_encode(['guid' => 'buyer_guid', 'nombre' => 'Pedro', 'apellido' => 'Martinez']),
+            'precioTotal' => 100,
+            'payment_intent_id' => 'payment_intent_test'
+        ]);
+
+        $this->mock(VentaController::class, function ($mock) {
+            $mock->shouldReceive('reembolsarPago')->once();
+        });
+
+        $response = $this->delete(route('venta.delete', $venta->guid));
+
+        // Verificar que la venta se marca como cancelada
+        $venta->refresh();
+        $this->assertEquals('Cancelado', $venta->estado);
+
+        $response->assertRedirect(route('admin.sells'));
+        $response->assertSessionHas('success', 'Venta eliminada con éxito');
+    }
+
+
 }
