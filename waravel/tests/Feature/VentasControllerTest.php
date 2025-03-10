@@ -404,8 +404,8 @@ class VentasControllerTest extends TestCase
         $venta = $this->controller->crearVenta($cliente, $lineasVenta, $precioDeTodo);
 
         // Verificar que la venta se haya creado correctamente
-        $this->assertEquals($cliente->usuario->id, $venta['comprador']['id']);
-        $this->assertEquals($cliente->usuario->guid, $venta['comprador']['guid']);
+        $this->assertEquals($cliente->id, $venta['comprador']['id']);
+        $this->assertEquals($cliente->guid, $venta['comprador']['guid']);
         $this->assertEquals($cliente->nombre, $venta['comprador']['nombre']);
         $this->assertEquals($cliente->apellido, $venta['comprador']['apellido']);
         $this->assertEquals($lineasVenta, $venta['lineaVentas']);
@@ -752,6 +752,99 @@ class VentasControllerTest extends TestCase
         $response = $this->get('/pago/save');
 
         $response->assertRedirect(route('payment.error'));
+    }
+
+    public function test_producto_no_disponible()
+    {
+        // Simular un producto no disponible
+        Producto::factory()->create(['estado' => 'No Disponible', 'stock' => 0]);
+
+        $linea = (object)[
+            'producto' => (object)[
+                'id' => 1,
+                'nombre' => 'Producto no disponible',
+            ],
+        ];
+
+        $response = $this->controller->validarProducto($linea);
+
+        $response->assertRedirect(route('payment.error'));
+        $response->assertSessionHas('message', 'El producto ya no está disponible: Producto no disponible');
+    }
+
+    public function test_producto_sin_stock()
+    {
+        // Simular un producto sin stock
+        Producto::factory()->create(['estado' => 'Disponible', 'stock' => 0]);
+
+        $linea = (object)[
+            'producto' => (object)[
+                'id' => 1,
+                'nombre' => 'Producto agotado',
+            ],
+        ];
+
+        $response = $this->controller->validarProducto($linea);
+
+        $response->assertRedirect(route('payment.error'));
+        $response->assertSessionHas('message', 'El producto ya no está disponible: Producto agotado');
+    }
+
+    public function test_producto_cantidad_mayor_que_stock()
+    {
+        // Simular un producto con stock limitado
+        Producto::factory()->create(['estado' => 'Disponible', 'stock' => 5, 'precio' => 10]);
+
+        $linea = (object)[
+            'producto' => (object)[
+                'id' => 1,
+                'nombre' => 'Producto con stock limitado',
+                'precio' => 10,
+                'vendedor' => (object)[
+                    'id' => 1,
+                    'guid' => '123-abc',
+                    'nombre' => 'Juan',
+                    'apellido' => 'Pérez',
+                ],
+            ],
+            'cantidad' => 10,
+        ];
+
+        $result = $this->controller->validarProducto($linea);
+
+        $this->assertEquals(5, $result['lineaVenta']['cantidad']);
+        $this->assertEquals(50, $result['precioLinea']);
+    }
+
+    public function test_producto_disponible_con_stock()
+    {
+        // Simular un producto con stock suficiente
+        Producto::factory()->create(['estado' => 'Disponible', 'stock' => 10, 'precio' => 20]);
+
+        $linea = (object)[
+            'producto' => (object)[
+                'id' => 1,
+                'nombre' => 'Producto válido',
+                'precio' => 20,
+                'estadoFisico' => 'Nuevo',
+                'descripcion' => 'Descripción del producto',
+                'categoria' => 'Electrónica',
+                'guid' => '456-def',
+                'vendedor' => (object)[
+                    'id' => 1,
+                    'guid' => '123-abc',
+                    'nombre' => 'Juan',
+                    'apellido' => 'Pérez',
+                ],
+            ],
+            'cantidad' => 3,
+        ];
+
+        $result = $this->controller->validarProducto($linea);
+
+        $this->assertEquals(3, $result['lineaVenta']['cantidad']);
+        $this->assertEquals(60, $result['precioLinea']);
+        $this->assertEquals('Producto válido', $result['lineaVenta']['producto']['nombre']);
     }
 
 }

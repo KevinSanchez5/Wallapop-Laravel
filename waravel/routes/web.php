@@ -90,6 +90,8 @@ Route::put('/carrito/removeOne', [CarritoControllerView::class, 'deleteOneFromCa
 Route::put('/carrito/addOne', [CarritoControllerView::class, 'addOneToCart'])->name('carrito.addOne');
 Route::delete('/carrito/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
 Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])->name('pagarcarrito');
+Route::put('/ventas/cancelar/{guid}', [VentaController::class, 'cancelarVenta'])->name('cancelar.venta');
+
 
 // Rutas para cambios de contraseña y pagos
 Route::get('/passchange', function () {

@@ -203,7 +203,7 @@ class VentaController extends Controller
         return Cliente::where('usuario_id', $usuario->id)->first();
     }
 
-    private function validarProducto($linea)
+    public function validarProducto($linea)
     {
         $producto = Producto::find($linea->producto->id);
         if (!$producto || $producto->estado !== 'Disponible' || $producto->stock == 0) {
@@ -241,6 +241,7 @@ class VentaController extends Controller
                     'estadoFisico' => $linea->producto->estadoFisico,
                     'precio' => $linea->producto->precio,
                     'categoria' => $linea->producto->categoria,
+                    'imagenes' => $linea->producto->imagenes,
                 ],
                 'precioTotal' => $producto->precio * $linea->cantidad,
             ],
@@ -253,8 +254,8 @@ class VentaController extends Controller
         return [
             'guid' => GuidGenerator::generarId(),
             'comprador' => [
-                'id' => $cliente->usuario->id,
-                'guid' => $cliente->usuario->guid,
+                'id' => $cliente->id,
+                'guid' => $cliente->guid,
                 'nombre' => $cliente->nombre,
                 'apellido' => $cliente->apellido,
             ],
@@ -419,10 +420,10 @@ class VentaController extends Controller
             return redirect()->route('profile')->with('error', 'Venta no encontrada');
         }
 
+        Log::info('Buscando el perfil del cliente en la base de datos y comprobando si le pertenece la venta');
+        $cliente = $this->validarUsuario();
 
-        $user = Auth()->user();
-
-        if ($user->guid !== $venta['comprador']['guid']) {
+        if ($cliente->guid !== $venta->comprador->guid) {
             Log::warning('Usuario no autorizado para cancelar la venta', ['guid' => $guid]);
             return redirect()->route('profile')->with('error', 'No tienes permiso para cancelar esta venta');
         }
@@ -516,4 +517,6 @@ class VentaController extends Controller
 
         return $pdf->stream('venta.pdf');
     }
+
+
 }
