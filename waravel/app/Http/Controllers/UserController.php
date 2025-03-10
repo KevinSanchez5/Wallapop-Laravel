@@ -458,17 +458,4 @@ class UserController extends Controller
             'message' => 'Correo enviado correctamente',
         ], 200);
     }
-
-    public function getEmail($userId)
-    {
-        Log::info("Buscando email del usuario con ID: {$userId}");
-        $user = User::find($userId);
-
-        if (!$user) {
-            Log::warning("Usuario no encontrado con ID: {$userId}");
-            return null;
-        }
-
-        return $user->email;
-    }
 }
