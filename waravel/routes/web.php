@@ -73,6 +73,8 @@ Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
     Route::get('/admin/backups', [BackupController::class, 'getAllBackups'])->name('admin.backups.list');
     Route::post('/admin/backup/restore/{filename}', [BackupController::class, 'restoreBackup'])->name('admin.backup.restore');
+    Route::post('/admin/updateVentas', [AdminController::class, 'updateStatusOfVentas'])->name('admin.update.ventas');
+
 });
 
 // Rutas públicas de productos y carrito
@@ -84,6 +86,8 @@ Route::put('/carrito/removeOne', [CarritoControllerView::class, 'deleteOneFromCa
 Route::put('/carrito/addOne', [CarritoControllerView::class, 'addOneToCart'])->name('carrito.addOne');
 Route::delete('/carrito/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
 Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])->name('pagarcarrito');
+Route::put('/ventas/cancelar/{guid}', [VentaController::class, 'cancelarVenta'])->name('cancelar.venta');
+
 
 // Rutas para cambios de contraseña y pagos
 Route::get('/passchange', function () {

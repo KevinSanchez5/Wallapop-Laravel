@@ -7,7 +7,10 @@ use App\Models\User;
 use App\Models\Producto;
 use App\Models\Valoracion;
 use App\Models\Cliente;
+use App\Models\Venta;
+use App\Utils\GuidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -219,5 +222,28 @@ class AdminControllerTest extends TestCase
         $response = $this->delete(route('admin.delete.client', 'non-existent-guid'));
         $response->assertRedirect(route('profile'))
             ->assertSessionHas('error', 'Cliente no encontrado');
+    }
+
+    public function testUpdateStatusVentasSuccessful()
+    {
+        Venta::factory()->create(['estado' => 'Pendiente']);
+        Venta::factory()->create(['estado' => 'Procesando']);
+        Venta::factory()->create(['estado' => 'Enviado']);
+        Venta::factory()->create(['estado' => 'Entregado']);
+
+        Log::spy();
+
+        $response = $this->post(route('admin.update.ventas'));
+
+        Log::shouldHaveReceived('info')->with('Iniciando actualiación masiva de ventas')->once();
+        Log::shouldHaveReceived('info')->with('Finalizando actualización masiva de ventas')->once();
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', 'Los estados de las ventas se han actualizado correctamente.');
+
+        $this->assertDatabaseHas('ventas', ['estado' => 'Procesando']);
+        $this->assertDatabaseHas('ventas', ['estado' => 'Enviado']);
+        $this->assertDatabaseHas('ventas', ['estado' => 'Entregado']);
+        $this->assertDatabaseCount('ventas', 4); // Verificar que hay 4 registros en total
     }
 }

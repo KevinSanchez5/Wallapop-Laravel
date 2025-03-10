@@ -17,7 +17,7 @@ class Venta extends Model
 {
 
     use HasFactory;
-    protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal', 'estado'/*, 'payment_intent_id*/];
+    protected $fillable = ['guid', 'comprador', 'lineaVentas', 'precioTotal', 'estado', 'payment_intent_id'];
 
     /**
      * Boot del modelo: Genera un GUID al crear una nueva venta si no existe uno.
