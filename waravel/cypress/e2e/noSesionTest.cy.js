@@ -15,7 +15,7 @@ describe('Página de Inicio', () => {
     });
 
     it('Debe interactuar con el menú de categorías', () => {
-        cy.get('button[name="categoria"]').should('be.visible');
+        cy.get('select[name="categoria"]').should('be.visible');
     });
 
     it('Debe realizar una búsqueda y mostrar resultados', () => {
