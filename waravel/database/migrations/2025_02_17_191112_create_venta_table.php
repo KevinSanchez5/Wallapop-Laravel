@@ -17,14 +17,13 @@ return new class extends Migration
             $table->json('comprador');
             $table->json('lineaVentas');
             $table->double('precioTotal');
-            //$table->string('payment_intent_id')->nullable();
+            $table->string('payment_intent_id')->nullable();
             $table->enum('estado', [
                 'Pendiente',
                 'Procesando',
                 'Enviado',
                 'Entregado',
-                'Cancelado',
-                'Devuelto'
+                'Cancelado'
             ]);
             $table->timestamps();
         });
