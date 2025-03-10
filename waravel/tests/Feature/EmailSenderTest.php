@@ -59,4 +59,61 @@ class EmailSenderTest extends TestCase
         $this->assertArrayHasKey('usuario', $content->with);
         $this->assertArrayHasKey('producto', $content->with);
     }
+    public function testEnvelopeEliminarPerfil()
+    {
+        $email = new EmailSender('usuario', 'codigo', null, 'eliminarPerfil');
+        $envelope = $email->envelope();
+
+        $this->assertInstanceOf(Envelope::class, $envelope);
+        $this->assertEquals('Eliminación de perfil - Waravel', $envelope->subject);
+    }
+
+    public function testEnvelopeProductoBorrado()
+    {
+        $email = new EmailSender('usuario', 'codigo', 'producto', 'productoBorrado');
+        $envelope = $email->envelope();
+
+        $this->assertInstanceOf(Envelope::class, $envelope);
+        $this->assertEquals('Producto Borrado en Waravel', $envelope->subject);
+    }
+
+    public function testEnvelopeBienvenida()
+    {
+        $email = new EmailSender('usuario', 'codigo', null, 'bienvenida');
+        $envelope = $email->envelope();
+
+        $this->assertInstanceOf(Envelope::class, $envelope);
+        $this->assertEquals('Bienvenid@ a  Waravel', $envelope->subject);
+    }
+
+    public function testContentEliminarPerfil()
+    {
+        $email = new EmailSender('usuario', 'codigo', null, 'eliminarPerfil');
+        $content = $email->content();
+
+        $this->assertInstanceOf(Content::class, $content);
+        $this->assertEquals('emails.eliminarPerfil', $content->view);
+        $this->assertArrayHasKey('usuario', $content->with);
+    }
+
+    public function testContentProductoBorrado()
+    {
+        $email = new EmailSender('usuario', 'codigo', 'producto', 'productoBorrado');
+        $content = $email->content();
+
+        $this->assertInstanceOf(Content::class, $content);
+        $this->assertEquals('emails.productoBorrado', $content->view);
+        $this->assertArrayHasKey('usuario', $content->with);
+        $this->assertArrayHasKey('producto', $content->with);
+    }
+
+    public function testContentBienvenida()
+    {
+        $email = new EmailSender('usuario', 'codigo', null, 'bienvenida');
+        $content = $email->content();
+
+        $this->assertInstanceOf(Content::class, $content);
+        $this->assertEquals('emails.bienvenida', $content->view);
+        $this->assertArrayHasKey('usuario', $content->with);
+    }
 }
