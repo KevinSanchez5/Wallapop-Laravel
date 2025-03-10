@@ -6,6 +6,7 @@ use App\Models\Cliente;
 use App\Models\User;
 use App\Models\Valoracion;
 use App\Models\Venta;
+use App\Utils\GuidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
@@ -35,6 +36,17 @@ class ProfileControllerViewTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_show_no_client(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        $response = $this->get(route('profile'));
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
+    }
+
+
     public function test_show_reviews()
     {
         $user = User::factory()->create(['role' => 'cliente']);
@@ -52,6 +64,16 @@ class ProfileControllerViewTest extends TestCase
     {
         $response = $this->get(route('profile.reviews'));
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_show_orders_no_client(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        $response = $this->get(route('profile.orders'));
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
     }
 
     public function test_show_orders()
@@ -94,22 +116,52 @@ class ProfileControllerViewTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_show_sales_no_client(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        $response = $this->get(route('profile.sales', ['guid' => 'DU6jCZtareb']));
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
+    }
+
     public function test_show_sale()
     {
         $user = User::factory()->create(['role' => 'cliente']);
         $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
-        $venta = Venta::factory()->create([
-            'guid' => 'guidventa-1',
-            'comprador' => json_encode(['id' => $cliente->id]),
+        $venta = Venta::create([
+            'guid' => GuidGenerator::generarId(),
+            'comprador' => [
+                'guid'=>'DU6jCZtareb',
+                'id' => Cliente::factory()->create()->id,
+                'nombre' => 'John',
+                'apellido' => 'Doe'
+            ],
+            'estado' => 'Pendiente',
             'lineaVentas' => [
                 [
                     'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
                         'id' => $cliente->id,
                         'nombre' => 'Juan',
                         'apellido' => 'Perez'
-                    ]
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'G4YXT9K5QLV',
+                        'id' => 1,
+                        'nombre' => 'Portatil Gamer',
+                        'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
+                        'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 800.00,
+                        'categoria' => 'Tecnologia'
+                    ],
+                    'precioTotal' => 2 * 800.00,
                 ]
-            ]
+            ],
+            'precioTotal' => 1600.00,
         ]);
         $this->actingAs($user);
 
@@ -126,13 +178,151 @@ class ProfileControllerViewTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_show_sale_no_client(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        $response = $this->get(route('sale.detail', ['guid' => 'guidventa-1'])); // Usa 'sale.detail'
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
+    }
+
+    public function test_show_sale_not_found(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $this->actingAs($user);
+
+        $response = $this->get(route('sale.detail', ['guid' => 'non-existent'])); // Usa 'sale.detail'
+
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No se ha encontrado la venta.');
+    }
+
+    public function test_show_sale_buyer_not_found(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $venta = Venta::create([
+            'guid' => GuidGenerator::generarId(),
+            'comprador' => [
+                'guid'=>'DU6jCZtareb',
+                'id' => 67576565,
+                'nombre' => 'John',
+                'apellido' => 'Doe'
+            ],
+            'estado' => 'Pendiente',
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => 90,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'G4YXT9K5QLV',
+                        'id' => 1,
+                        'nombre' => 'Portatil Gamer',
+                        'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
+                        'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 800.00,
+                        'categoria' => 'Tecnologia'
+                    ],
+                    'precioTotal' => 2 * 800.00,
+                ]
+            ],
+            'precioTotal' => 1600.00,
+        ]);
+        $this->actingAs($user);
+
+        $response = $this->get(route('sale.detail', $venta->guid));
+
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No se ha encontrado el comprador.');
+    }
+
+    public function test_show_sale_seller_not_found(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $venta = Venta::create([
+            'guid' => GuidGenerator::generarId(),
+            'comprador' => [
+                'guid'=>'DU6jCZtareb',
+                'id' => Cliente::factory()->create()->id,
+                'nombre' => 'John',
+                'apellido' => 'Doe'
+            ],
+            'estado' => 'Pendiente',
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => 90,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'G4YXT9K5QLV',
+                        'id' => 1,
+                        'nombre' => 'Portatil Gamer',
+                        'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
+                        'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 800.00,
+                        'categoria' => 'Tecnologia'
+                    ],
+                    'precioTotal' => 2 * 800.00,
+                ]
+            ],
+            'precioTotal' => 1600.00,
+        ]);
+        $this->actingAs($user);
+
+        $response = $this->get(route('sale.detail', $venta->guid));
+
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No tienes permisos para ver esta venta.');
+    }
+
     public function test_show_order()
     {
         $user = User::factory()->create(['role' => 'cliente']);
         $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
-        $venta = Venta::factory()->create([
-            'guid' => 'guidventa-1',
-            'comprador' => json_encode(['id' => $cliente->id])
+        $venta = Venta::create([
+            'guid' => GuidGenerator::generarId(),
+            'comprador' => [
+                'guid'=>'DU6jCZtareb',
+                'id' => $cliente->id,
+                'nombre' => 'John',
+                'apellido' => 'Doe'
+            ],
+            'estado' => 'Pendiente',
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => Cliente::factory()->create()->id,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'G4YXT9K5QLV',
+                        'id' => 1,
+                        'nombre' => 'Portatil Gamer',
+                        'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
+                        'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 800.00,
+                        'categoria' => 'Tecnologia'
+                    ],
+                    'precioTotal' => 2 * 800.00,
+                ]
+            ],
+            'precioTotal' => 1600.00,
         ]);
         $this->actingAs($user);
 
@@ -147,6 +337,82 @@ class ProfileControllerViewTest extends TestCase
         $venta = Venta::factory()->create(['guid' => 'guidventa-1']);
         $response = $this->get(route('order.detail', ['guid' => $venta->guid])); // Usa 'order.detail'
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_show_order_no_client(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        $response = $this->get(route('order.detail', ['guid' => 'DU6jCZtareb']));
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
+    }
+
+    public function test_show_order_not_found(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        Cliente::factory()->create(['usuario_id' => $user->id]);
+        $this->actingAs($user);
+
+        $response = $this->get(route('order.detail', ['guid' => 'non esistent']));
+
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No se ha encontrado el pedido.');
+    }
+
+    public function test_show_order_logged_in_client_doesnt_match_the_buyer()
+    {
+        $user = User::factory()->create(['role' => 'cliente']);
+        $cliente = Cliente::factory()->create(['usuario_id' => $user->id]);
+        $venta = Venta::create([
+            'guid' => GuidGenerator::generarId(),
+            'comprador' => [
+                'guid'=>'DU6jCZtareb',
+                'id' => Cliente::factory()->create()->id,
+                'nombre' => 'John',
+                'apellido' => 'Doe'
+            ],
+            'estado' => 'Pendiente',
+            'lineaVentas' => [
+                [
+                    'vendedor' => [
+                        'guid'=>'2G6HueqixE5',
+                        'id' => Cliente::factory()->create()->id,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Perez'
+                    ],
+                    'cantidad' => 2,
+                    'producto' => [
+                        'guid'=>'G4YXT9K5QLV',
+                        'id' => 1,
+                        'nombre' => 'Portatil Gamer',
+                        'imagenes' => ['productos/portatil1.webp', 'productos/portatil2.webp'],
+                        'descripcion' => 'Portatil gaming de gama alta para trabajos pesados.',
+                        'estadoFisico' => 'Nuevo',
+                        'precio' => 800.00,
+                        'categoria' => 'Tecnologia'
+                    ],
+                    'precioTotal' => 2 * 800.00,
+                ]
+            ],
+            'precioTotal' => 1600.00,
+        ]);
+        $this->actingAs($user);
+
+        $response = $this->get(route('order.detail', ['guid' => $venta->guid]));
+
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No tienes permisos para ver este pedido.');
+    }
+
+    public function test_show_favorites_no_client(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        $response = $this->get(route('profile.favorites'));
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
     }
 
     public function test_show_favorites()
@@ -184,6 +450,16 @@ class ProfileControllerViewTest extends TestCase
     {
         $response = $this->get(route('profile.edit'));
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_edit_no_client(){
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        $response = $this->get(route('profile.edit'));
+
+        $response->assertRedirect(route('profile'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
     }
 
     // Test para actualizar el perfil del usuario
@@ -339,7 +615,7 @@ class ProfileControllerViewTest extends TestCase
         $user = User::factory()->create(['role' => 'cliente']);
         $this->actingAs($user);
 
-        $response = $this->delete(route('profile.destroy.profile')); // Usa 'profile.destroy.profile'
+        $response = $this->delete(route('profile.destroy')); // Usa 'profile.destroy.profile'
 
         $response->assertRedirect('/');
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
@@ -362,15 +638,21 @@ class ProfileControllerViewTest extends TestCase
 
         $response = $this->get(route('profile.find-user', ['email' => 'nonexistent@example.com']));
 
-        $response->assertJson([]);
+        $response->assertContent('');
     }
 
     public function test_destroy()
     {
-        $user = User::factory()->create(['role' => 'cliente']);
+        $user = User::factory()->create(['role' => 'cliente', 'password' => Hash::make('password')]);
+        Cliente::factory()->create([
+            'usuario_id' => $user->id
+        ]);
+
         $this->actingAs($user);
 
-        $response = $this->delete(route('profile.destroy.profile'));
+        $response = $this->delete(route('profile.destroy'), [
+            'password' => 'password'
+        ]);
 
         $response->assertRedirect('/');
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
@@ -378,7 +660,7 @@ class ProfileControllerViewTest extends TestCase
 
     public function test_destroy_no_autenticado()
     {
-        $response = $this->delete(route('profile.destroy.profile'));
+        $response = $this->delete(route('profile.destroy'));
         $response->assertRedirect(route('login'));
     }
 
@@ -414,6 +696,28 @@ class ProfileControllerViewTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_show_filtered_sales_no_client()
+    {
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        // Crear ventas con diferentes estados
+        Venta::factory()->create([
+            'lineaVentas' => json_encode([['vendedor' => ['id' => 1]]]),
+            'estado' => 'Pendiente',
+        ]);
+        Venta::factory()->create([
+            'lineaVentas' => json_encode([['vendedor' => ['id' => 2]]]),
+            'estado' => 'Entregado',
+        ]);
+
+        // Filtrar por estado 'Pendiente'
+        $response = $this->get(route('profile.sales.search', ['estado' => 'Pendiente']));
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
+    }
+
     public function test_show_filtered_sales()
     {
         $user = User::factory()->create(['role' => 'cliente']);
@@ -446,5 +750,26 @@ class ProfileControllerViewTest extends TestCase
     {
         $response = $this->get(route('profile.sales.search', ['estado' => 'Pendiente']));
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_show_filtered_orders_no_client()
+    {
+        $user = User::factory()->create(['role' => 'cliente']);
+        $this->actingAs($user);
+
+        // Crear ventas con diferentes estados
+        Venta::factory()->create([
+            'lineaVentas' => json_encode([['vendedor' => ['id' => 1]]]),
+            'estado' => 'Pendiente',
+        ]);
+        Venta::factory()->create([
+            'lineaVentas' => json_encode([['vendedor' => ['id' => 2]]]),
+            'estado' => 'Entregado',
+        ]);
+
+        $response = $this->get(route('profile.orders.search', ['estado' => 'Pendiente']));
+
+        $response->assertRedirect(route('pages.home'));
+        $response->assertSessionHas('error', 'No se ha encontrado el perfil del cliente.');
     }
 }

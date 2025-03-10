@@ -169,7 +169,7 @@
                 <span class="sr-only">Check icon</span>
             </div>
             <div class="ms-3 text-md font-bold ml-5">¿Estás seguro de eliminar tu perfil?</div>
-            <form action="{{ route('profile.destroy.profile') }}" method="POST" id="deleteForm" class="flex items-center">
+            <form action="{{ route('profile.destroy') }}" method="POST" id="deleteForm" class="flex items-center">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="ml-4 bg-red-600 text-white px-3 py-1 rounded-md">Sí</button>
