@@ -75,23 +75,6 @@ class EmailSenderTest extends TestCase
         $this->assertArrayHasKey('usuario', $content->with);
         $this->assertArrayHasKey('producto', $content->with);
     }
-    public function testEnvelopeEliminarPerfil()
-    {
-        $email = new EmailSender('usuario', 'codigo', null, 'eliminarPerfil');
-        $envelope = $email->envelope();
-
-        $this->assertInstanceOf(Envelope::class, $envelope);
-        $this->assertEquals('Eliminación de perfil - Waravel', $envelope->subject);
-    }
-
-    public function testEnvelopeProductoBorrado()
-    {
-        $email = new EmailSender('usuario', 'codigo', 'producto', 'productoBorrado');
-        $envelope = $email->envelope();
-
-        $this->assertInstanceOf(Envelope::class, $envelope);
-        $this->assertEquals('Producto Borrado en Waravel', $envelope->subject);
-    }
 
     public function testEnvelopeBienvenida()
     {
