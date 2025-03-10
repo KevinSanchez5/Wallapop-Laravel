@@ -40,7 +40,7 @@
 
                     <div class="space-y-2">
                         <dl class="flex items-center justify-between gap-4">
-                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">Iva</dt>
+                            <dt class="text-xl font-normal text-gray-500 dark:text-gray-400">IVA</dt>
                             <dd id="totalPrice" class="text-xl font-bold text-gray-500 dark:text-gray-400">{{ number_format($pedido->precioTotal - ($pedido->precioTotal / 1.21), 2) }} €</dd>
                         </dl>
                     </div>
@@ -54,9 +54,13 @@
 
                     @if($pedido->estado == 'Pendiente')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <a href="#" class="bg-black text-white text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
-                                Cancelar
-                            </a>
+                            <form action="{{ route('cancelar.venta', $pedido->guid) }}" method="POST" class="inline-block  w-full ">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="bg-black text-white text-center font-medium py-2 px-6  w-full rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+                                    Cancelar Venta
+                                </button>
+                            </form>
                             <a href="{{ route('pdf.venta', ['guid' => $pedido->guid]) }}" class="bg-[#BFF205] text-black text-center font-medium py-2 px-6 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                                 Ver Factura
                             </a>

@@ -12,6 +12,17 @@ use Illuminate\Support\Facades\Validator;
 
 class ClienteControllerView extends Controller
 {
+
+    /**
+     * Muestra la información del cliente junto con sus productos y valoraciones.
+     *
+     * Este método busca al cliente por su GUID, obtiene sus productos disponibles y sus valoraciones.
+     * También calcula el promedio de las valoraciones y obtiene las estrellas llenas y vacías.
+     * Si el usuario está autenticado, se cargan sus productos favoritos.
+     *
+     * @param string $guid GUID del cliente a mostrar.
+     * @return \Illuminate\View\View Vista con la información del cliente, productos, valoraciones, y estrellas.
+     */
     public function mostrarCliente($guid)
     {
         $cliente = Cliente::where('guid', $guid)->firstOrFail();
@@ -47,27 +58,23 @@ class ClienteControllerView extends Controller
         ));
     }
 
-    // Buscar favoritos
-    public function mostrarFavoritos($guid)
-    {
-        Log::info("Buscando favoritos para el cliente con Guid: {$guid}");
-
-        $cliente = Cliente::where('guid',$guid)->first();
-
-        if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
-        }
-
-        $favoritos = $cliente->favoritos;
-        Log::info("Se encontraron " . count($favoritos) . " favoritos para el cliente con ID: {$guid}");
-
-        return view('pages.ver-favoritos', compact('favoritos'));
-    }
-
-    // Agregar un producto a favoritos
+    /**
+     * Añade un producto a los favoritos de un cliente.
+     *
+     * Este método valida que el producto y el cliente existan, luego agrega el producto a la lista de favoritos del cliente.
+     * Si el producto ya está en favoritos, se devuelve un mensaje indicando que ya está añadido.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud que incluyen el GUID del producto y el ID del usuario.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación.
+     */
     public function añadirFavorito(Request $request)
     {
         Log::info("Intentando agregar un producto a favoritos para el cliente logeado");
+
+        // Verificar si el usuario está autenticado
+        if (!auth()->check()) {
+            return response()->json(['message' => 'No autorizado'], 401);
+        }
 
         $validator = Validator::make($request->all(), [
             'productoGuid' => 'required',
@@ -84,7 +91,7 @@ class ClienteControllerView extends Controller
 
         $cliente = Cliente::where('usuario_id', $userId)->first();
         if (!$cliente) {
-            Log::info("Cliente con Guid {$cliente->guid} no encontrado");
+            Log::info("Cliente con usuario_id {$userId} no encontrado");
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
@@ -108,11 +115,22 @@ class ClienteControllerView extends Controller
         return response()->json(['status' => 200, 'message' => 'Producto agregado a favoritos']);
     }
 
-
-    // Quitar un producto de favoritos
+    /**
+     * Elimina un producto de los favoritos de un cliente.
+     *
+     * Este método valida que el producto y el cliente existan, luego elimina el producto de la lista de favoritos del cliente.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud que incluyen el GUID del producto y el ID del usuario.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación.
+     */
     public function eliminarFavorito(Request $request)
     {
         Log::info("Intentando eliminar un producto de favoritos para el cliente logeado");
+
+        // Verificar si el usuario está autenticado
+        if (!auth()->check()) {
+            return response()->json(['message' => 'No autorizado'], 401);
+        }
 
         $validator = Validator::make($request->all(), [
             'productoGuid' => 'required',
@@ -129,7 +147,7 @@ class ClienteControllerView extends Controller
 
         $cliente = Cliente::where('usuario_id', $userId)->first();
         if (!$cliente) {
-            Log::info("Cliente con Guid {$cliente->guid} no encontrado");
+            Log::info("Cliente con usuario_id {$userId} no encontrado");
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
@@ -147,3 +165,4 @@ class ClienteControllerView extends Controller
         return response()->json(['status' => 200, 'message' => 'Producto eliminado de favoritos']);
     }
 }
+

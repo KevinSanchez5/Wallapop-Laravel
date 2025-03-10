@@ -13,11 +13,22 @@ use Illuminate\Support\Str;
 
 class ProductoControllerView extends Controller
 {
+
+    /**
+     * Obtener el ID del cliente autenticado.
+     *
+     * @return int El ID del cliente.
+     */
     protected function getClienteId()
     {
         return Cliente::where('usuario_id', auth()->id())->value('id');
     }
 
+    /**
+     * Muestra la vista de productos disponibles.
+     *
+     * @return \Illuminate\View\View La vista con los productos disponibles.
+     */
     public function indexVista()
     {
         Log::info('Acceso a la vista de productos disponibles');
@@ -37,6 +48,12 @@ class ProductoControllerView extends Controller
 
         return view('pages.home', compact('productos'));
     }
+
+    /**
+     * Realiza una búsqueda de productos según los parámetros proporcionados.
+     *
+     * @return \Illuminate\View\View La vista con los productos encontrados.
+     */
 
     public function search()
     {
@@ -82,6 +99,14 @@ class ProductoControllerView extends Controller
         return view('pages.home', compact('productos'));
     }
 
+    /**
+     * Muestra la vista de un producto específico.
+     *
+     * @param string $guid El GUID del producto.
+     *
+     * @return \Illuminate\View\View|RedirectResponse Vista del producto o redirección si no se encuentra.
+     */
+
     public function showVista($guid)
     {
         Log::info('Acceso al producto con GUID: ' . $guid);
@@ -114,16 +139,30 @@ class ProductoControllerView extends Controller
         return view('pages.ver-producto', compact('producto', 'productoFavorito'));
     }
 
+    /**
+     * Crea un nuevo producto.
+     *
+     * @param \Illuminate\Http\Request $request Los datos del formulario para crear el producto.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección a la vista de perfil.
+     */
+
     public function store(Request $request)
     {
-        Log::info('Creando un nuevo producto');
-
+        // Verificar si el usuario está autenticado
         if (!auth()->check()) {
             return redirect()->route('login')->with('error', 'Debes estar logeado para crear un producto');
         }
 
+        // Obtener el ID del cliente autenticado
+        $clienteId = $this->getClienteId();
+        if (!$clienteId) {
+            return redirect()->route('profile')->with('error', 'No se pudo obtener el ID del cliente');
+        }
+
+        // Validar los datos del formulario
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => 'required|string|min:3|max:255',
             'descripcion' => 'required|string',
             'estadoFisico' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
@@ -136,8 +175,7 @@ class ProductoControllerView extends Controller
             'imagen5' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        $clienteId = $this->getClienteId();
-
+        // Crear el producto
         $producto = Producto::create([
             'vendedor_id' => $clienteId,
             'nombre' => $request->nombre,
@@ -147,38 +185,33 @@ class ProductoControllerView extends Controller
             'stock' => $request->stock,
             'categoria' => $request->categoria,
             'estado' => 'Disponible',
-            'imagenes' => [],  // Inicializar como array vacío
+            'imagenes' => [], // Inicializar como array vacío
         ]);
 
+        // Procesar y almacenar imágenes
         $imagenes = [];
-
         for ($i = 1; $i <= 5; $i++) {
             if ($request->hasFile("imagen$i")) {
-                $imagenRequest = Request::create('/', 'POST', [], [], ['image' => $request->file("imagen$i")], []);
-
-                if (!$imagenRequest->hasFile('image')) {
-                    Log::error("Error procesando imagen$i");
-                    return response()->json(['error' => "Error procesando imagen$i"], 400);
-                }
-
-                // Obtener solo la ruta de la imagen
-                $imagenUrl = $this->addListingPhoto($imagenRequest, $producto->id);
+                $imagenUrl = $request->file("imagen$i")->store('imagenes', 'public');
                 $imagenes[] = $imagenUrl;
             }
         }
 
-        // Guarda las rutas de las imágenes
+        // Guardar las rutas de las imágenes en el modelo
         $producto->imagenes = $imagenes;
         $producto->save();
 
-        // Guarda el producto en la caché con las imágenes correctamente guardadas
-        Cache::put("producto_{$producto->guid}", $producto->toArray(), now());
-
-        Log::info('Producto creado correctamente', ['producto' => $producto]);
-
+        // Redirigir con mensaje de éxito
         return redirect()->route('profile')->with('success', 'Producto añadido correctamente.');
     }
 
+    /**
+     * Muestra el formulario de edición de un producto.
+     *
+     * @param string $guid El GUID del producto a editar.
+     *
+     * @return \Illuminate\View\View|RedirectResponse La vista de edición del producto o redirección si no se encuentra.
+     */
     public function edit($guid)
     {
         Log::info('Acceso al formulario de edición del producto con GUID: ' . $guid);
@@ -205,6 +238,15 @@ class ProductoControllerView extends Controller
 
         return view('profile.edit-producto', compact('producto'));
     }
+
+    /**
+     * Actualiza la información de un producto.
+     *
+     * @param \Illuminate\Http\Request $request Los datos del formulario para actualizar el producto.
+     * @param string $guid El GUID del producto a actualizar.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección con mensaje de éxito o error.
+     */
 
     public function update(Request $request, $guid)
     {
@@ -278,12 +320,26 @@ class ProductoControllerView extends Controller
         return redirect()->route('profile')->with('success', 'Producto actualizado correctamente.');
     }
 
+    /**
+     * Muestra el formulario de creación de un producto.
+     *
+     * @return \Illuminate\View\View La vista para agregar un producto.
+     */
+
     public function showAddForm()
     {
         Log::info('Acceso al formulario de creación de producto');
         return view('profile.add-producto');
     }
 
+    /**
+     * Maneja la subida de imágenes para un producto.
+     *
+     * @param \Illuminate\Http\Request $request Los datos del formulario de la imagen.
+     * @param int $id El ID del producto para el que se está subiendo la imagen.
+     *
+     * @return string|\Illuminate\Http\JsonResponse La ruta de la imagen subida o un error en caso de fallo.
+     */
     public function addListingPhoto(Request $request, $id)
     {
         $product = Producto::find($id);
@@ -340,6 +396,14 @@ class ProductoControllerView extends Controller
         }
     }
 
+    /**
+     * Elimina un producto por su GUID.
+     *
+     * @param string $guid El GUID del producto a eliminar.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección con mensaje de éxito o error.
+     */
+
     public function destroy($guid)
     {
         Log::info('Eliminando producto con GUID: ' . $guid);
@@ -369,9 +433,16 @@ class ProductoControllerView extends Controller
         return redirect()->route('profile')->with('success', 'Producto eliminado correctamente.');
     }
 
+    /**
+     * Cambia el estado de un producto entre "Disponible" y "Desactivado".
+     *
+     * @param string $guid El GUID del producto.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirección con mensaje de éxito o error.
+     */
+
     public function changestatus($guid)
     {
-        // Verificar si el usuario está autenticado
         if (!auth()->check()) {
             return redirect()->route('login')->with('error', 'Debes estar logeado para cambiar el estado del producto');
         }
@@ -383,6 +454,7 @@ class ProductoControllerView extends Controller
             return redirect()->route('profile')->with('error', 'Producto no encontrado');
         }
 
+        // Obtener el ID del cliente autenticado
         $clienteId = $this->getClienteId();
 
         // Verificar si el cliente autenticado es el vendedor del producto
@@ -398,5 +470,4 @@ class ProductoControllerView extends Controller
         // Redirigir con mensaje de éxito
         return redirect()->route('profile')->with('success', 'Estado del producto actualizado correctamente.');
     }
-
 }

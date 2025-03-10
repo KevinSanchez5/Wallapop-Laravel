@@ -19,8 +19,6 @@ Route::get('/', [ProductoControllerView::class, 'indexVista'])->name('pages.home
 Route::get('/cliente/{guid}', [ClienteControllerView::class, 'mostrarCliente'])->name('cliente.ver');
 Route::post('/cliente/addFavorite', [ClienteControllerView::class, 'añadirFavorito'])->name('favorito.añadir');
 Route::delete('/cliente/removeFavorite', [ClienteControllerView::class, 'eliminarFavorito'])->name('favorito.eliminar');
-Route::get('/clientes/{guid}/valoraciones', [ValoracionesControllerView::class, 'index'])->name('cliente.valoraciones');
-Route::get('/clientes/{guid}/puntuacion', [ValoracionesControllerView::class, 'promedio'])->name('cliente.puntuacion');
 
 // Rutas protegidas para clientes
 Route::middleware(['auth', UserRoleAuth::class])->group(function () {
@@ -30,6 +28,7 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::get('/profile/myOrders', [ProfileControllerView::class, 'showOrders'])->name('profile.orders');
     Route::get('/profile/mySales', [ProfileControllerView::class, 'showSales'])->name('profile.sales');
     Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
+    Route::get('/profile/mySales/search', [ProfileControllerView::class, 'showFilteredSales'])->name('profile.sales.search');
     Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('order.detail');
     Route::get('/profile/mySales/{guid}', [ProfileControllerView::class, 'showSale'])->name('sale.detail');
     Route::get('/profile/myFavorites', [ProfileControllerView::class, 'showFavorites'])->name('profile.favorites');
@@ -38,12 +37,7 @@ Route::middleware(['auth', UserRoleAuth::class])->group(function () {
     Route::delete('/profile', [ProfileControllerView::class, 'destroy'])->name('profile.destroy');
     Route::patch('/profile/changePassword', [ProfileControllerView::class, 'cambioContrasenya'])->name('profile.change.password');
     Route::delete('/profile', [ProfileControllerView::class, 'eliminarPerfil'])->name('profile.destroy.profile');
-
-    // Pedidos y ventas
-    Route::get('/profile/mySales/search', [ProfileControllerView::class, 'showFilteredSales'])->name('profile.sales.search');
-    Route::get('/profile/myOrders/search', [ProfileControllerView::class, 'showFilteredOrders'])->name('profile.orders.search');
-    Route::get('/profile/myOrders/{guid}', [ProfileControllerView::class, 'showOrder'])->name('order.detail');
-    Route::get('/profile/mySales/{guid}', [ProfileControllerView::class, 'showSale'])->name('sale.detail');
+    Route::get('/profile/find-user/{email}', [ProfileControllerView::class, 'findUserByEmail'])->name('profile.find-user');
 
     // Gestión de productos
     Route::post('/producto', [ProductoControllerView::class, 'store'])->name('producto.store');
@@ -79,6 +73,8 @@ Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
     Route::get('/admin/backups', [BackupController::class, 'getAllBackups'])->name('admin.backups.list');
     Route::post('/admin/backup/restore/{filename}', [BackupController::class, 'restoreBackup'])->name('admin.backup.restore');
+    Route::post('/admin/updateVentas', [AdminController::class, 'updateStatusOfVentas'])->name('admin.update.ventas');
+
 });
 
 // Rutas públicas de productos y carrito
@@ -90,6 +86,8 @@ Route::put('/carrito/removeOne', [CarritoControllerView::class, 'deleteOneFromCa
 Route::put('/carrito/addOne', [CarritoControllerView::class, 'addOneToCart'])->name('carrito.addOne');
 Route::delete('/carrito/deleteFromCart', [CarritoControllerView::class, 'removeFromCart'])->name('carrito.remove');
 Route::post('procesarCompra', [VentaController::class, 'procesarCompra'])->name('pagarcarrito');
+Route::put('/ventas/cancelar/{guid}', [VentaController::class, 'cancelarVenta'])->name('cancelar.venta');
+
 
 // Rutas para cambios de contraseña y pagos
 Route::get('/passchange', function () {

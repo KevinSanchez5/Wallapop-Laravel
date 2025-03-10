@@ -15,6 +15,15 @@ use Illuminate\Support\Facades\Validator;
 
 class CarritoControllerView extends Controller
 {
+
+    /**
+     * Muestra el carrito de compras.
+     *
+     * Este método busca el carrito de compras almacenado en la sesión y lo pasa a la vista correspondiente.
+     * Si no existe un carrito en la sesión, se crea uno por defecto.
+     *
+     * @return \Illuminate\View\View Vista con el carrito de compras.
+     */
     public function showCart()
     {
         Log::info('Buscando el carrito en la sesión');
@@ -26,6 +35,17 @@ class CarritoControllerView extends Controller
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.shoppingCart', compact('cart'));
     }
+
+    /**
+     * Elimina un producto del carrito de compras.
+     *
+     * Este método elimina el producto cuyo ID es enviado en la solicitud del carrito de compras.
+     * Si el producto es encontrado, se actualiza el carrito y se devuelve una respuesta con el carrito actualizado.
+     * Si no se encuentra el producto, se devuelve un error.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud, que incluye el ID del producto.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación y los datos del carrito actualizado.
+     */
 
     public function removeFromCart(Request $request)
     {
@@ -84,6 +104,17 @@ class CarritoControllerView extends Controller
             ]
         );
     }
+
+    /**
+     * Elimina una unidad de un producto del carrito de compras.
+     *
+     * Este método disminuye la cantidad de un producto en el carrito o lo elimina si su cantidad llega a 0.
+     * Si se encuentra el producto, se actualiza el carrito y se devuelve una respuesta con los datos actualizados.
+     * Si el producto no se encuentra, se devuelve un error.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud, que incluye el ID del producto.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación y los datos del carrito actualizado.
+     */
 
     public function deleteOneFromCart(Request $request)
     {
@@ -159,6 +190,17 @@ class CarritoControllerView extends Controller
         );
     }
 
+    /**
+     * Añade una unidad de un producto al carrito de compras.
+     *
+     * Este método aumenta la cantidad de un producto en el carrito.
+     * Si no hay suficiente stock, se devuelve un error.
+     * Si se encuentra el producto, se actualiza el carrito y se devuelve una respuesta con los datos actualizados.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud, que incluye el ID del producto.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación y los datos del carrito actualizado.
+     */
+
     public function addOneToCart(Request $request){
         $validator = Validator::make($request->all(), [
             'productId' => 'required'
@@ -225,6 +267,15 @@ class CarritoControllerView extends Controller
             ]
         );
     }
+
+    /**
+     * Añade un producto al carrito o edita un producto ya existente.
+     *
+     * Este método permite agregar un producto al carrito o modificar su cantidad, validando que haya stock suficiente y que el producto no le pertenezca al usuario autenticado.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud, que incluye el ID del producto y la cantidad.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación y los datos del carrito actualizado.
+     */
 
 
     public function addToCartOrEditSetProduct(Request $request)
@@ -332,6 +383,14 @@ class CarritoControllerView extends Controller
         ]);
     }
 
+    /**
+     * Muestra la vista de resumen del pedido.
+     *
+     * Este método recupera el carrito de compras y los detalles del cliente asociado al usuario autenticado, para mostrar la vista de resumen del pedido.
+     *
+     * @return \Illuminate\View\View Vista con el resumen del pedido y los detalles del cliente.
+     */
+
     public function showOrder()
     {
         Log::info('Buscando el carrito en la sesión');
@@ -352,9 +411,23 @@ class CarritoControllerView extends Controller
             return redirect()->route('carrito')->with('error', 'No se ha encontrado un cliente asociado al usuario');
         }
 
+        if ($cart->lineasCarrito == []){
+            Log::warning('No hay productos en el carrito');
+            return redirect()->route('carrito')->with('error', 'Añada productos al carrito antes de realizar una compra');
+        }
         Log::info('Devolviendo la vista con el carrito');
         return view('pages.orderSummary', compact('cart', 'cliente', 'usuario'));
     }
+
+    /**
+     * Verifica si un producto pertenece al usuario que ha iniciado sesión.
+     *
+     * Este método verifica si el producto añadido al carrito pertenece al usuario autenticado.
+     * Si el producto es del usuario, se devuelve un error.
+     *
+     * @param \App\Models\Producto $producto Producto a verificar.
+     * @return \Illuminate\Http\JsonResponse|bool Respuesta JSON con el error si el producto pertenece al usuario, o false si no.
+     */
 
     public function verifyProductDoesntBelongToCurrentUser($producto){
         Log::info('Verificando el producto no le pertence al cliente que ha iniciado sesión');
