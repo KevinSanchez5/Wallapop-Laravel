@@ -70,7 +70,7 @@ describe('Perfil del Cliente', () => {
         cy.contains('Perfil').click();
 
         cy.contains('Productos').click();
-        cy.url().should('include', '/profile/myProducts');
+        cy.url().should('include', '/profile');
 
         cy.contains('Valoraciones').click();
         cy.url().should('include', '/profile/myReviews');
@@ -86,7 +86,7 @@ describe('Perfil del Cliente', () => {
 
         cy.contains('Juan Pérez', { timeout: 10000 }).should('be.visible').click();
 
-        cy.visit('/profile/myProducts');
+        cy.visit('/profile');
         cy.get('#productos ul li').should('exist');
     });
 
