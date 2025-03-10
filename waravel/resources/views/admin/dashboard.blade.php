@@ -149,11 +149,18 @@
         </div>
 
         <div class="w-full md:w-1/2 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 h-[375px] overflow-y-auto">
-            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-200">
-                <i class="fas fa-money-bill text-[#BFF205]"></i> &nbsp;
-                Ultimas Ventas
+            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-200 flex items-center justify-between">
+                <span>
+                    <i class="fas fa-money-bill text-[#BFF205]"></i> &nbsp; Últimas Ventas
+                </span>
+                <form action="{{ route('admin.update.ventas') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="bg-gray-800 dark:bg-white text-white dark:text-black font-medium py-1 px-3 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+                        Actualizar Estados
+                    </button>
+                </form>
             </h5>
-            <ul class="space-y-3 overflow-y-auto pr-2" style="max-height: 290px;">
+            <ul class="space-y-3 overflow-y-auto pr-2 mt-3" style="max-height: 290px;">
                 @foreach ($latestSales as $sale)
                     <li class="p-3 rounded-lg flex justify-between items-center {{ $loop->iteration % 2 == 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gray-50 dark:bg-gray-800' }}">
                         <div>
@@ -238,5 +245,6 @@
                 }
             }
         });
+
     </script>
 @endsection

@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+
 
 class AdminController extends Controller
 {
@@ -319,5 +321,24 @@ class AdminController extends Controller
 
             return redirect()->route('admin.dashboard')->with('error', 'Administrador no encontrado.');
         }
+    }
+
+    public function updateStatusOfVentas()
+    {
+    Log::info('Iniciando actualiación masiva de ventas');
+
+        Venta::query()->update([
+            'estado' => DB::raw("
+            CASE
+                WHEN estado = 'Pendiente' THEN 'Procesando'
+                WHEN estado = 'Procesando' THEN 'Enviado'
+                WHEN estado = 'Enviado' THEN 'Entregado'
+                ELSE estado
+            END
+            "),
+        ]);
+
+        Log::info('Finalizando actualización masiva de ventas');
+        return redirect()->back()->with('success', 'Los estados de las ventas se han actualizado correctamente.');
     }
 }

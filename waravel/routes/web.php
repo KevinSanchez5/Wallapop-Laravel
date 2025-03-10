@@ -79,6 +79,8 @@ Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
     Route::get('/admin/backups', [BackupController::class, 'getAllBackups'])->name('admin.backups.list');
     Route::post('/admin/backup/restore/{filename}', [BackupController::class, 'restoreBackup'])->name('admin.backup.restore');
+    Route::post('/admin/updateVentas', [AdminController::class, 'updateStatusOfVentas'])->name('admin.update.ventas');
+
 });
 
 // Rutas públicas de productos y carrito
