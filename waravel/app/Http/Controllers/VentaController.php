@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailSenderPdf;
 use App\Models\Cliente;
 use App\Models\User;
 use App\Models\Producto;
@@ -12,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -395,7 +397,9 @@ class VentaController extends Controller
 
                 session()->forget(['carrito','venta','stripe_session_id']);
 
-                return redirect()->route('payment.success');
+                $this->enviarCorreoFactura($venta['guid']);
+
+                return redirect()->route('payment.success'); // Ruta donde el usuario ve el mensaje de éxito
 
             } else {
                 Log::warning("El pago no se completó correctamente. Estado: " . $paymentIntent->status);
@@ -588,10 +592,54 @@ class VentaController extends Controller
             Redis::set('venta_'. $guid, json_encode($data), 'EX',1800);
         }
 
-        $pdf = Pdf::loadView('pdf.venta', compact('venta'));
+        $pdf = Pdf::loadView('pdf.ventaNoEmail', compact('venta'));
 
-        return $pdf->stream('venta.pdf');
+        return $pdf->download('venta.pdf');
     }
 
+    public function enviarCorreoFactura($guid)
+    {
+        Log::info('Generando PDF de la venta');
+        $venta = Venta::where('guid', $guid)->first();
 
+        if (!$venta) {
+            return response()->json(['message' => 'Venta no encontrada'], 404);
+        }
+
+        $data = [
+            'id' => $venta->id,
+            'guid' => $venta->guid,
+            'estado' => $venta->estado,
+            'comprador' => $venta->comprador,
+            'lineaVentas' => $venta->lineaVentas,
+            'precioTotal' => $venta->precioTotal,
+            'created_at' => $venta->created_at->toDateTimeString(),
+            'updated_at' => $venta->updated_at->toDateTimeString(),
+        ];
+
+        $venta = (object) $data;
+        Log::info('Contenido de la variable $venta:', (array) $venta);
+
+        // Generar el PDF
+        $pdf = Pdf::loadView('pdf.venta', compact('venta'));
+
+        $compradorEmail = Cliente::getUserEmailByClientGuid($venta->comprador->guid);
+        Log::info('Email del comprador:', ['email' => $compradorEmail]);
+
+        try {
+            Mail::to($compradorEmail)->send(EmailSenderPdf::createWithPdf($venta, $pdf));
+            Log::info('Correo de factura enviado', ['email' => $compradorEmail]);
+        } catch (\Exception $e) {
+            Log::error('Error al enviar el correo de factura', [
+                'email' => $compradorEmail,
+                'exception' => $e->getMessage()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 503);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo enviado correctamente',
+        ], 200);
+    }
 }
