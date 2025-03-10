@@ -280,7 +280,6 @@ class ProductoControllerView extends Controller
             'imagen5' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        // Actualizar los campos del producto
         $producto->update([
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
@@ -290,8 +289,7 @@ class ProductoControllerView extends Controller
             'categoria' => $request->categoria,
         ]);
 
-        // Manejar las imágenes nuevas
-        $imagenes = $producto->imagenes;  // Mantener las imágenes existentes
+        $imagenes = $producto->imagenes ?: [];
 
         for ($i = 1; $i <= 5; $i++) {
             if ($request->hasFile("imagen$i")) {
@@ -302,17 +300,15 @@ class ProductoControllerView extends Controller
                     return response()->json(['error' => "Error procesando imagen$i"], 400);
                 }
 
-                // Obtener la ruta de la imagen y agregarla a las imágenes existentes
                 $imagenUrl = $this->addListingPhoto($imagenRequest, $producto->id);
-                $imagenes[] = $imagenUrl;  // Añadir la nueva imagen al array de imágenes
+
+                $imagenes[$i - 1] = $imagenUrl;
             }
         }
 
-        // Actualizar las imágenes en el producto
         $producto->imagenes = $imagenes;
         $producto->save();
 
-        // Actualizar el cache del producto
         Cache::put("producto_{$producto->guid}", $producto, now()->addMinutes(60));
 
         Log::info('Producto actualizado correctamente', ['producto' => $producto]);
