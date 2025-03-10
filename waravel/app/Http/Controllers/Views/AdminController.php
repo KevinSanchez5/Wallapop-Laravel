@@ -225,6 +225,32 @@ class AdminController extends Controller
         return view('admin.products', compact('productos'));
     }
 
+    public function listSells()
+    {
+        Log::info("Obteniendo todos las Ventas");
+
+        $query = Venta::query();
+
+        // Filtro de búsqueda
+        if (request()->has('search') && request('search') !== '') {
+            $search = request('search');
+
+            $query->where(function ($query) {
+                $query->whereRaw("LOWER(guid) LIKE ?")
+                    ->orWhereRaw("LOWER(estado) LIKE ?")
+                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.guid')) LIKE ?")
+                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.nombre')) LIKE ?")
+                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.apellido')) LIKE ?")
+                    ->orWhereRaw("LOWER(JSON_EXTRACT(comprador, '$.id')) LIKE ?");
+            });
+        }
+        $ventas = $query->orderBy('updated_at', 'desc')->paginate(10);
+
+        Log::info("Redireccionando a la lista de ventas");
+
+        return view('admin.sells', compact('ventas'));
+    }
+
     /**
      * Crea un nuevo administrador si no hay más de 10 administradores.
      *
