@@ -131,21 +131,4 @@ class Cliente extends Model
         return json_decode($value);
     }
 
-    public static function getUserEmailByClientGuid($clientGuid)
-    {
-        $cliente = self::where('guid', $clientGuid)->first();
-
-        if (!$cliente) {
-            return null;
-        }
-
-        $user = $cliente->usuario;
-
-        if (!$user) {
-            return null;
-        }
-
-        return $user->email;
-    }
-
 }
