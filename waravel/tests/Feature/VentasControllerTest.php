@@ -852,7 +852,9 @@ class VentasControllerTest extends TestCase
 
     public function testUpdateVentaEstado()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role' => 'admin'
+        ]);
         $this->actingAs($user);
 
         $venta = Venta::factory()->create(['estado' => 'Pendiente']);
