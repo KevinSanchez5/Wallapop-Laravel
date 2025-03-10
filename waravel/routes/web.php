@@ -61,6 +61,7 @@ Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::get('/admin/clients', [AdminController::class, 'listClients'])->name('admin.clients');
     Route::get('/admin/products', [AdminController::class, 'listProducts'])->name('admin.products');
     Route::get('/admin/reviews', [AdminController::class, 'listReviews'])->name('admin.reviews');
+    Route::get('/admin/sells', [AdminController::class, 'listSells'])->name('admin.sells');
     Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
 
     // Gestión de eliminaciones y baneos
@@ -68,12 +69,15 @@ Route::middleware(['auth', AdminRoleAuth::class])->group(function () {
     Route::delete('/admin/client/delete/{guid}', [AdminController::class, 'deleteClient'])->name('admin.delete.client');
     Route::delete('/admin/reviews/delete/{guid}', [AdminController::class, 'deleteReview'])->name('admin.delete.review');
     Route::patch('/admin/product/ban/{guid}', [AdminController::class, 'banProduct'])->name('admin.ban.product');
+    Route::delete('/admin/ventas/delete/{guid}', [VentaController::class, 'deleteVentaAdmin'])->name('admin.delete.venta');
 
     // Gestión de backups
     Route::get('/admin/backup', [AdminController::class, 'backupDatabase'])->name('admin.backup');
     Route::get('/admin/backups', [BackupController::class, 'getAllBackups'])->name('admin.backups.list');
     Route::post('/admin/backup/restore/{filename}', [BackupController::class, 'restoreBackup'])->name('admin.backup.restore');
     Route::post('/admin/updateVentas', [AdminController::class, 'updateStatusOfVentas'])->name('admin.update.ventas');
+    Route::put('/admin/ventas/{guid}/estado', [VentaController::class, 'updateVentaEstado'])->name('admin.updateVentaEstado');
+
 
 });
 
