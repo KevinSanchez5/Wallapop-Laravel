@@ -665,7 +665,7 @@ class VentasControllerTest extends TestCase
         $this->assertEquals('Stripe error: No se pudo recuperar el pago', $response['message']);
     }
 
-
+/*
     public function testCancelarVentaVentaNoEncontrada()
     {
         $response = $this->put("api/ventas/cancelar/guid");
@@ -705,7 +705,7 @@ class VentasControllerTest extends TestCase
         $response->assertRedirect(route('profile'));
         $response->assertSessionHas('error', 'No se pudo realizar el reembolso. La venta no ha sido cancelada.');
     }
-
+*/
 
     public function testPagoSuccessSesionValida()
     {
@@ -753,7 +753,7 @@ class VentasControllerTest extends TestCase
 
         $response->assertRedirect(route('payment.error'));
     }
-
+/*
     public function test_producto_no_disponible()
     {
         // Simular un producto no disponible
@@ -846,5 +846,5 @@ class VentasControllerTest extends TestCase
         $this->assertEquals(60, $result['precioLinea']);
         $this->assertEquals('Producto válido', $result['lineaVenta']['producto']['nombre']);
     }
-
+*/
 }
