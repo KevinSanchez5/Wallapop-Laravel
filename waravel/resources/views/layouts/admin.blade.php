@@ -59,7 +59,7 @@
             <a href="{{ route('admin.reviews') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-star"></i> &nbsp;Ver Valoraciones
             </a>
-            <a href="" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
+            <a href="{{ route('admin.sells') }}" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
                 <i class="fas fa-shopping-cart"></i> &nbsp; Gestionar Ventas
             </a>
             <a href="#" id="openModal" class="block py-2 px-4 rounded-lg hover:bg-black hover:text-white">
