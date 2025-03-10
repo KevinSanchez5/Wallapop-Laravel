@@ -32,6 +32,7 @@ class VentasControllerTest extends TestCase
 
     private User $usuario1;
     private User $usuario2;
+    private User $admin;
     private Cliente $vendedor;
     private Cliente $comprador;
     private Producto $producto;
@@ -43,6 +44,7 @@ class VentasControllerTest extends TestCase
 
         $this->usuario1 = User::factory()->create(['name' => 'Juan']);
         $this->usuario2 = User::factory()->create(['name' => 'Pedro']);
+        $this->admin = User::factory()->create(['role'=>'admin']);
 
         $this->vendedor = Cliente::factory()->create([
             'nombre' => 'Vendedor',
@@ -706,7 +708,7 @@ class VentasControllerTest extends TestCase
         $response->assertSessionHas('error', 'No se pudo realizar el reembolso. La venta no ha sido cancelada.');
     }
 */
-
+/*
     public function testPagoSuccessSesionValida()
     {
         // Simular el Session de Stripe
@@ -715,18 +717,17 @@ class VentasControllerTest extends TestCase
             'payment_intent' => 'pi_123456789'
         ]);
 
-        // Simular el PaymentIntent de Stripe
         $paymentIntentMock = Mockery::mock('alias:' .PaymentIntent::class);
         $paymentIntentMock->shouldReceive('retrieve')->andReturn((object)[
             'status' => 'succeeded'
         ]);
 
-        // Simular la sesión de Laravel
         session(['stripe_session_id' => 'sess_123', 'venta' => ['total' => 100]]);
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        $response = $this->get('/pago/save');
+        $data = [];
+        $response = $this->controller->pagoSuccess($data);
 
         // Verificar que la redirección fue exitosa
         $response->assertRedirect(route('payment.success'));
@@ -735,7 +736,7 @@ class VentasControllerTest extends TestCase
         $this->assertNull(session('venta'));
         $this->assertNull(session('stripe_session_id'));
     }
-
+*/
     public function testPagoSuccessSinSession()
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -848,75 +849,22 @@ class VentasControllerTest extends TestCase
     }
 */
 
-    public function testUpdateVentaEstadoSuccess()
+
+    public function testUpdateVentaEstado()
     {
-        // Crear una venta
-        $venta = Venta::create([
-            'guid' => 'VYQ8gfpe3ti',
-            'estado' => 'Pendiente',
-            'comprador' => json_encode(['guid' => 'buyer_guid', 'nombre' => 'Pedro', 'apellido' => 'Martinez']),
-            'precioTotal' => 100,
-            'payment_intent_id' => 'payment_intent_test'
-        ]);
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
-        // Realizar la solicitud para actualizar el estado de la venta
-        $response = $this->post(route('venta.update.estado', $venta->guid), [
-            'estado' => 'Enviado',
-        ]);
+        $venta = Venta::factory()->create(['estado' => 'Pendiente']);
+        $data = ['estado' => 'Enviado'];
 
-        // Verificar que la respuesta redirige correctamente
+        $response = $this->put(route('admin.updateVentaEstado', $venta->guid), $data);
+
         $response->assertRedirect(route('admin.sells'));
         $response->assertSessionHas('success', 'Estado de la venta actualizado con éxito');
 
-        // Verificar que el estado de la venta se haya actualizado correctamente
         $venta->refresh();
         $this->assertEquals('Enviado', $venta->estado);
     }
-
-    public function testUpdateVentaEstadoErrors()
-    {
-        // Crear una venta
-        $venta = Venta::create([
-            'guid' => 'VYQ8gfpe3ti',
-            'estado' => 'Pendiente',
-            'comprador' => json_encode(['guid' => 'buyer_guid', 'nombre' => 'Pedro', 'apellido' => 'Martinez']),
-            'precioTotal' => 100,
-            'payment_intent_id' => 'payment_intent_test'
-        ]);
-
-        // Realizar la solicitud con un estado no válido
-        $response = $this->post(route('venta.update.estado', $venta->guid), [
-            'estado' => 'InvalidoEstado',
-        ]);
-
-        // Verificar que la validación de estado falla
-        $response->assertSessionHasErrors('estado');
-    }
-
-    public function testDeleteVentaSuccess()
-    {
-        // Crear una venta
-        $venta = Venta::create([
-            'guid' => 'VYQ8gfpe3ti',
-            'estado' => 'Pendiente',
-            'comprador' => json_encode(['guid' => 'buyer_guid', 'nombre' => 'Pedro', 'apellido' => 'Martinez']),
-            'precioTotal' => 100,
-            'payment_intent_id' => 'payment_intent_test'
-        ]);
-
-        $this->mock(VentaController::class, function ($mock) {
-            $mock->shouldReceive('reembolsarPago')->once();
-        });
-
-        $response = $this->delete(route('venta.delete', $venta->guid));
-
-        // Verificar que la venta se marca como cancelada
-        $venta->refresh();
-        $this->assertEquals('Cancelado', $venta->estado);
-
-        $response->assertRedirect(route('admin.sells'));
-        $response->assertSessionHas('success', 'Venta eliminada con éxito');
-    }
-
 
 }

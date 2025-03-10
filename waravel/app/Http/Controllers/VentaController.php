@@ -595,7 +595,6 @@ class VentaController extends Controller
 
     public function updateVentaEstado(Request $request, $guid)
     {
-        // Validar que el estado es uno de los válidos
         $request->validate([
             'estado' => 'required|in:Pendiente,Procesando,Enviado,Entregado,Cancelado'
         ]);
