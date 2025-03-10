@@ -16,6 +16,10 @@
         <include>
             <directory>app</directory>
         </include>
+        <exclude>
+            <directory>./app/Http/Controllers/Auth</directory>
+            <directory>./app/Http/Requests</directory>
+        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
@@ -35,7 +39,9 @@
             <html outputDirectory="build/coverage"/>
             <text outputFile="build/coverage.txt"/>
             <clover outputFile="build/logs/clover.xml"/>
+
         </report>
+
     </coverage>
 
 </phpunit>
