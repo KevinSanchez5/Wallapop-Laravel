@@ -603,14 +603,6 @@ class VentaController extends Controller
         $request->validate([
             'estado' => 'required|in:Pendiente,Procesando,Enviado,Entregado,Cancelado'
         ]);
-    /**
-     * Envía un correo electrónico con la factura de una venta.
-     *
-     * Este método genera un archivo PDF con los detalles de la venta y lo envía al correo electrónico del comprador.
-     *
-     * @param string $guid El GUID de la venta.
-     * @return \Illuminate\Http\JsonResponse Respuesta JSON indicando el éxito o fallo del envío del correo.
-     */
 
         $venta = Venta::where('guid', $guid)->firstOrFail();
 
@@ -633,6 +625,15 @@ class VentaController extends Controller
         // Redirigir con un mensaje de éxito
         return redirect()->route('admin.sells')->with('success', 'Venta eliminada con éxito');
     }
+
+    /**
+     * Envía un correo electrónico con la factura de una venta.
+     *
+     * Este método genera un archivo PDF con los detalles de la venta y lo envía al correo electrónico del comprador.
+     *
+     * @param string $guid El GUID de la venta.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON indicando el éxito o fallo del envío del correo.
+     */
 
     public function enviarCorreoFactura($guid)
     {
