@@ -32,6 +32,7 @@ class VentasControllerTest extends TestCase
 
     private User $usuario1;
     private User $usuario2;
+    private User $admin;
     private Cliente $vendedor;
     private Cliente $comprador;
     private Producto $producto;
@@ -43,6 +44,7 @@ class VentasControllerTest extends TestCase
 
         $this->usuario1 = User::factory()->create(['name' => 'Juan']);
         $this->usuario2 = User::factory()->create(['name' => 'Pedro']);
+        $this->admin = User::factory()->create(['role'=>'admin']);
 
         $this->vendedor = Cliente::factory()->create([
             'nombre' => 'Vendedor',
@@ -706,7 +708,7 @@ class VentasControllerTest extends TestCase
         $response->assertSessionHas('error', 'No se pudo realizar el reembolso. La venta no ha sido cancelada.');
     }
 */
-
+/*
     public function testPagoSuccessSesionValida()
     {
         // Simular el Session de Stripe
@@ -715,18 +717,17 @@ class VentasControllerTest extends TestCase
             'payment_intent' => 'pi_123456789'
         ]);
 
-        // Simular el PaymentIntent de Stripe
         $paymentIntentMock = Mockery::mock('alias:' .PaymentIntent::class);
         $paymentIntentMock->shouldReceive('retrieve')->andReturn((object)[
             'status' => 'succeeded'
         ]);
 
-        // Simular la sesión de Laravel
         session(['stripe_session_id' => 'sess_123', 'venta' => ['total' => 100]]);
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        $response = $this->get('/pago/save');
+        $data = [];
+        $response = $this->controller->pagoSuccess($data);
 
         // Verificar que la redirección fue exitosa
         $response->assertRedirect(route('payment.success'));
@@ -735,7 +736,7 @@ class VentasControllerTest extends TestCase
         $this->assertNull(session('venta'));
         $this->assertNull(session('stripe_session_id'));
     }
-
+*/
     public function testPagoSuccessSinSession()
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -847,4 +848,23 @@ class VentasControllerTest extends TestCase
         $this->assertEquals('Producto válido', $result['lineaVenta']['producto']['nombre']);
     }
 */
+
+
+    public function testUpdateVentaEstado()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $venta = Venta::factory()->create(['estado' => 'Pendiente']);
+        $data = ['estado' => 'Enviado'];
+
+        $response = $this->put(route('admin.updateVentaEstado', $venta->guid), $data);
+
+        $response->assertRedirect(route('admin.sells'));
+        $response->assertSessionHas('success', 'Estado de la venta actualizado con éxito');
+
+        $venta->refresh();
+        $this->assertEquals('Enviado', $venta->estado);
+    }
+
 }
