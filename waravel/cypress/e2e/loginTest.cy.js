@@ -26,7 +26,7 @@ describe('Iniciar Sesión', () => {
         cy.get("input[name='password']").type("incorrecto");
         cy.get("button[type='submit']").click();
 
-        cy.contains("These credentials do not match our records.").should("be.visible");
+        cy.contains("auth.failed").should("be.visible");
     });
 
 
