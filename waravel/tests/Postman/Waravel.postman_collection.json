@@ -1,0 +1,759 @@
+{
+	"info": {
+		"_postman_id": "a0e92ccc-1c6e-4b06-8139-57078c8895da",
+		"name": "Waravel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38648794"
+	},
+	"item": [
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Get All Clientes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/clientes",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetClienteByGuid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/clientes/2G6HueqixE5",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"2G6HueqixE5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cliente",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \r\n    \"nombre\": \"Pepe\",\r\n    \"apellido\": \"Sanchez\",\r\n    \"avatar\": \"\",\r\n    \"telefono\": \"653456789\",\r\n    \"direccion\": {\r\n        \"calle\": \"Calle Falsa\",\r\n        \"numero\": 123,\r\n        \"ciudad\": \"Madrid\"\r\n    },\r\n    \"activo\": true,\r\n    \"usuario_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/clientes",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cliente",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Lola\",\r\n    \"apellido\": \"Garcia\",\r\n    \"activo\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/clientes/ySNCEKxmWyv",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"ySNCEKxmWyv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cliente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/clientes/ySNCEKxmWyv",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"ySNCEKxmWyv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarFavoritos",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/clientes/2G6HueqixE5",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"2G6HueqixE5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/users",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by GUID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/users/P4K7VQ9XTYL",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"users",
+								"P4K7VQ9XTYL"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"María López\",\r\n    \"email\": \"maria.lopez@example.com\",\r\n    \"password\": \"Secure@123\",\r\n    \"role\": \"cliente\",\r\n    \"telefono\": \"612345678\",\r\n    \"direccion\": {\r\n        \"calle\": \"Av. Siempre Viva\",\r\n        \"numero\": \"742\",\r\n        \"ciudad\": \"Springfield\",\r\n        \"codigo_postal\": \"12345\",\r\n        \"pais\": \"USA\"\r\n    },\r\n    \"activo\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/users",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Pedro Martínez\",\r\n    \"password\": \"Password123?\",\r\n    \"role\": \"user\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/users/b3ywnJ1xw9u",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"users",
+								"b3ywnJ1xw9u"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/users/b3ywnJ1xw9u",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"users",
+								"b3ywnJ1xw9u"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Productos",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/productos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product byGuid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/productos/G4YXT9K5QLV",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"productos",
+								"G4YXT9K5QLV"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Producto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vendedor_id\": \"2\",\r\n    \"nombre\": \"Producto Ejemplo\",\r\n    \"descripcion\": \"Descripción detallada del producto.\",\r\n    \"estadoFisico\": \"Nuevo\",\r\n    \"precio\": 199.99,\r\n    \"stock\": 50,\r\n    \"categoria\": \"Cocina\",\r\n    \"estado\": \"Disponible\",\r\n    \"imagenes\": [\r\n        \"http://miapi.com/imagenes/producto1.jpg\",\r\n        \"http://miapi.com/imagenes/producto2.jpg\"\r\n    ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/productos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Producto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Espejito\",\r\n    \"descripcion\": \"Descripción actualizada del producto\",\r\n    \"estadoFisico\": \"Nuevo\",\r\n    \"precio\": 150.50,\r\n    \"stock\": 30,\r\n    \"categoria\": \"Cocina\",\r\n    \"estado\": \"Disponible\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/productos/dj7QriwvbJh",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"productos",
+								"dj7QriwvbJh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Producto",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/productos/dj7QriwvbJh",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"productos",
+								"dj7QriwvbJh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Valoraciones",
+			"item": [
+				{
+					"name": "Get All Valoraciones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/valoraciones",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"valoraciones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Valoracion byGuid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/valoraciones/G7pXkT3L9qY",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"valoraciones",
+								"G7pXkT3L9qY"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Valoracion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n  \"comentario\": \"Este es un comentario de prueba sobre el producto.\",\r\n  \"puntuacion\": 4,\r\n  \"clienteValorado_id\": 3,\r\n  \"autor_id\": 2\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/valoraciones",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"valoraciones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Valoracion",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/valoraciones/uz76kSMuE6a",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"valoraciones",
+								"uz76kSMuE6a"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ventas",
+			"item": [
+				{
+					"name": "Get All Ventas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/ventas",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"ventas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Venta by guid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/ventas/kY8XqT5L9v3",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"ventas",
+								"kY8XqT5L9v3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Venta",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"comprador\": {\r\n    \"id\": 1,\r\n    \"nombre\": \"Juan Pérez\",\r\n    \"email\": \"juan@example.com\"\r\n  },\r\n  \"estado\": \"proce\",\r\n  \"lineaVentas\": [\r\n    {\r\n      \"producto_id\": 1,\r\n      \"cantidad\": 2,\r\n      \"precio\": 100\r\n    },\r\n    {\r\n      \"producto_id\": 2,\r\n      \"cantidad\": 1,\r\n      \"precio\": 150\r\n    }\r\n  ],\r\n  \"precioTotal\": 350\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1/api/ventas",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"ventas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Venta",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1/api/ventas/TfVlrgiUnfz",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"path": [
+								"api",
+								"ventas",
+								"TfVlrgiUnfz"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Backup",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/backups/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"backups",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/backups/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"backups",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/backups/delete/backup_2025-02-27_15-18-03.sql",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"backups",
+								"delete",
+								"backup_2025-02-27_15-18-03.sql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete All",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/backups/delete-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"backups",
+								"delete-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/backups/restore/backup_2025-02-27_15-23-08.sql",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"backups",
+								"restore",
+								"backup_2025-02-27_15-23-08.sql"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
